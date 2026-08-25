@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leadų sąrašas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar a { color: white; text-decoration: none; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .container { padding: 2rem; }
+        .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .controls input, .controls select, .controls button { padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .controls button { background: #2563eb; color: white; border: 0; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
+        .new { background: #dbeafe; color: #1d4ed8; }
+        .contacted { background: #fef3c7; color: #b45309; }
+        .proposal { background: #dcfce7; color: #166534; }
+        .won { background: #dcfce7; color: #166534; }
+        .lost { background: #fee2e2; color: #b91c1c; }
+        .late { color: #dc2626; font-weight: bold; }
+        .overdue-row { background: #fef2f2; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <h2>Leadų sąrašas</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="toolbar">
+            <div>
+                <a href="/leads/new/" style="text-decoration:none;"><button type="button">Pridėti leadą</button></a>
+                <span style="margin-left: 1rem; color: #64748b;">Viso leadų: {{ total_leads }}</span>
+            </div>
+            <form class="controls" method="get">
+                <input type="search" name="q" value="{{ query }}" placeholder="Paieška pagal vardą, įmonę, el. paštą" />
+                <select name="status">
+                    <option value="">Visi statusai</option>
+                    <option value="new" {% if status == 'new' %}selected{% endif %}>Naujas</option>
+                    <option value="contacted" {% if status == 'contacted' %}selected{% endif %}>Susisiekta</option>
+                    <option value="proposal" {% if status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
+                    <option value="won" {% if status == 'won' %}selected{% endif %}>Laimėtas</option>
+                    <option value="lost" {% if status == 'lost' %}selected{% endif %}>Prarastas</option>
+                </select>
+                <select name="followup">
+                    <option value="">Visi follow-up'ai</option>
+                    <option value="today" {% if followup_filter == 'today' %}selected{% endif %}>Šiandien</option>
+                    <option value="overdue" {% if followup_filter == 'overdue' %}selected{% endif %}>Vėluojantys</option>
+                    <option value="upcoming" {% if followup_filter == 'upcoming' %}selected{% endif %}>Būsimi</option>
+                </select>
+                <select name="sort">
+                    <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Paskutiniai atnaujinti</option>
+                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Pagal vardą A-Z</option>
+                    <option value="-name" {% if sort_by == '-name' %}selected{% endif %}>Pagal vardą Z-A</option>
+                    <option value="next_follow_up" {% if sort_by == 'next_follow_up' %}selected{% endif %}>Artimiausi follow-up'ai</option>
+                    <option value="-budget" {% if sort_by == '-budget' %}selected{% endif %}>Didžiausias biudžetas</option>
+                </select>
+                <button type="submit">Filtruoti</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Vardas / Įmonė</th>
+                    <th>Kontaktas</th>
+                    <th>Statusas</th>
+                    <th>Paskutinis kontaktas</th>
+                    <th>Kitas follow-up</th>
+                    <th>Biudžetas</th>
+                    <th>Veiksmai</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in leads %}
+                    <tr class="{% if lead.next_follow_up and lead.next_follow_up < today %}overdue-row{% endif %}">
+                        <td>
+                            <strong>{{ lead.name }}</strong><br>
+                            <small>{{ lead.company }}</small>
+                        </td>
+                        <td>
+                            {{ lead.email }}<br>
+                            <small>{{ lead.phone }}</small>
+                        </td>
+                        <td>
+                            <form method="post" action="/leads/{{ lead.pk }}/status/" style="display:inline;">
+                                {% csrf_token %}
+                                <select name="status" onchange="this.form.submit()">
+                                    <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
+                                    <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
+                                    <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
+                                    <option value="won" {% if lead.status == 'won' %}selected{% endif %}>Laimėtas</option>
+                                    <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Prarastas</option>
+                                </select>
+                            </form>
+                        </td>
+                        <td>{{ lead.last_contacted|default:"-" }}</td>
+                        <td>
+                            {% if lead.next_follow_up %}
+                                <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td>{{ lead.budget }} €</td>
+                        <td>
+                            <a href="/leads/{{ lead.pk }}/">Peržiūrėti</a><br>
+                            <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="margin-top:0.35rem;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reminder" />
+                                <button type="submit" style="padding:0.3rem 0.5rem; border:0; border-radius:6px; background:#2563eb; color:white; cursor:pointer;">Priminti</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="7">Nėra leadų</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

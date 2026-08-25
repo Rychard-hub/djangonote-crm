@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Follow-up Reminder - {{ lead.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #3b82f6; color: white; padding: 20px; text-align: center; }
+        .content { background: #f9fafb; padding: 20px; border-radius: 5px; }
+        .lead-details { background: white; padding: 15px; border-radius: 5px; margin: 15px 0; }
+        .urgent { background: #fee2e2; color: #991b1b; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .normal { background: #dbeafe; color: #1e40af; padding: 10px; border-radius: 5px; margin: 10px 0; }
+        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 Follow-up Reminder</h1>
+        </div>
+        
+        <div class="content">
+            <h2>Hello {{ user.get_full_name|default:user.username }},</h2>
+            
+            <p>This is a reminder that you have a follow-up scheduled for <strong>{{ lead.name }}</strong>{% if lead.company %} from {{ lead.company }}{% endif %}.</p>
+            
+            <div class="lead-details">
+                <h3>Lead Details:</h3>
+                <ul>
+                    <li><strong>Name:</strong> {{ lead.name }}</li>
+                    {% if lead.company %}<li><strong>Company:</strong> {{ lead.company }}</li>{% endif %}
+                    {% if lead.email %}<li><strong>Email:</strong> {{ lead.email }}</li>{% endif %}
+                    {% if lead.phone %}<li><strong>Phone:</strong> {{ lead.phone }}</li>{% endif %}
+                    <li><strong>Status:</strong> {{ lead.status_display }}</li>
+                    <li><strong>Follow-up Date:</strong> {{ lead.next_follow_up|date:"Y-m-d H:i" }}</li>
+                    {% if lead.budget %}<li><strong>Budget:</strong> €{{ lead.budget }}</li>{% endif %}
+                    {% if lead.notes %}<li><strong>Notes:</strong> {{ lead.notes }}</li>{% endif %}
+                </ul>
+            </div>
+            
+            {% if days_until == 0 %}
+                <div class="urgent">
+                    <strong>⚠️ URGENT:</strong> This follow-up is scheduled for TODAY!
+                </div>
+            {% elif days_until == 1 %}
+                <div class="normal">
+                    <strong>📅 Tomorrow:</strong> This follow-up is scheduled for TOMORROW!
+                </div>
+            {% else %}
+                <div class="normal">
+                    <strong>📅 Upcoming:</strong> This follow-up is scheduled in {{ days_until }} days.
+                </div>
+            {% endif %}
+            
+            <p>Please make sure to contact the lead and update their status in the CRM system.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Best regards,<br>CRM System</p>
+        </div>
+    </div>
+</body>
+</html>

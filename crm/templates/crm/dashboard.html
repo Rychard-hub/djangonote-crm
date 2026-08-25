@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRM Dashboard</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .nav a { color: white; text-decoration: none; }
+        .container { padding: 2rem; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+        .card { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .metric { font-size: 1.8rem; font-weight: bold; margin-top: 0.4rem; }
+        .sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        ul { padding-left: 1rem; }
+        li { margin-bottom: 0.5rem; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div>
+            <h2>Freelancer CRM</h2>
+        </div>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <section class="grid">
+            <div class="card">
+                <div>Šiandienos follow-up</div>
+                <div class="metric">{{ today_followups }}</div>
+            </div>
+            <div class="card">
+                <div>Nauji leadai</div>
+                <div class="metric">{{ new_leads }}</div>
+            </div>
+            <div class="card">
+                <div>Laukiantys atsakymo lead'ai</div>
+                <div class="metric">{{ waiting_leads }}</div>
+            </div>
+            <div class="card">
+                <div>Laimėti projektai</div>
+                <div class="metric">{{ won_projects }}</div>
+            </div>
+            <div class="card">
+                <div>Prarasti projektai</div>
+                <div class="metric">{{ lost_projects }}</div>
+            </div>
+        </section>
+
+        <section class="sections">
+            <div class="card">
+                <h3>Artimiausi follow-up'ai</h3>
+                <ul>
+                    {% for lead in upcoming_followups %}
+                        <li>
+                            <strong>{{ lead.name }}</strong> — 
+                            {% if lead.next_follow_up == today %}
+                                Šiandien
+                            {% else %}
+                                {{ lead.next_follow_up }}
+                            {% endif %}
+                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
+                        </li>
+                    {% empty %}
+                        <li>Nėra artimų follow-up'ų</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Vėluojantys kontaktai</h3>
+                <ul>
+                    {% for lead in overdue_contacts %}
+                        <li>
+                            <strong style="color: #dc2626;">{{ lead.name }}</strong> — 
+                            <span style="color: #dc2626;">{{ today|timesince:lead.next_follow_up }} vėluoja</span>
+                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
+                        </li>
+                    {% empty %}
+                        <li>Visi kontaktai tvarkingi</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+
+        <section class="sections">
+            <div class="card">
+                <h3>Paskutiniai atnaujinti lead'ai</h3>
+                <ul>
+                    {% for lead in recent_leads %}
+                        <li>
+                            <a href="/leads/{{ lead.pk }}/">{{ lead.name }}</a> — 
+                            <span class="badge {{ lead.status }}">{{ lead.get_status_display }}</span>
+                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
+                        </li>
+                    {% empty %}
+                        <li>Kol kas nėra leadų</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Šiandienos užduotys</h3>
+                <ul>
+                    {% for task in today_tasks %}
+                        <li>
+                            <input type="checkbox" {% if task.completed %}checked{% endif %} disabled>
+                            {{ task.title }}
+                            <br><small>Lead: <a href="/leads/{{ task.lead.pk }}/">{{ task.lead.name }}</a></small>
+                        </li>
+                    {% empty %}
+                        <li>Nėra šiandienos užduočių</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

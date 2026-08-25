@@ -1,0 +1,23 @@
+Kvietimas prisijungti prie Freelancer CRM
+
+Sveiki,
+
+Jūs buvote pakviesti prisijungti prie Freelancer CRM sistemos.
+
+Sukurkite savo paskyrą spusteldami žemiau esančią nuorodą:
+{{ invitation_link }}
+
+Kas yra Freelancer CRM?
+- Moderni klientų valdymo sistema
+- Lead'ų ir pardavimų pipeline valdymas
+- Automatiniai priminimai ir ataskaitos
+- PDF dokumentų generavimas
+- Mobiliai pritaikyta sąsaja
+
+Sukurkite paskyrą dabar ir pradėkite efektyviai valdyti savo klientus!
+
+Jei turite klausimų, susisiekite su mumis.
+
+Pagarbiai,
+{{ user.get_full_name|default:user.username }}
+Freelancer CRM komanda

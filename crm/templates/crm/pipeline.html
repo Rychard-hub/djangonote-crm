@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pipeline / Kanban</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar a { color: white; text-decoration: none; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .container { padding: 2rem; }
+        .kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: start; }
+        .column { background: white; border-radius: 12px; padding: 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .column h3 { margin-top: 0; font-size: 1rem; }
+        .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem; margin-bottom: 0.7rem; }
+        .card strong { display: block; margin-bottom: 0.2rem; }
+        .meta { font-size: 0.85rem; color: #475569; margin-top: 0.3rem; }
+        .empty { color: #64748b; font-size: 0.9rem; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <h2>Pipeline / Kanban</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="kanban">
+            {% for column in columns %}
+                <section class="column">
+                    <h3>{{ column.label }}</h3>
+                    {% for lead in column.leads %}
+                        <div class="card">
+                            <strong>{{ lead.name }}</strong>
+                            <div class="meta">Kitas follow-up: {{ lead.next_follow_up|default:"-" }}</div>
+                            <div class="meta">{{ lead.notes|default:"Nėra pastabos"|truncatechars:80 }}</div>
+                        </div>
+                    {% empty %}
+                        <div class="empty">Nėra leadų</div>
+                    {% endfor %}
+                </section>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

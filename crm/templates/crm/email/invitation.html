@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Kvietimas prisijungti prie Freelancer CRM</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #3b82f6; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9fafb; padding: 30px; border-radius: 0 0 10px 10px; }
+        .button { display: inline-block; background: #3b82f6; color: white; padding: 15px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .button:hover { background: #2563eb; }
+        .features { background: white; padding: 20px; border-radius: 5px; margin: 20px 0; }
+        .feature-item { padding: 10px 0; border-bottom: 1px solid #eee; }
+        .feature-item:last-child { border-bottom: none; }
+        .footer { text-align: center; color: #666; font-size: 12px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 Kvietimas į Freelancer CRM</h1>
+            <p>Moderni klientų valdymo sistema</p>
+        </div>
+        
+        <div class="content">
+            <h2>Sveiki,</h2>
+            
+            <p>{{ user.get_full_name|default:user.username }} pakvietė jus prisijungti prie Freelancer CRM sistemos.</p>
+            
+            <p>Sukurkite savo paskyrą ir pradėkite efektyviai valdyti savo klientus bei pardavimų procesą.</p>
+            
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ invitation_link }}" class="button">
+                    🚀 Sukurti paskyrą
+                </a>
+            </div>
+            
+            <div class="features">
+                <h3>Kas gausite su Freelancer CRM?</h3>
+                <div class="feature-item">
+                    <strong>👥 Klientų valdymas:</strong> Visi lead'ai vienoje vietoje
+                </div>
+                <div class="feature-item">
+                    <strong>🔄 Pipeline valdymas:</strong> Vizualus pardavimų procesas
+                </div>
+                <div class="feature-item">
+                    <strong>📅 Automatiniai priminimai:</strong> Niekada nepraleiskite svarbių susitikimų
+                </div>
+                <div class="feature-item">
+                    <strong>📊 Statistika ir ataskaitos:</strong> Realus laiko duomenų analizė
+                </div>
+                <div class="feature-item">
+                    <strong>📄 PDF generavimas:</strong> Profesionalūs dokumentai
+                </div>
+                <div class="feature-item">
+                    <strong>📱 Mobili versija:</strong> Dirbkite iš bet kur
+                </div>
+            </div>
+            
+            <p>Spustelėkite mygtuką aukščiau ir pradėkite naudoti modernią CRM sistemą jau šiandien!</p>
+            
+            <p>Jei turite klausimų, susisiekite su mumis arba su {{ user.get_full_name|default:user.username }}.</p>
+        </div>
+        
+        <div class="footer">
+            <p>Šis el. laiškas buvo išsiųstas iš Freelancer CRM sistemos</p>
+            <p>Pagarbiai,<br>{{ user.get_full_name|default:user.username }} ir Freelancer CRM komanda</p>
+        </div>
+    </div>
+</body>
+</html>

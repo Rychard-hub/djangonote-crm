@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ lead.name }} | Lead detalės</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .container { max-width: 960px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .header { display: flex; justify-content: space-between; gap: 1rem; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; }
+        .actions { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .actions a, .actions form button { padding: 0.6rem 0.9rem; border-radius: 8px; text-decoration: none; border: 0; cursor: pointer; }
+        .edit { background: #2563eb; color: white; }
+        .delete { background: #dc2626; color: white; }
+        .success { background: #16a34a; color: white; }
+        .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .card { background: #f8fafc; padding: 1rem; border-radius: 10px; margin-top: 1rem; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        ul { padding-left: 1rem; }
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
+        .new { background: #dbeafe; color: #1d4ed8; }
+        .contacted { background: #fef3c7; color: #b45309; }
+        .proposal { background: #dcfce7; color: #166534; }
+        .won { background: #dcfce7; color: #166534; }
+        .lost { background: #fee2e2; color: #b91c1c; }
+        .today { background: #fbbf24; color: #92400e; }
+        .overdue { background: #dc2626; color: white; }
+        .upcoming { background: #10b981; color: white; }
+        .quick-actions { background: #f0f9ff; padding: 1rem; border-radius: 10px; margin-top: 1rem; border: 2px solid #0ea5e9; }
+        .action-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .quick-btn { padding: 0.5rem 0.8rem; border: 0; border-radius: 8px; cursor: pointer; font-size: 0.9rem; }
+        .quick-btn.call { background: #3b82f6; color: white; }
+        .quick-btn.email { background: #10b981; color: white; }
+        .quick-btn.task { background: #f59e0b; color: white; }
+        .quick-btn.reminder { background: #8b5cf6; color: white; }
+        .status-actions { background: #fef3c7; padding: 1rem; border-radius: 10px; margin-top: 1rem; }
+        .status-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .status-btn { padding: 0.4rem 0.8rem; border: 0; border-radius: 6px; cursor: pointer; font-size: 0.85rem; }
+        .status-btn.new { background: #dbeafe; color: #1d4ed8; }
+        .status-btn.contacted { background: #fef3c7; color: #b45309; }
+        .status-btn.proposal { background: #dcfce7; color: #166534; }
+        .status-btn.won { background: #16a34a; color: white; }
+        .status-btn.lost { background: #dc2626; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h2>{{ lead.name }} / {{ lead.company|default:"-" }}</h2>
+                <div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
+                    <span class="badge {{ lead.status }}">{{ lead.get_status_display }}</span>
+                    {% if is_today %}
+                        <span class="badge today">Šiandien</span>
+                    {% elif is_overdue %}
+                        <span class="badge overdue">Vėluoja {{ days_until_followup }} d.</span>
+                    {% elif days_until_followup == 1 %}
+                        <span class="badge upcoming">Rytoj</span>
+                    {% elif days_until_followup and days_until_followup <= 7 %}
+                        <span class="badge upcoming">Po {{ days_until_followup }} d.</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="actions">
+                <a class="edit" href="/leads/{{ lead.pk }}/edit/">Redaguoti</a>
+                <a class="edit" href="/leads/">Grįžti į sąrašą</a>
+            </div>
+        </div>
+
+        <div class="quick-actions">
+            <h3>Greiti veiksmai</h3>
+            <div class="action-buttons">
+                <form method="post" action="/leads/{{ lead.pk }}/comments/" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="body" value="Telefoninis skambutis">
+                    <input type="hidden" name="kind" value="call">
+                    <input type="hidden" name="author" value="Sistema">
+                    <button type="submit" class="quick-btn call">📞 Skambutis</button>
+                </form>
+                <form method="post" action="/leads/{{ lead.pk }}/comments/" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="body" value="El. laiškas išsiųstas">
+                    <input type="hidden" name="kind" value="email">
+                    <input type="hidden" name="author" value="Sistema">
+                    <button type="submit" class="quick-btn email">✉️ Laiškas</button>
+                </form>
+                <form method="post" action="/leads/{{ lead.pk }}/tasks/" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="title" value="Susisiekti dėl pasiūlymo">
+                    <button type="submit" class="quick-btn task">📋 Užduotis</button>
+                </form>
+                {% if lead.email %}
+                <form method="post" action="/leads/{{ lead.pk }}/reminder/" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="quick-btn reminder">🔔 Priminimas</button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h3>📞 Kontaktinė informacija</h3>
+                <p><strong>El. paštas:</strong> {% if lead.email %}<a href="mailto:{{ lead.email }}">{{ lead.email }}</a>{% else %}-{% endif %}</p>
+                <p><strong>Telefonas:</strong> {% if lead.phone %}<a href="tel:{{ lead.phone }}">{{ lead.phone }}</a>{% else %}-{% endif %}</p>
+                <p><strong>Šaltinis:</strong> {{ lead.source|default:"-" }}</p>
+            </div>
+            <div class="card">
+                <h3>💰 Projektas</h3>
+                <p><strong>Biudžetas:</strong> {{ lead.budget }} €</p>
+                <p><strong>Paskutinis kontaktas:</strong> {{ lead.last_contacted|default:"-" }}</p>
+                <p><strong>Kitas follow-up:</strong> {{ lead.next_follow_up|default:"-" }}</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>📝 Poreikiai ir pastabos</h3>
+            <p>{{ lead.notes|default:"Nėra nurodytų poreikių." }}</p>
+        </div>
+
+        <div class="card">
+            <h3>💬 Komunikacijos istorija</h3>
+            <form method="post" action="/leads/{{ lead.pk }}/comments/" style="margin-bottom:0.8rem;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <select name="kind" style="padding:0.6rem;">
+                        <option value="note">📝 Pastaba</option>
+                        <option value="call">📞 Skambutis</option>
+                        <option value="email">✉️ Laiškas</option>
+                        <option value="message">💬 Žinutė</option>
+                    </select>
+                    <input type="text" name="author" placeholder="Autorius" value="Sistema" style="flex: 1; padding:0.6rem;" />
+                </div>
+                <textarea name="body" rows="2" placeholder="Įrašykite komentarą ar komunikacijos detalę..." style="width:100%; box-sizing:border-box; margin-bottom:0.5rem;"></textarea>
+                <button type="submit" class="edit">Pridėti įrašą</button>
+            </form>
+            <ul>
+                {% for comment in comments %}
+                    <li style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                            <strong>{{ comment.get_kind_display }} · {{ comment.author }}</strong>
+                            <small style="color: #6b7280;">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+                        </div>
+                        <div>{{ comment.body }}</div>
+                    </li>
+                {% empty %}
+                    <li>Kol kas istorijos įrašų nėra.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>📋 Užduotys ({{ completed_tasks }}/{{ total_tasks }} atliktos)</h3>
+            {% if pending_tasks > 0 %}
+            <p style="color: #f59e0b; margin-bottom: 1rem;">Laukia atlikimo: {{ pending_tasks }} užduotys</p>
+            {% endif %}
+            <form method="post" action="/leads/{{ lead.pk }}/tasks/" style="margin-bottom:0.8rem;">
+                {% csrf_token %}
+                <div style="display: flex; gap: 0.5rem;">
+                    <input type="text" name="title" placeholder="Nauja užduotis..." style="flex: 1; box-sizing:border-box; padding:0.6rem;" />
+                    <button type="submit" class="edit">Pridėti</button>
+                </div>
+            </form>
+            <ul>
+                {% for task in tasks %}
+                    <li style="margin-bottom: 0.5rem;">
+                        <form method="post" action="/tasks/{{ task.pk }}/toggle/" style="display:inline; margin-right: 0.5rem;">
+                            {% csrf_token %}
+                            <input type="checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
+                        </form>
+                        {% if task.completed %}<s style="color: #6b7280;">{{ task.title }}</s>{% else %}<strong>{{ task.title }}</strong>{% endif %}
+                        <small style="color: #6b7280;">({{ task.created_at|date:"m.d" }})</small>
+                    </li>
+                {% empty %}
+                    <li>Kol kas užduočių nėra.</li>
+                {% endfor %}
+            </ul>
+        </div>
+
+        <div class="card">
+            <h3>Lead’o istorijos žurnalas</h3>
+            <ul>
+                {% for activity in activities %}
+                    <li>{{ activity.created_at }} — {{ activity.action }}: {{ activity.details }}</li>
+                {% empty %}
+                    <li>Kol kas įrašų nėra.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

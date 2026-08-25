@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naujas leadas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .container { max-width: 680px; margin: 2rem auto; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        form { display: grid; gap: 0.9rem; }
+        label { font-weight: 600; font-size: 0.95rem; }
+        input, select, textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        button { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+        .hint { font-size: 0.85rem; color: #64748b; margin-top: 0.2rem; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>{% if mode == 'edit' %}Redaguoti leadą{% else %}Pridėti leadą{% endif %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="row">
+                <div>
+                    <label for="name">Vardas / įmonė</label>
+                    <input id="name" name="name" value="{{ lead.name|default:'' }}" required>
+                    <div class="hint">Pavyzdžiui: Mantas ar „Studio X“</div>
+                </div>
+                <div>
+                    <label for="company">Įmonė</label>
+                    <input id="company" name="company" value="{{ lead.company|default:'' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="email">El. paštas</label>
+                    <input id="email" name="email" type="email" value="{{ lead.email|default:'' }}">
+                </div>
+                <div>
+                    <label for="phone">Telefonas</label>
+                    <input id="phone" name="phone" value="{{ lead.phone|default:'' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="source">Šaltinis</label>
+                    <input id="source" name="source" value="{{ lead.source|default:'' }}" placeholder="LinkedIn, rekomendacija, svetainė">
+                </div>
+                <div>
+                    <label for="status">Statusas</label>
+                    <select id="status" name="status">
+                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
+                        <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
+                        <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
+                        <option value="won" {% if lead.status == 'won' %}selected{% endif %}>Laimėtas</option>
+                        <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Prarastas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="budget">Biudžetas</label>
+                    <input id="budget" name="budget" type="number" step="0.01" value="{{ lead.budget|default:'0' }}">
+                </div>
+                <div>
+                    <label for="next_follow_up">Kitas follow-up</label>
+                    <input id="next_follow_up" name="next_follow_up" type="date" value="{{ lead.next_follow_up|default:'' }}">
+                </div>
+            </div>
+            <div>
+                <label for="notes">Pastabos</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Trumpa pastaba apie poreikį ar susitarimą">{{ lead.notes|default:'' }}</textarea>
+            </div>
+            <button type="submit">Išsaugoti</button>
+        </form>
+    </div>
+</body>
+</html>

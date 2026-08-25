@@ -1,0 +1,38 @@
+Daily CRM Report - {{ report_date|date:"Y-m-d" }}
+
+Hello {{ user.get_full_name|default:user.username }},
+
+Here's your daily CRM activity report for {{ report_date|date:"Y-m-d" }}.
+
+📊 Summary Statistics:
+- Total Leads: {{ stats.total_leads }}
+- New Leads Today: {{ stats.new_leads }}
+- Contacted Today: {{ stats.contacted_leads }}
+- Proposals Sent: {{ stats.proposal_leads }}
+- Won Deals: {{ stats.won_leads }}
+- Lost Deals: {{ stats.lost_leads }}
+- Total Pipeline Value: €{{ stats.total_budget|default:"0" }}
+- Won Revenue: €{{ stats.won_budget|default:"0" }}
+
+{% if activities %}
+📋 Recent Activities:
+{% for activity in activities %}
+- {{ activity.created_at|date:"H:i" }}: {{ activity.action }} - {{ activity.details }}
+{% endfor %}
+{% else %}
+No activities recorded today.
+{% endif %}
+
+{% if followups %}
+📅 Upcoming Follow-ups:
+{% for followup in followups %}
+- {{ followup.name }}{% if followup.company %} ({{ followup.company }}){% endif %} - {{ followup.next_follow_up|date:"Y-m-d H:i" }}
+{% endfor %}
+{% else %}
+No upcoming follow-ups in the next 7 days.
+{% endif %}
+
+Keep up the great work! Your pipeline is looking good.
+
+Best regards,
+CRM System

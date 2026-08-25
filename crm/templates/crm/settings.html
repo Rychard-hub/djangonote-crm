@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nustatymai</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .nav a { color: white; text-decoration: none; }
+        .container { padding: 2rem; max-width: 760px; margin: 0 auto; }
+        .card { background: white; padding: 1rem 1.2rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); margin-bottom: 1rem; }
+        label { display: block; margin-top: 0.7rem; font-weight: 600; }
+        input, select { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem; }
+        button { margin-top: 0.9rem; padding: 0.7rem 1rem; border: 0; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <h2>Nustatymai</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="/settings/">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="card">
+            <h3>Profilis</h3>
+            <form method="post">
+                {% csrf_token %}
+                <label>Vardas / pavardė</label>
+                <input type="text" name="full_name" value="{{ full_name }}" placeholder="Tavo vardas" />
+
+                <label>El. paštas</label>
+                <input type="email" name="email" value="{{ email }}" placeholder="tavo@email.com" />
+
+                <label>Naujas slaptažodis</label>
+                <input type="password" name="password" placeholder="Palik tuščią, jei nekeičiamas" />
+
+                <label>Priminimų intervalas (dienos)</label>
+                <input type="number" name="reminder_days" min="1" value="{{ reminder_days }}" />
+
+                <label>Laiko zona</label>
+                <select name="timezone">
+                    <option value="Europe/Vilnius" {% if timezone == 'Europe/Vilnius' %}selected{% endif %}>Europe/Vilnius</option>
+                    <option value="UTC" {% if timezone == 'UTC' %}selected{% endif %}>UTC</option>
+                </select>
+
+                <button type="submit">Išsaugoti</button>
+            </form>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Follow-up priminimai</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar a { color: white; text-decoration: none; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .container { padding: 2rem; }
+        .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
+        .chip { display: inline-block; padding: 0.5rem 0.8rem; border-radius: 999px; text-decoration: none; background: #e2e8f0; color: #0f172a; }
+        .chip.active { background: #2563eb; color: white; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; background: #fef3c7; color: #b45309; }
+        .late { color: #dc2626; font-weight: bold; }
+        button { padding: 0.4rem 0.7rem; border: 0; border-radius: 6px; background: #16a34a; color: white; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <h2>Follow-up priminimai</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="filters">
+            <a class="chip {% if filter_type == 'today' %}active{% endif %}" href="/followups/?filter=today">Šiandien</a>
+            <a class="chip {% if filter_type == 'overdue' %}active{% endif %}" href="/followups/?filter=overdue">Vėluoja</a>
+            <a class="chip {% if filter_type == 'week' %}active{% endif %}" href="/followups/?filter=week">Šią savaitę</a>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Klientas</th>
+                    <th>Paskutinis kontaktas</th>
+                    <th>Kitas follow-up</th>
+                    <th>Statusas</th>
+                    <th>Veiksmas</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in followups %}
+                    <tr>
+                        <td>
+                            <strong>{{ lead.name }}</strong><br>
+                            <small>{{ lead.company }}</small>
+                        </td>
+                        <td>{{ lead.last_contacted|default:"-" }}</td>
+                        <td>
+                            {% if lead.next_follow_up %}
+                                <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
+                            {% else %}
+                                -
+                            {% endif %}
+                        </td>
+                        <td><span class="badge">{{ lead.get_status_display }}</span></td>
+                        <td>
+                            <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="reminder" />
+                                <button type="submit">Pažymėti atlikta</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="5">Nėra priminimų šiame filtre</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </main>
+</body>
+</html>

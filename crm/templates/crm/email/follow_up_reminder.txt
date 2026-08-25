@@ -1,0 +1,32 @@
+Follow-up Reminder - {{ lead.name }}
+
+Hello {{ user.get_full_name|default:user.username }},
+
+This is a reminder that you have a follow-up scheduled for {{ lead.name }}{% if lead.company %} from {{ lead.company }}{% endif %}.
+
+Lead Details:
+- Name: {{ lead.name }}
+- Company: {{ lead.company|default:"Not specified" }}
+- Email: {{ lead.email|default:"Not specified" }}
+- Phone: {{ lead.phone|default:"Not specified" }}
+- Status: {{ lead.status_display }}
+- Follow-up Date: {{ lead.next_follow_up|date:"Y-m-d H:i" }}
+{% if lead.budget %}
+- Budget: €{{ lead.budget }}
+{% endif %}
+{% if lead.notes %}
+- Notes: {{ lead.notes }}
+{% endif %}
+
+{% if days_until == 0 %}
+This follow-up is scheduled for TODAY!
+{% elif days_until == 1 %}
+This follow-up is scheduled for TOMORROW!
+{% else %}
+This follow-up is scheduled in {{ days_until }} days.
+{% endif %}
+
+Please make sure to contact the lead and update their status in the CRM system.
+
+Best regards,
+CRM System

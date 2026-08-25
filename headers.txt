@@ -1,0 +1,12 @@
+HTTP/1.1 500 Internal Server Error
+Server: nginx/1.29.8
+Date: Mon, 20 Jul 2026 12:39:28 GMT
+Content-Type: text/html; charset=utf-8
+Content-Length: 192037
+Connection: keep-alive
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: same-origin
+Cross-Origin-Opener-Policy: same-origin
+Vary: origin
+

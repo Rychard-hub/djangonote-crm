@@ -1,0 +1,22 @@
+El. pašto patvirtinimas - Freelancer CRM
+
+Sveiki,
+
+Ačiū, kad užsiregistravote Freelancer CRM sistemoje!
+
+Norėdami užbaigti registraciją, patvirtinkite savo el. paštą spusteldami žemiau esančią nuorodą:
+
+{{ verification_link }}
+
+Po patvirtinimo galėsite:
+- Prisijungti prie sistemos
+- Valdyti savo klientus ir lead'us
+- Naudoti visas CRM funkcijas
+- Gauti automatinius priminimus
+
+Ši nuoroda galios 24 valandas.
+
+Jei jūs neregistravotės, ignoruokite šį el. laišką.
+
+Pagarbiai,
+Freelancer CRM komanda
