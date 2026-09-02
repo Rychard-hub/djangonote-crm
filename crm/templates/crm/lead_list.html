@@ -59,7 +59,7 @@
                   hx-trigger="change from:find select, submit">
                 <input type="search" name="q" value="{{ query }}" placeholder="Paieška pagal vardą, įmonę, el. paštą"
                        hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true"
-                       hx-trigger="keyup changed delay:400ms, search" />
+                       hx-trigger="keyup changed delay:400ms" />
                 <select name="status">
                     <option value="">Visi statusai</option>
                     <option value="new" {% if status == 'new' %}selected{% endif %}>Naujas</option>

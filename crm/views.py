@@ -10,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
@@ -157,15 +158,7 @@ def followup_list_view(request):
     return render(request, 'crm/followup_list.html', context)
 
 
-PIPELINE_STAGES = [
-    ('new', 'Naujas'),
-    ('contacted', 'Susisiekta'),
-    ('waiting', 'Laukia atsakymo'),
-    ('negotiation', 'Derybos'),
-    ('proposal', 'Pasiūlymas išsiųstas'),
-    ('won', 'Laimėta'),
-    ('lost', 'Prarasta'),
-]
+PIPELINE_STAGES = Lead.STATUS_CHOICES
 
 
 def _pipeline_columns(user):
@@ -307,7 +300,7 @@ def lead_create_view(request):
         )
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=204)
-            response['HX-Redirect'] = '/leads/'
+            response['HX-Redirect'] = reverse('lead-list')
             return response
         return redirect('lead-list')
 
@@ -374,7 +367,7 @@ def lead_edit_view(request, pk):
         lead.save()
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=204)
-            response['HX-Redirect'] = f'/leads/{lead.pk}/'
+            response['HX-Redirect'] = reverse('lead-detail', kwargs={'pk': lead.pk})
             return response
         return redirect('lead-detail', pk=lead.pk)
 
@@ -482,9 +475,10 @@ def lead_quick_action_view(request, pk):
 @login_required(login_url='login')
 def lead_status_mark_view(request, pk, status):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
-    lead.status = status
-    lead.save()
-    Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+    if request.method == 'POST':
+        lead.status = status
+        lead.save()
+        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
 
     if request.headers.get('HX-Request'):
         return render(request, 'crm/partials/_status_badge.html', {'lead': lead})
