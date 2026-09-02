@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     'django_celery_results',
     'accounts',
     'crm',
+    'catalog',
 ]
 
 MIDDLEWARE = [

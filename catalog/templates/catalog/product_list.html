@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Katalogas</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar a { color: white; text-decoration: none; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .container { padding: 2rem; }
+        .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
+        .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+        .controls input, .controls select, .controls button { padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; }
+        .controls button { background: #2563eb; color: white; border: 0; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
+        .product { background: #dbeafe; color: #1d4ed8; }
+        .service { background: #dcfce7; color: #166534; }
+        .active-yes { color: #166534; }
+        .active-no { color: #b91c1c; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
+        .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-box form { display: grid; gap: 0.9rem; }
+        .modal-box label { font-weight: 600; font-size: 0.95rem; }
+        .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+        .modal-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+    </style>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div id="modal"></div>
+    <header class="topbar">
+        <h2>Katalogas</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="/catalog/">Katalogas</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        <div class="toolbar">
+            <div>
+                <a href="/catalog/new/" hx-get="{% url 'product-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;"><button type="button">Pridėti prekę/paslaugą</button></a>
+                <span id="total-products-count" style="margin-left: 1rem; color: #64748b;">Viso: {{ total_products }}</span>
+            </div>
+            <form class="controls" method="get"
+                  hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true"
+                  hx-trigger="change from:find select, submit">
+                <input type="search" name="q" value="{{ query }}" placeholder="Paieška pagal pavadinimą ar aprašymą"
+                       hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true"
+                       hx-trigger="keyup changed delay:400ms" />
+                <select name="kind">
+                    <option value="">Visi tipai</option>
+                    <option value="product" {% if kind == 'product' %}selected{% endif %}>Produktas</option>
+                    <option value="service" {% if kind == 'service' %}selected{% endif %}>Paslauga</option>
+                </select>
+                <select name="active">
+                    <option value="">Visi</option>
+                    <option value="yes" {% if active == 'yes' %}selected{% endif %}>Aktyvūs</option>
+                    <option value="no" {% if active == 'no' %}selected{% endif %}>Neaktyvūs</option>
+                </select>
+                <button type="submit">Filtruoti</button>
+            </form>
+        </div>
+
+        <div id="product-table-wrap">
+            {% include 'catalog/partials/_product_table.html' %}
+        </div>
+    </main>
+</body>
+</html>

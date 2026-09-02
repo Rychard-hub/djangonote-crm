@@ -1,0 +1,36 @@
+<table>
+    <thead>
+        <tr>
+            <th>Pavadinimas</th>
+            <th>Tipas</th>
+            <th>Kaina</th>
+            <th>Būsena</th>
+            <th>Veiksmai</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for product in products %}
+            <tr>
+                <td>
+                    <strong>{{ product.name }}</strong><br>
+                    <small>{{ product.description|default:""|truncatechars:80 }}</small>
+                </td>
+                <td><span class="badge {{ product.kind }}">{{ product.get_kind_display }}</span></td>
+                <td>{{ product.price }} {{ product.currency }}</td>
+                <td>
+                    {% if product.active %}
+                        <span class="active-yes">Aktyvus</span>
+                    {% else %}
+                        <span class="active-no">Neaktyvus</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <a href="/catalog/{{ product.pk }}/edit/" hx-get="{% url 'product-edit' product.pk %}" hx-target="#modal" hx-swap="innerHTML">Redaguoti</a><br>
+                    <a href="/catalog/{{ product.pk }}/delete/">Ištrinti</a>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="5">Kol kas nieko nėra kataloge</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
