@@ -43,3 +43,17 @@ class Membership(models.Model):
 
     def __str__(self):
         return f'{self.user.username} @ {self.organization.name}'
+
+
+def get_organization(user):
+    """Resolve the tenant Organization for a logged-in user.
+
+    Provisions one on the fly for a user with no Membership -- e.g. an
+    account created via the admin, `createsuperuser`, or a script, rather
+    than through the registration flow that normally calls
+    Organization.objects.create_for_user().
+    """
+    membership = Membership.objects.filter(user=user).select_related('organization').first()
+    if membership is None:
+        return Organization.objects.create_for_user(user)
+    return membership.organization

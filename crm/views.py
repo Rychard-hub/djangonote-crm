@@ -15,7 +15,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
-from accounts.models import Organization
+from accounts.models import Organization, get_organization
 from .models import Activity, Comment, Lead, Task, Profile
 
 
@@ -105,7 +105,8 @@ def password_reset_view(request):
 
 @login_required(login_url='login')
 def dashboard_view(request):
-    user_leads = Lead.objects.filter(owner=request.user)
+    organization = get_organization(request.user)
+    user_leads = Lead.objects.filter(organization=organization)
     today = date.today()
     
     # Realūs duomenys metrikoms
@@ -127,7 +128,7 @@ def dashboard_view(request):
         'recent_leads': user_leads.order_by('-updated_at')[:5],
         # Šiandienos užduotys
         'today_tasks': Task.objects.filter(
-            lead__owner=request.user,
+            lead__organization=organization,
             completed=False
         ).order_by('created_at')[:5],
         'today': today,
@@ -139,7 +140,7 @@ def dashboard_view(request):
 def followup_list_view(request):
     today = date.today()
     filter_type = request.GET.get('filter', 'today')
-    queryset = Lead.objects.filter(owner=request.user, next_follow_up__isnull=False)
+    queryset = Lead.objects.filter(organization=get_organization(request.user), next_follow_up__isnull=False)
 
     if filter_type == 'today':
         queryset = queryset.filter(next_follow_up=today)
@@ -163,11 +164,11 @@ def followup_list_view(request):
 PIPELINE_STAGES = Lead.STATUS_CHOICES
 
 
-def _pipeline_columns(user):
+def _pipeline_columns(organization):
     codes = [code for code, _ in PIPELINE_STAGES]
     columns = []
     for i, (code, label) in enumerate(PIPELINE_STAGES):
-        leads = Lead.objects.filter(owner=user, status=code).order_by('next_follow_up', 'name')
+        leads = Lead.objects.filter(organization=organization, status=code).order_by('next_follow_up', 'name')
         columns.append({
             'code': code,
             'label': label,
@@ -180,19 +181,20 @@ def _pipeline_columns(user):
 
 @login_required(login_url='login')
 def pipeline_view(request):
-    return render(request, 'crm/pipeline.html', {'columns': _pipeline_columns(request.user)})
+    return render(request, 'crm/pipeline.html', {'columns': _pipeline_columns(get_organization(request.user))})
 
 
 @login_required(login_url='login')
 def lead_pipeline_move_view(request, pk, status):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    organization = get_organization(request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=organization)
     if request.method == 'POST':
         lead.status = status
         lead.save()
         Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
 
     if request.headers.get('HX-Request'):
-        return render(request, 'crm/partials/_kanban_board.html', {'columns': _pipeline_columns(request.user)})
+        return render(request, 'crm/partials/_kanban_board.html', {'columns': _pipeline_columns(organization)})
     return redirect('pipeline')
 
 
@@ -235,7 +237,7 @@ def settings_view(request):
 
 @login_required(login_url='login')
 def lead_list_view(request):
-    leads = Lead.objects.filter(owner=request.user)
+    leads = Lead.objects.filter(organization=get_organization(request.user))
     today = date.today()
     
     # Filtrai
@@ -299,6 +301,7 @@ def lead_create_view(request):
             budget=request.POST.get('budget', '0') or '0',
             notes=request.POST.get('notes', '').strip(),
             owner=request.user,
+            organization=get_organization(request.user),
         )
         if request.headers.get('HX-Request'):
             response = HttpResponse(status=204)
@@ -313,7 +316,7 @@ def lead_create_view(request):
 
 @login_required(login_url='login')
 def lead_detail_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     today = date.today()
     
     # Papildomi duomenys
@@ -353,7 +356,7 @@ def lead_detail_view(request, pk):
 
 @login_required(login_url='login')
 def lead_edit_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
 
     if request.method == 'POST':
         lead.name = request.POST.get('name', '').strip()
@@ -380,7 +383,7 @@ def lead_edit_view(request, pk):
 
 @login_required(login_url='login')
 def lead_delete_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     if request.method == 'POST':
         lead.delete()
         return redirect('lead-list')
@@ -389,7 +392,7 @@ def lead_delete_view(request, pk):
 
 @login_required(login_url='login')
 def lead_status_update_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     if request.method == 'POST':
         lead.status = request.POST.get('status', lead.status)
         lead.save()
@@ -398,7 +401,7 @@ def lead_status_update_view(request, pk):
 
 @login_required(login_url='login')
 def lead_comment_add_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     comment = None
     if request.method == 'POST':
         body = request.POST.get('body', '').strip()
@@ -416,7 +419,7 @@ def lead_comment_add_view(request, pk):
 
 @login_required(login_url='login')
 def lead_reminder_send_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     sent = False
     if request.method == 'POST' and lead.email:
         send_mail(
@@ -435,7 +438,7 @@ def lead_reminder_send_view(request, pk):
 
 @login_required(login_url='login')
 def lead_task_add_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     task = None
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
@@ -452,7 +455,7 @@ def lead_task_add_view(request, pk):
 
 @login_required(login_url='login')
 def task_toggle_view(request, pk):
-    task = get_object_or_404(Task, pk=pk, lead__owner=request.user)
+    task = get_object_or_404(Task, pk=pk, lead__organization=get_organization(request.user))
     task.completed = not task.completed
     task.save()
     Activity.objects.create(lead=task.lead, action='task_toggled', details=task.title, created_by=request.user)
@@ -464,7 +467,7 @@ def task_toggle_view(request, pk):
 
 @login_required(login_url='login')
 def lead_quick_action_view(request, pk):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     if request.method == 'POST':
         action = request.POST.get('action', '')
         if action == 'reminder':
@@ -476,7 +479,7 @@ def lead_quick_action_view(request, pk):
 
 @login_required(login_url='login')
 def lead_status_mark_view(request, pk, status):
-    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     if request.method == 'POST':
         lead.status = status
         lead.save()
