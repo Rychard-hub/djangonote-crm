@@ -19,6 +19,7 @@
         .late { color: #dc2626; font-weight: bold; }
         button { padding: 0.4rem 0.7rem; border: 0; border-radius: 6px; background: #16a34a; color: white; cursor: pointer; }
     </style>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body>
     <header class="topbar">
@@ -33,51 +34,9 @@
     </header>
 
     <main class="container">
-        <div class="filters">
-            <a class="chip {% if filter_type == 'today' %}active{% endif %}" href="/followups/?filter=today">Šiandien</a>
-            <a class="chip {% if filter_type == 'overdue' %}active{% endif %}" href="/followups/?filter=overdue">Vėluoja</a>
-            <a class="chip {% if filter_type == 'week' %}active{% endif %}" href="/followups/?filter=week">Šią savaitę</a>
+        <div id="followup-content">
+            {% include 'crm/partials/_followup_content.html' %}
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Klientas</th>
-                    <th>Paskutinis kontaktas</th>
-                    <th>Kitas follow-up</th>
-                    <th>Statusas</th>
-                    <th>Veiksmas</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for lead in followups %}
-                    <tr>
-                        <td>
-                            <strong>{{ lead.name }}</strong><br>
-                            <small>{{ lead.company }}</small>
-                        </td>
-                        <td>{{ lead.last_contacted|default:"-" }}</td>
-                        <td>
-                            {% if lead.next_follow_up %}
-                                <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
-                            {% else %}
-                                -
-                            {% endif %}
-                        </td>
-                        <td><span class="badge">{{ lead.get_status_display }}</span></td>
-                        <td>
-                            <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="action" value="reminder" />
-                                <button type="submit">Pažymėti atlikta</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr><td colspan="5">Nėra priminimų šiame filtre</td></tr>
-                {% endfor %}
-            </tbody>
-        </table>
     </main>
 </body>
 </html>

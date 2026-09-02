@@ -1,0 +1,58 @@
+<table>
+    <thead>
+        <tr>
+            <th>Vardas / Įmonė</th>
+            <th>Kontaktas</th>
+            <th>Statusas</th>
+            <th>Paskutinis kontaktas</th>
+            <th>Kitas follow-up</th>
+            <th>Biudžetas</th>
+            <th>Veiksmai</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for lead in leads %}
+            <tr class="{% if lead.next_follow_up and lead.next_follow_up < today %}overdue-row{% endif %}">
+                <td>
+                    <strong>{{ lead.name }}</strong><br>
+                    <small>{{ lead.company }}</small>
+                </td>
+                <td>
+                    {{ lead.email }}<br>
+                    <small>{{ lead.phone }}</small>
+                </td>
+                <td>
+                    <form method="post" action="/leads/{{ lead.pk }}/status/" style="display:inline;">
+                        {% csrf_token %}
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
+                            <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
+                            <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
+                            <option value="won" {% if lead.status == 'won' %}selected{% endif %}>Laimėtas</option>
+                            <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Prarastas</option>
+                        </select>
+                    </form>
+                </td>
+                <td>{{ lead.last_contacted|default:"-" }}</td>
+                <td>
+                    {% if lead.next_follow_up %}
+                        <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+                <td>{{ lead.budget }} €</td>
+                <td>
+                    <a href="/leads/{{ lead.pk }}/">Peržiūrėti</a><br>
+                    <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="margin-top:0.35rem;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="reminder" />
+                        <button type="submit" style="padding:0.3rem 0.5rem; border:0; border-radius:6px; background:#2563eb; color:white; cursor:pointer;">Priminti</button>
+                    </form>
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="7">Nėra leadų</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

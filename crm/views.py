@@ -152,6 +152,8 @@ def followup_list_view(request):
         'filter_type': filter_type,
         'today': today,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_followup_content.html', context)
     return render(request, 'crm/followup_list.html', context)
 
 
@@ -257,6 +259,8 @@ def lead_list_view(request):
         'total_leads': leads.count(),
         'today': today,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_list_response.html', context)
     return render(request, 'crm/lead_list.html', context)
 
 
