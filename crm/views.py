@@ -1,7 +1,7 @@
 from django import forms
 from datetime import date, timedelta
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
@@ -316,6 +316,7 @@ def lead_detail_view(request, pk):
         'days_until_followup': days_until_followup,
         'is_overdue': lead.next_follow_up and lead.next_follow_up < today,
         'is_today': lead.next_follow_up == today,
+        'status_choices': Lead.STATUS_CHOICES,
     }
     return render(request, 'crm/lead_detail.html', context)
 
@@ -362,18 +363,25 @@ def lead_status_update_view(request, pk):
 @login_required(login_url='login')
 def lead_comment_add_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    comment = None
     if request.method == 'POST':
         body = request.POST.get('body', '').strip()
         kind = request.POST.get('kind', 'note')
         author = request.POST.get('author', 'Sistema').strip() or 'Sistema'
         if body:
-            Comment.objects.create(lead=lead, body=body, kind=kind, author=author, created_by=request.user)
+            comment = Comment.objects.create(lead=lead, body=body, kind=kind, author=author, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        if comment is None:
+            return HttpResponse('')
+        return render(request, 'crm/partials/_comment_add_response.html', {'comment': comment})
     return redirect('lead-detail', pk=lead.pk)
 
 
 @login_required(login_url='login')
 def lead_reminder_send_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    sent = False
     if request.method == 'POST' and lead.email:
         send_mail(
             subject=f'Priminimas apie leadą {lead.name}',
@@ -382,17 +390,27 @@ def lead_reminder_send_view(request, pk):
             recipient_list=[lead.email],
             fail_silently=True,
         )
+        sent = True
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_reminder_status.html', {'sent': sent})
     return redirect('lead-detail', pk=lead.pk)
 
 
 @login_required(login_url='login')
 def lead_task_add_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    task = None
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
         if title:
-            Task.objects.create(lead=lead, title=title, created_by=request.user)
+            task = Task.objects.create(lead=lead, title=title, created_by=request.user)
             Activity.objects.create(lead=lead, action='task_added', details=title, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        if task is None:
+            return HttpResponse('')
+        return render(request, 'crm/partials/_task_add_response.html', {'task': task})
     return redirect('lead-detail', pk=lead.pk)
 
 
@@ -402,6 +420,9 @@ def task_toggle_view(request, pk):
     task.completed = not task.completed
     task.save()
     Activity.objects.create(lead=task.lead, action='task_toggled', details=task.title, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_task_item.html', {'task': task})
     return redirect('lead-detail', pk=task.lead.pk)
 
 
@@ -423,4 +444,7 @@ def lead_status_mark_view(request, pk, status):
     lead.status = status
     lead.save()
     Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_status_badge.html', {'lead': lead})
     return redirect('lead-detail', pk=lead.pk)
