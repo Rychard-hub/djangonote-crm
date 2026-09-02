@@ -41,15 +41,25 @@
         .status-btn.proposal { background: #dcfce7; color: #166534; }
         .status-btn.won { background: #16a34a; color: white; }
         .status-btn.lost { background: #dc2626; color: white; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
+        .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; }
+        .modal-box form { display: grid; gap: 0.9rem; }
+        .modal-box label { font-weight: 600; font-size: 0.95rem; }
+        .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+        .modal-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+        .modal-box .hint { font-size: 0.85rem; color: #64748b; margin-top: 0.2rem; }
     </style>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+    <div id="modal"></div>
     <div class="container">
         <div class="header">
             <div>
                 <h2>{{ lead.name }} / {{ lead.company|default:"-" }}</h2>
                 <div style="display: flex; gap: 1rem; align-items: center; margin-top: 0.5rem;">
-                    <span class="badge {{ lead.status }}">{{ lead.get_status_display }}</span>
+                    {% include 'crm/partials/_status_badge.html' %}
                     {% if is_today %}
                         <span class="badge today">Šiandien</span>
                     {% elif is_overdue %}
@@ -62,7 +72,7 @@
                 </div>
             </div>
             <div class="actions">
-                <a class="edit" href="/leads/{{ lead.pk }}/edit/">Redaguoti</a>
+                <a class="edit" href="/leads/{{ lead.pk }}/edit/" hx-get="{% url 'lead-edit' lead.pk %}" hx-target="#modal" hx-swap="innerHTML">Redaguoti</a>
                 <a class="edit" href="/leads/">Grįžti į sąrašą</a>
             </div>
         </div>
@@ -70,31 +80,40 @@
         <div class="quick-actions">
             <h3>Greiti veiksmai</h3>
             <div class="action-buttons">
-                <form method="post" action="/leads/{{ lead.pk }}/comments/" style="display:inline;">
-                    {% csrf_token %}
+                <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend" style="display:inline;">
                     <input type="hidden" name="body" value="Telefoninis skambutis">
                     <input type="hidden" name="kind" value="call">
                     <input type="hidden" name="author" value="Sistema">
                     <button type="submit" class="quick-btn call">📞 Skambutis</button>
                 </form>
-                <form method="post" action="/leads/{{ lead.pk }}/comments/" style="display:inline;">
-                    {% csrf_token %}
+                <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend" style="display:inline;">
                     <input type="hidden" name="body" value="El. laiškas išsiųstas">
                     <input type="hidden" name="kind" value="email">
                     <input type="hidden" name="author" value="Sistema">
                     <button type="submit" class="quick-btn email">✉️ Laiškas</button>
                 </form>
-                <form method="post" action="/leads/{{ lead.pk }}/tasks/" style="display:inline;">
-                    {% csrf_token %}
+                <form hx-post="{% url 'lead-task-add' lead.pk %}" hx-target="#task-list" hx-swap="beforeend" style="display:inline;">
                     <input type="hidden" name="title" value="Susisiekti dėl pasiūlymo">
                     <button type="submit" class="quick-btn task">📋 Užduotis</button>
                 </form>
                 {% if lead.email %}
-                <form method="post" action="/leads/{{ lead.pk }}/reminder/" style="display:inline;">
-                    {% csrf_token %}
+                <form hx-post="{% url 'lead-reminder-send' lead.pk %}" hx-target="#reminder-status" hx-swap="outerHTML" style="display:inline;">
                     <button type="submit" class="quick-btn reminder">🔔 Priminimas</button>
                 </form>
                 {% endif %}
+                <span id="reminder-status"></span>
+            </div>
+        </div>
+
+        <div class="status-actions">
+            <h3>Pakeisti statusą</h3>
+            <div class="status-buttons">
+                {% for code, label in status_choices %}
+                    <button type="button" class="status-btn {{ code }}"
+                            hx-post="{% url 'lead-status-mark' lead.pk code %}"
+                            hx-target="#lead-status-badge"
+                            hx-swap="outerHTML">{{ label }}</button>
+                {% endfor %}
             </div>
         </div>
 
@@ -120,8 +139,8 @@
 
         <div class="card">
             <h3>💬 Komunikacijos istorija</h3>
-            <form method="post" action="/leads/{{ lead.pk }}/comments/" style="margin-bottom:0.8rem;">
-                {% csrf_token %}
+            <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend"
+                  hx-on::after-request="if(event.detail.successful) this.reset()" style="margin-bottom:0.8rem;">
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
                     <select name="kind" style="padding:0.6rem;">
                         <option value="note">📝 Pastaba</option>
@@ -131,20 +150,14 @@
                     </select>
                     <input type="text" name="author" placeholder="Autorius" value="Sistema" style="flex: 1; padding:0.6rem;" />
                 </div>
-                <textarea name="body" rows="2" placeholder="Įrašykite komentarą ar komunikacijos detalę..." style="width:100%; box-sizing:border-box; margin-bottom:0.5rem;"></textarea>
+                <textarea name="body" rows="2" placeholder="Įrašykite komentarą ar komunikacijos detalę..." style="width:100%; box-sizing:border-box; margin-bottom:0.5rem;" required></textarea>
                 <button type="submit" class="edit">Pridėti įrašą</button>
             </form>
-            <ul>
+            <ul id="comments-list">
                 {% for comment in comments %}
-                    <li style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
-                            <strong>{{ comment.get_kind_display }} · {{ comment.author }}</strong>
-                            <small style="color: #6b7280;">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
-                        </div>
-                        <div>{{ comment.body }}</div>
-                    </li>
+                    {% include 'crm/partials/_comment_item.html' %}
                 {% empty %}
-                    <li>Kol kas istorijos įrašų nėra.</li>
+                    <li id="comment-empty">Kol kas istorijos įrašų nėra.</li>
                 {% endfor %}
             </ul>
         </div>
@@ -154,25 +167,18 @@
             {% if pending_tasks > 0 %}
             <p style="color: #f59e0b; margin-bottom: 1rem;">Laukia atlikimo: {{ pending_tasks }} užduotys</p>
             {% endif %}
-            <form method="post" action="/leads/{{ lead.pk }}/tasks/" style="margin-bottom:0.8rem;">
-                {% csrf_token %}
+            <form hx-post="{% url 'lead-task-add' lead.pk %}" hx-target="#task-list" hx-swap="beforeend"
+                  hx-on::after-request="if(event.detail.successful) this.reset()" style="margin-bottom:0.8rem;">
                 <div style="display: flex; gap: 0.5rem;">
-                    <input type="text" name="title" placeholder="Nauja užduotis..." style="flex: 1; box-sizing:border-box; padding:0.6rem;" />
+                    <input type="text" name="title" placeholder="Nauja užduotis..." style="flex: 1; box-sizing:border-box; padding:0.6rem;" required />
                     <button type="submit" class="edit">Pridėti</button>
                 </div>
             </form>
-            <ul>
+            <ul id="task-list">
                 {% for task in tasks %}
-                    <li style="margin-bottom: 0.5rem;">
-                        <form method="post" action="/tasks/{{ task.pk }}/toggle/" style="display:inline; margin-right: 0.5rem;">
-                            {% csrf_token %}
-                            <input type="checkbox" onchange="this.form.submit()" {% if task.completed %}checked{% endif %}>
-                        </form>
-                        {% if task.completed %}<s style="color: #6b7280;">{{ task.title }}</s>{% else %}<strong>{{ task.title }}</strong>{% endif %}
-                        <small style="color: #6b7280;">({{ task.created_at|date:"m.d" }})</small>
-                    </li>
+                    {% include 'crm/partials/_task_item.html' %}
                 {% empty %}
-                    <li>Kol kas užduočių nėra.</li>
+                    <li id="task-empty">Kol kas užduočių nėra.</li>
                 {% endfor %}
             </ul>
         </div>

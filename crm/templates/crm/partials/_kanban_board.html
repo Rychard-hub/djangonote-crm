@@ -1,0 +1,28 @@
+<div class="kanban" id="kanban-board">
+    {% for column in columns %}
+        <section class="column">
+            <h3>{{ column.label }}</h3>
+            {% for lead in column.leads %}
+                <div class="card">
+                    <strong>{{ lead.name }}</strong>
+                    <div class="meta">Kitas follow-up: {{ lead.next_follow_up|default:"-" }}</div>
+                    <div class="meta">{{ lead.notes|default:"Nėra pastabos"|truncatechars:80 }}</div>
+                    <div class="move-buttons">
+                        {% if column.prev_code %}
+                            <button type="button" class="move-btn"
+                                    hx-post="{% url 'lead-pipeline-move' lead.pk column.prev_code %}"
+                                    hx-target="#kanban-board" hx-swap="outerHTML">← Atgal</button>
+                        {% endif %}
+                        {% if column.next_code %}
+                            <button type="button" class="move-btn"
+                                    hx-post="{% url 'lead-pipeline-move' lead.pk column.next_code %}"
+                                    hx-target="#kanban-board" hx-swap="outerHTML">Toliau →</button>
+                        {% endif %}
+                    </div>
+                </div>
+            {% empty %}
+                <div class="empty">Nėra leadų</div>
+            {% endfor %}
+        </section>
+    {% endfor %}
+</div>

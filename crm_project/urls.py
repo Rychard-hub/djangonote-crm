@@ -28,6 +28,7 @@ from crm.views import (
     lead_detail_view,
     lead_edit_view,
     lead_list_view,
+    lead_pipeline_move_view,
     lead_quick_action_view,
     lead_reminder_send_view,
     lead_status_mark_view,
@@ -62,5 +63,6 @@ urlpatterns = [
     path('leads/<int:pk>/tasks/', lead_task_add_view, name='lead-task-add'),
     path('tasks/<int:pk>/toggle/', task_toggle_view, name='task-toggle'),
     path('leads/<int:pk>/mark/<str:status>/', lead_status_mark_view, name='lead-status-mark'),
+    path('leads/<int:pk>/pipeline-move/<str:status>/', lead_pipeline_move_view, name='lead-pipeline-move'),
     path('leads/<int:pk>/quick-action/', lead_quick_action_view, name='lead-quick-action'),
 ]

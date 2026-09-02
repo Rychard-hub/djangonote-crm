@@ -1,0 +1,7 @@
+<li style="margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+    <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+        <strong>{{ comment.get_kind_display }} · {{ comment.author }}</strong>
+        <small style="color: #6b7280;">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+    </div>
+    <div>{{ comment.body }}</div>
+</li>

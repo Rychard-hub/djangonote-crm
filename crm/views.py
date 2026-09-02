@@ -1,7 +1,7 @@
 from django import forms
 from datetime import date, timedelta
 
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
@@ -10,6 +10,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
@@ -152,26 +153,45 @@ def followup_list_view(request):
         'filter_type': filter_type,
         'today': today,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_followup_content.html', context)
     return render(request, 'crm/followup_list.html', context)
+
+
+PIPELINE_STAGES = Lead.STATUS_CHOICES
+
+
+def _pipeline_columns(user):
+    codes = [code for code, _ in PIPELINE_STAGES]
+    columns = []
+    for i, (code, label) in enumerate(PIPELINE_STAGES):
+        leads = Lead.objects.filter(owner=user, status=code).order_by('next_follow_up', 'name')
+        columns.append({
+            'code': code,
+            'label': label,
+            'leads': leads,
+            'prev_code': codes[i - 1] if i > 0 else None,
+            'next_code': codes[i + 1] if i < len(codes) - 1 else None,
+        })
+    return columns
 
 
 @login_required(login_url='login')
 def pipeline_view(request):
-    stages = [
-        ('new', 'Naujas'),
-        ('contacted', 'Susisiekta'),
-        ('waiting', 'Laukia atsakymo'),
-        ('negotiation', 'Derybos'),
-        ('proposal', 'Pasiūlymas išsiųstas'),
-        ('won', 'Laimėta'),
-        ('lost', 'Prarasta'),
-    ]
-    columns = []
-    for code, label in stages:
-        leads = Lead.objects.filter(owner=request.user, status=code).order_by('next_follow_up', 'name')
-        columns.append({'code': code, 'label': label, 'leads': leads})
+    return render(request, 'crm/pipeline.html', {'columns': _pipeline_columns(request.user)})
 
-    return render(request, 'crm/pipeline.html', {'columns': columns})
+
+@login_required(login_url='login')
+def lead_pipeline_move_view(request, pk, status):
+    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        lead.status = status
+        lead.save()
+        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_kanban_board.html', {'columns': _pipeline_columns(request.user)})
+    return redirect('pipeline')
 
 
 @login_required(login_url='login')
@@ -257,6 +277,8 @@ def lead_list_view(request):
         'total_leads': leads.count(),
         'today': today,
     }
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_list_response.html', context)
     return render(request, 'crm/lead_list.html', context)
 
 
@@ -276,8 +298,14 @@ def lead_create_view(request):
             notes=request.POST.get('notes', '').strip(),
             owner=request.user,
         )
+        if request.headers.get('HX-Request'):
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = reverse('lead-list')
+            return response
         return redirect('lead-list')
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_form_modal.html', {'mode': 'create'})
     return render(request, 'crm/lead_form.html', {'mode': 'create'})
 
 
@@ -316,6 +344,7 @@ def lead_detail_view(request, pk):
         'days_until_followup': days_until_followup,
         'is_overdue': lead.next_follow_up and lead.next_follow_up < today,
         'is_today': lead.next_follow_up == today,
+        'status_choices': Lead.STATUS_CHOICES,
     }
     return render(request, 'crm/lead_detail.html', context)
 
@@ -336,8 +365,14 @@ def lead_edit_view(request, pk):
         lead.budget = request.POST.get('budget', '0') or '0'
         lead.notes = request.POST.get('notes', '').strip()
         lead.save()
+        if request.headers.get('HX-Request'):
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = reverse('lead-detail', kwargs={'pk': lead.pk})
+            return response
         return redirect('lead-detail', pk=lead.pk)
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_form_modal.html', {'mode': 'edit', 'lead': lead})
     return render(request, 'crm/lead_form.html', {'mode': 'edit', 'lead': lead})
 
 
@@ -362,18 +397,25 @@ def lead_status_update_view(request, pk):
 @login_required(login_url='login')
 def lead_comment_add_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    comment = None
     if request.method == 'POST':
         body = request.POST.get('body', '').strip()
         kind = request.POST.get('kind', 'note')
         author = request.POST.get('author', 'Sistema').strip() or 'Sistema'
         if body:
-            Comment.objects.create(lead=lead, body=body, kind=kind, author=author, created_by=request.user)
+            comment = Comment.objects.create(lead=lead, body=body, kind=kind, author=author, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        if comment is None:
+            return HttpResponse('')
+        return render(request, 'crm/partials/_comment_add_response.html', {'comment': comment})
     return redirect('lead-detail', pk=lead.pk)
 
 
 @login_required(login_url='login')
 def lead_reminder_send_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    sent = False
     if request.method == 'POST' and lead.email:
         send_mail(
             subject=f'Priminimas apie leadą {lead.name}',
@@ -382,17 +424,27 @@ def lead_reminder_send_view(request, pk):
             recipient_list=[lead.email],
             fail_silently=True,
         )
+        sent = True
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_reminder_status.html', {'sent': sent})
     return redirect('lead-detail', pk=lead.pk)
 
 
 @login_required(login_url='login')
 def lead_task_add_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    task = None
     if request.method == 'POST':
         title = request.POST.get('title', '').strip()
         if title:
-            Task.objects.create(lead=lead, title=title, created_by=request.user)
+            task = Task.objects.create(lead=lead, title=title, created_by=request.user)
             Activity.objects.create(lead=lead, action='task_added', details=title, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        if task is None:
+            return HttpResponse('')
+        return render(request, 'crm/partials/_task_add_response.html', {'task': task})
     return redirect('lead-detail', pk=lead.pk)
 
 
@@ -402,6 +454,9 @@ def task_toggle_view(request, pk):
     task.completed = not task.completed
     task.save()
     Activity.objects.create(lead=task.lead, action='task_toggled', details=task.title, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_task_item.html', {'task': task})
     return redirect('lead-detail', pk=task.lead.pk)
 
 
@@ -420,7 +475,11 @@ def lead_quick_action_view(request, pk):
 @login_required(login_url='login')
 def lead_status_mark_view(request, pk, status):
     lead = get_object_or_404(Lead, pk=pk, owner=request.user)
-    lead.status = status
-    lead.save()
-    Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+    if request.method == 'POST':
+        lead.status = status
+        lead.save()
+        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_status_badge.html', {'lead': lead})
     return redirect('lead-detail', pk=lead.pk)

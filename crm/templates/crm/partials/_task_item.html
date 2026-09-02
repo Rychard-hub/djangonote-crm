@@ -1,0 +1,10 @@
+<li id="task-{{ task.pk }}" style="margin-bottom: 0.5rem;">
+    <input type="checkbox" style="margin-right: 0.5rem;"
+           hx-post="{% url 'task-toggle' task.pk %}"
+           hx-target="#task-{{ task.pk }}"
+           hx-swap="outerHTML"
+           hx-trigger="change"
+           {% if task.completed %}checked{% endif %}>
+    {% if task.completed %}<s style="color: #6b7280;">{{ task.title }}</s>{% else %}<strong>{{ task.title }}</strong>{% endif %}
+    <small style="color: #6b7280;">({{ task.created_at|date:"m.d" }})</small>
+</li>
