@@ -1,0 +1,64 @@
+<div class="modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h2 style="margin:0;">{% if mode == 'edit' %}Redaguoti leadą{% else %}Pridėti leadą{% endif %}</h2>
+            <button type="button" onclick="document.getElementById('modal').innerHTML=''"
+                    style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
+        </div>
+        <form hx-post="{% if mode == 'edit' %}{% url 'lead-edit' lead.pk %}{% else %}{% url 'lead-create' %}{% endif %}"
+              hx-target="#modal" hx-swap="innerHTML">
+            <div class="row">
+                <div>
+                    <label for="name">Vardas / įmonė</label>
+                    <input id="name" name="name" value="{{ lead.name|default:'' }}" required>
+                    <div class="hint">Pavyzdžiui: Mantas ar „Studio X“</div>
+                </div>
+                <div>
+                    <label for="company">Įmonė</label>
+                    <input id="company" name="company" value="{{ lead.company|default:'' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="email">El. paštas</label>
+                    <input id="email" name="email" type="email" value="{{ lead.email|default:'' }}">
+                </div>
+                <div>
+                    <label for="phone">Telefonas</label>
+                    <input id="phone" name="phone" value="{{ lead.phone|default:'' }}">
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="source">Šaltinis</label>
+                    <input id="source" name="source" value="{{ lead.source|default:'' }}" placeholder="LinkedIn, rekomendacija, svetainė">
+                </div>
+                <div>
+                    <label for="status">Statusas</label>
+                    <select id="status" name="status">
+                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
+                        <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
+                        <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
+                        <option value="won" {% if lead.status == 'won' %}selected{% endif %}>Laimėtas</option>
+                        <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Prarastas</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="budget">Biudžetas</label>
+                    <input id="budget" name="budget" type="number" step="0.01" value="{{ lead.budget|default:'0' }}">
+                </div>
+                <div>
+                    <label for="next_follow_up">Kitas follow-up</label>
+                    <input id="next_follow_up" name="next_follow_up" type="date" value="{{ lead.next_follow_up|default:'' }}">
+                </div>
+            </div>
+            <div>
+                <label for="notes">Pastabos</label>
+                <textarea id="notes" name="notes" rows="3" placeholder="Trumpa pastaba apie poreikį ar susitarimą">{{ lead.notes|default:'' }}</textarea>
+            </div>
+            <button type="submit">Išsaugoti</button>
+        </form>
+    </div>
+</div>

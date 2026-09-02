@@ -305,8 +305,14 @@ def lead_create_view(request):
             notes=request.POST.get('notes', '').strip(),
             owner=request.user,
         )
+        if request.headers.get('HX-Request'):
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = '/leads/'
+            return response
         return redirect('lead-list')
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_form_modal.html', {'mode': 'create'})
     return render(request, 'crm/lead_form.html', {'mode': 'create'})
 
 
@@ -366,8 +372,14 @@ def lead_edit_view(request, pk):
         lead.budget = request.POST.get('budget', '0') or '0'
         lead.notes = request.POST.get('notes', '').strip()
         lead.save()
+        if request.headers.get('HX-Request'):
+            response = HttpResponse(status=204)
+            response['HX-Redirect'] = f'/leads/{lead.pk}/'
+            return response
         return redirect('lead-detail', pk=lead.pk)
 
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_form_modal.html', {'mode': 'edit', 'lead': lead})
     return render(request, 'crm/lead_form.html', {'mode': 'edit', 'lead': lead})
 
 
