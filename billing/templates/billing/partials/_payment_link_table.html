@@ -1,0 +1,36 @@
+<table>
+    <thead>
+        <tr>
+            <th>Aprašymas</th>
+            <th>Suma</th>
+            <th>Susieta su</th>
+            <th>Būsena</th>
+            <th>Sukurta</th>
+            <th>Nuoroda</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for link in links %}
+            <tr>
+                <td>{{ link.description|default:"-" }}</td>
+                <td>{{ link.amount }} {{ link.currency }}</td>
+                <td>
+                    {% if link.lead %}<a href="/leads/{{ link.lead.pk }}/">{{ link.lead.name }}</a>{% endif %}
+                    {% if link.product %}{{ link.product.name }}{% endif %}
+                    {% if not link.lead and not link.product %}-{% endif %}
+                </td>
+                <td><span class="badge {{ link.status }}">{{ link.get_status_display }}</span></td>
+                <td>{{ link.created_at|date:"Y-m-d H:i" }}</td>
+                <td>
+                    {% if link.url %}
+                        <button type="button" class="copy-btn" onclick="copyLink(this, '{{ link.url }}')">Kopijuoti nuorodą</button>
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6">Kol kas mokėjimo nuorodų nėra</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

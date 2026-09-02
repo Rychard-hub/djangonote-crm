@@ -46,6 +46,7 @@ urlpatterns = [
     path('api/health/', health_check, name='health-check'),
     path('api/', include('crm.api_urls')),  # API endpoints
     path('catalog/', include('catalog.urls')),
+    path('billing/', include('billing.urls')),
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),
     path('password-reset/', password_reset_view, name='password-reset'),

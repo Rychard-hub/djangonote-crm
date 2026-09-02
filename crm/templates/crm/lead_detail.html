@@ -101,6 +101,9 @@
                     <button type="submit" class="quick-btn reminder">🔔 Priminimas</button>
                 </form>
                 {% endif %}
+                <a href="/billing/payment-links/new/?lead={{ lead.pk }}" hx-get="/billing/payment-links/new/?lead={{ lead.pk }}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;">
+                    <button type="button" class="quick-btn reminder">💳 Mokėjimo nuoroda</button>
+                </a>
                 <span id="reminder-status"></span>
             </div>
         </div>

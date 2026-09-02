@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sukurti mokėjimo nuorodą</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .container { max-width: 560px; margin: 2rem auto; background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        form { display: grid; gap: 0.9rem; }
+        label { font-weight: 600; font-size: 0.95rem; }
+        input, select, textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
+        button { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+        .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
+        .modal-error { background: #fee2e2; color: #b91c1c; padding: 0.8rem; border-radius: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Sukurti mokėjimo nuorodą</h2>
+        {% if error %}
+            <div class="modal-error">
+                Nepavyko sukurti mokėjimo nuorodos: {{ error }}
+                <br>Nustatykite <code>STRIPE_SECRET_KEY</code> aplinkos kintamąjį ir bandykite dar kartą.
+            </div>
+        {% endif %}
+        <form method="post">
+            {% csrf_token %}
+            <div>
+                <label for="description">Aprašymas</label>
+                <input id="description" name="description" placeholder="Pvz.: Landing page kūrimas">
+            </div>
+            <div class="row">
+                <div>
+                    <label for="amount">Suma</label>
+                    <input id="amount" name="amount" type="number" step="0.01" min="0.01" required>
+                </div>
+                <div>
+                    <label for="currency">Valiuta</label>
+                    <input id="currency" name="currency" value="EUR" maxlength="3">
+                </div>
+            </div>
+            <div>
+                <label for="lead">Susieti su lead'u (nebūtina)</label>
+                <select id="lead" name="lead">
+                    <option value="">-</option>
+                    {% for lead in leads %}
+                        <option value="{{ lead.pk }}" {% if selected_lead == lead.pk|stringformat:"s" %}selected{% endif %}>{{ lead.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="product">Susieti su preke/paslauga (nebūtina)</label>
+                <select id="product" name="product">
+                    <option value="">-</option>
+                    {% for product in products %}
+                        <option value="{{ product.pk }}">{{ product.name }} ({{ product.price }} {{ product.currency }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Sukurti nuorodą</button>
+        </form>
+    </div>
+</body>
+</html>
