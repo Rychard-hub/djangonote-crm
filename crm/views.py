@@ -15,6 +15,7 @@ from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 
+from accounts.models import Organization
 from .models import Activity, Comment, Lead, Task, Profile
 
 
@@ -58,6 +59,7 @@ def register_view(request):
         if form.is_valid():
             user = form.save()
             Profile.objects.create(user=user)
+            Organization.objects.create_for_user(user)
             login(request, user)
             return redirect('dashboard')
     else:
