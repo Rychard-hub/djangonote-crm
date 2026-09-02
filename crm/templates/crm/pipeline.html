@@ -17,9 +17,12 @@
         .card strong { display: block; margin-bottom: 0.2rem; }
         .meta { font-size: 0.85rem; color: #475569; margin-top: 0.3rem; }
         .empty { color: #64748b; font-size: 0.9rem; }
+        .move-buttons { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
+        .move-btn { padding: 0.3rem 0.5rem; border: 0; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; font-size: 0.8rem; }
     </style>
+    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
-<body>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <header class="topbar">
         <h2>Pipeline / Kanban</h2>
         <nav class="nav">
@@ -32,22 +35,7 @@
     </header>
 
     <main class="container">
-        <div class="kanban">
-            {% for column in columns %}
-                <section class="column">
-                    <h3>{{ column.label }}</h3>
-                    {% for lead in column.leads %}
-                        <div class="card">
-                            <strong>{{ lead.name }}</strong>
-                            <div class="meta">Kitas follow-up: {{ lead.next_follow_up|default:"-" }}</div>
-                            <div class="meta">{{ lead.notes|default:"Nėra pastabos"|truncatechars:80 }}</div>
-                        </div>
-                    {% empty %}
-                        <div class="empty">Nėra leadų</div>
-                    {% endfor %}
-                </section>
-            {% endfor %}
-        </div>
+        {% include 'crm/partials/_kanban_board.html' %}
     </main>
 </body>
 </html>

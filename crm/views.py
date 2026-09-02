@@ -157,23 +157,48 @@ def followup_list_view(request):
     return render(request, 'crm/followup_list.html', context)
 
 
+PIPELINE_STAGES = [
+    ('new', 'Naujas'),
+    ('contacted', 'Susisiekta'),
+    ('waiting', 'Laukia atsakymo'),
+    ('negotiation', 'Derybos'),
+    ('proposal', 'Pasiūlymas išsiųstas'),
+    ('won', 'Laimėta'),
+    ('lost', 'Prarasta'),
+]
+
+
+def _pipeline_columns(user):
+    codes = [code for code, _ in PIPELINE_STAGES]
+    columns = []
+    for i, (code, label) in enumerate(PIPELINE_STAGES):
+        leads = Lead.objects.filter(owner=user, status=code).order_by('next_follow_up', 'name')
+        columns.append({
+            'code': code,
+            'label': label,
+            'leads': leads,
+            'prev_code': codes[i - 1] if i > 0 else None,
+            'next_code': codes[i + 1] if i < len(codes) - 1 else None,
+        })
+    return columns
+
+
 @login_required(login_url='login')
 def pipeline_view(request):
-    stages = [
-        ('new', 'Naujas'),
-        ('contacted', 'Susisiekta'),
-        ('waiting', 'Laukia atsakymo'),
-        ('negotiation', 'Derybos'),
-        ('proposal', 'Pasiūlymas išsiųstas'),
-        ('won', 'Laimėta'),
-        ('lost', 'Prarasta'),
-    ]
-    columns = []
-    for code, label in stages:
-        leads = Lead.objects.filter(owner=request.user, status=code).order_by('next_follow_up', 'name')
-        columns.append({'code': code, 'label': label, 'leads': leads})
+    return render(request, 'crm/pipeline.html', {'columns': _pipeline_columns(request.user)})
 
-    return render(request, 'crm/pipeline.html', {'columns': columns})
+
+@login_required(login_url='login')
+def lead_pipeline_move_view(request, pk, status):
+    lead = get_object_or_404(Lead, pk=pk, owner=request.user)
+    if request.method == 'POST':
+        lead.status = status
+        lead.save()
+        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_kanban_board.html', {'columns': _pipeline_columns(request.user)})
+    return redirect('pipeline')
 
 
 @login_required(login_url='login')
