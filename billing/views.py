@@ -1,6 +1,7 @@
 from datetime import datetime, timezone as dt_timezone
 from decimal import Decimal, InvalidOperation
 
+import stripe
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
@@ -60,6 +61,12 @@ def payment_link_create_view(request):
         except InvalidOperation:
             amount = Decimal('0')
 
+        if amount <= 0:
+            context = {'error': 'Suma turi būti didesnė už 0.', 'products': products, 'leads': leads}
+            if request.headers.get('HX-Request'):
+                return render(request, 'billing/partials/_payment_link_form_modal.html', context)
+            return render(request, 'billing/payment_link_form.html', context)
+
         payment_link = PaymentLink(
             organization=organization,
             description=request.POST.get('description', '').strip(),
@@ -78,6 +85,11 @@ def payment_link_create_view(request):
             )
         except StripeNotConfigured as exc:
             context = {'error': str(exc), 'products': products, 'leads': leads}
+            if request.headers.get('HX-Request'):
+                return render(request, 'billing/partials/_payment_link_form_modal.html', context)
+            return render(request, 'billing/payment_link_form.html', context)
+        except stripe.StripeError as exc:
+            context = {'error': f'Stripe klaida: {exc.user_message or str(exc)}', 'products': products, 'leads': leads}
             if request.headers.get('HX-Request'):
                 return render(request, 'billing/partials/_payment_link_form_modal.html', context)
             return render(request, 'billing/payment_link_form.html', context)
@@ -122,6 +134,13 @@ def subscribe_view(request, plan_code):
     plan = get_object_or_404(Plan, code=plan_code)
 
     if request.method == 'POST':
+        if plan.monthly_price == 0:
+            subscription.plan = plan
+            subscription.status = 'active'
+            subscription.stripe_subscription_id = ''
+            subscription.save()
+            return redirect('plan-list')
+
         try:
             session = create_subscription_checkout_session(
                 organization,
@@ -134,6 +153,13 @@ def subscribe_view(request, plan_code):
                 'subscription': subscription,
                 'plans': Plan.objects.exclude(code=subscription.plan.code).order_by('monthly_price'),
                 'error': str(exc),
+            }
+            return render(request, 'billing/plan_list.html', context)
+        except stripe.StripeError as exc:
+            context = {
+                'subscription': subscription,
+                'plans': Plan.objects.exclude(code=subscription.plan.code).order_by('monthly_price'),
+                'error': f'Stripe klaida: {exc.user_message or str(exc)}',
             }
             return render(request, 'billing/plan_list.html', context)
         return redirect(session.url)

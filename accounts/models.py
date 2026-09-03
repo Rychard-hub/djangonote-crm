@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from django.db import models
+from django.db import IntegrityError, models
 from django.utils.text import slugify
 
 
@@ -54,6 +54,11 @@ def get_organization(user):
     Organization.objects.create_for_user().
     """
     membership = Membership.objects.filter(user=user).select_related('organization').first()
-    if membership is None:
+    if membership is not None:
+        return membership.organization
+
+    try:
         return Organization.objects.create_for_user(user)
-    return membership.organization
+    except IntegrityError:
+        # Lost a race with a concurrent first request for the same user.
+        return Membership.objects.select_related('organization').get(user=user).organization

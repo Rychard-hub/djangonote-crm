@@ -1,3 +1,5 @@
+from decimal import Decimal, InvalidOperation
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,6 +7,14 @@ from django.urls import reverse
 
 from accounts.models import get_organization
 from .models import Product
+
+
+def _parse_price(request):
+    try:
+        price = Decimal(request.POST.get('price', '0') or '0')
+    except InvalidOperation:
+        price = Decimal('0')
+    return max(price, Decimal('0'))
 
 
 @login_required(login_url='login')
@@ -46,7 +56,7 @@ def product_create_view(request):
             name=request.POST.get('name', '').strip(),
             kind=request.POST.get('kind', 'service'),
             description=request.POST.get('description', '').strip(),
-            price=request.POST.get('price', '0') or '0',
+            price=_parse_price(request),
             currency=request.POST.get('currency', 'EUR').strip() or 'EUR',
             active=bool(request.POST.get('active')),
             organization=get_organization(request.user),
@@ -70,7 +80,7 @@ def product_edit_view(request, pk):
         product.name = request.POST.get('name', '').strip()
         product.kind = request.POST.get('kind', 'service')
         product.description = request.POST.get('description', '').strip()
-        product.price = request.POST.get('price', '0') or '0'
+        product.price = _parse_price(request)
         product.currency = request.POST.get('currency', 'EUR').strip() or 'EUR'
         product.active = bool(request.POST.get('active'))
         product.save()
