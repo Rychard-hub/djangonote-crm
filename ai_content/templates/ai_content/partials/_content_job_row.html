@@ -4,7 +4,13 @@
     <td>{{ job.prompt|truncatechars:80 }}</td>
     <td><span class="badge {{ job.status }}">{{ job.get_status_display }}</span></td>
     <td class="result-text">
-        {% if job.status == 'done' %}{{ job.result_text }}{% endif %}
+        {% if job.status == 'done' and job.is_media and job.result_file %}
+            {% if job.kind == 'image' %}
+                <img src="{{ job.result_file.url }}" alt="{{ job.prompt|truncatechars:80 }}" style="max-width:160px; border-radius:6px;">
+            {% elif job.kind == 'video' %}
+                <video controls src="{{ job.result_file.url }}" style="max-width:220px; border-radius:6px;"></video>
+            {% endif %}
+        {% elif job.status == 'done' %}{{ job.result_text }}{% endif %}
         {% if job.status == 'failed' %}<span style="color:#b91c1c;">{{ job.error }}</span>{% endif %}
         {% if job.in_progress %}<em>Generuojama...</em>{% endif %}
     </td>

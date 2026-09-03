@@ -271,6 +271,11 @@ STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
 # views/tasks handle AIProviderNotConfigured gracefully rather than crashing.
 ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 
+# Stability AI settings (AI image/video generation) -- unset in dev;
+# ai_content views/tasks handle ImageProviderNotConfigured gracefully
+# rather than crashing.
+STABILITY_API_KEY = os.getenv('STABILITY_API_KEY', '')
+
 if not EMAIL_BACKEND:
     if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
