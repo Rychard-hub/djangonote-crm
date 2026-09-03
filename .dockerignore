@@ -1,0 +1,27 @@
+.git
+.gitignore
+.idea
+.vscode
+
+__pycache__/
+*.pyc
+
+# Local dev DB and generated media -- never ship these into the image
+db.sqlite3
+media/
+logs/
+
+# Local secrets -- real values come from the platform's env vars, not the image
+.env
+.env.*
+!.env.example
+
+# Misc local/dev-only scripts and captured output, not needed at runtime
+cookies.txt
+headers.txt
+create_test_data.py
+create_test_user.py
+debug_mcp.py
+demo_mcp.py
+demo_mcp_auth.py
+token_response.txt

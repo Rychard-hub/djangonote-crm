@@ -25,6 +25,15 @@ CORS_ALLOWED_ORIGINS = os.getenv(
 
 CORS_ALLOW_CREDENTIALS = True
 
+# Django rejects unsafe (POST/PUT/...) requests whose Origin isn't listed
+# here once the app sits behind a proxy like Railway's edge -- set this to
+# your public URL(s), e.g. https://your-app.up.railway.app
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
 # --------------------------------------------------
 # INSTALLED APPS
 # --------------------------------------------------
@@ -44,9 +53,15 @@ INSTALLED_APPS = [
     "django_extensions",
     "django_celery_beat",
     "django_celery_results",
+    "storages",
 
     # tavo apps
+    "accounts",
     "crm",
+    "catalog",
+    "billing",
+    "ai_content",
+    "assistant",
 ]
 
 # --------------------------------------------------
@@ -90,7 +105,9 @@ DATABASES = {
     "default": dj_database_url.config(
         default=os.getenv("DATABASE_URL", "postgres://crm_user:crm_pass@db:5433/crm_db"),
         conn_max_age=600,
-        ssl_require=False,
+        # Railway's internal Postgres connection doesn't need/support SSL;
+        # set to "1" if connecting over its public proxy instead.
+        ssl_require=os.getenv("DATABASE_SSL_REQUIRE", "0") == "1",
     )
 }
 
@@ -133,8 +150,42 @@ MEDIA_ROOT = BASE_DIR / "media"
 PDF_ROOT = MEDIA_ROOT / "pdfs"
 PDF_URL = MEDIA_URL + "pdfs/"
 
-# WhiteNoise production static files
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# Static files are baked into the container image, so WhiteNoise serves
+# them straight from local disk -- no object storage needed there. Media
+# (user uploads, generated PDFs/images/videos) is a different story: most
+# PaaS containers (Railway included) have an ephemeral filesystem, so
+# anything written to MEDIA_ROOT disappears on the next deploy/restart.
+# Point AWS_STORAGE_BUCKET_NAME at an S3-compatible bucket (e.g.
+# Cloudflare R2) to persist it there instead; unset, it falls back to
+# local disk, same "unconfigured -> degrade" pattern used for the
+# Stripe/Anthropic/Stability integrations below.
+STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
+
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
+
+if AWS_STORAGE_BUCKET_NAME:
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
+    # e.g. https://<account_id>.r2.cloudflarestorage.com for Cloudflare R2
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL", "")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto")
+    AWS_S3_ADDRESSING_STYLE = os.getenv("AWS_S3_ADDRESSING_STYLE", "virtual")
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_DEFAULT_ACL = None  # R2 doesn't support per-object ACLs
+    AWS_S3_FILE_OVERWRITE = False
+    # Public bucket/custom domain (e.g. an r2.dev subdomain or your own
+    # domain mapped to the bucket) -> plain URLs, no querystring auth.
+    # Leave unset for a private bucket accessed via signed URLs instead.
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN", "")
+    AWS_QUERYSTRING_AUTH = not AWS_S3_CUSTOM_DOMAIN
+    STORAGES["default"] = {"BACKEND": "storages.backends.s3.S3Storage"}
 
 # --------------------------------------------------
 # DEFAULT PRIMARY KEY
@@ -179,8 +230,12 @@ SIMPLE_JWT = {
 # --------------------------------------------------
 # CELERY / REDIS
 # --------------------------------------------------
-CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
-CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+# Railway's Redis plugin injects REDIS_URL; CELERY_BROKER_URL/
+# CELERY_RESULT_BACKEND only need setting explicitly if you want the
+# broker and result backend to live in different places.
+REDIS_URL = os.getenv("REDIS_URL", "redis://redis:6379/0")
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", REDIS_URL)
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", REDIS_URL)
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
@@ -209,7 +264,7 @@ CELERY_BEAT_SCHEDULE = {
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL", "redis://redis:6379/0"),
+        "LOCATION": REDIS_URL,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -226,6 +281,26 @@ EMAIL_USE_TLS = os.getenv("EMAIL_USE_TLS", "True") == "True"
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@crm.example.com")
+
+# --------------------------------------------------
+# THIRD-PARTY APP SETTINGS
+# --------------------------------------------------
+# Frontend URL for invitation/reset links
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
+
+# Stripe (payment links) -- billing views handle StripeNotConfigured
+# gracefully rather than crashing when unset.
+STRIPE_SECRET_KEY = os.getenv("STRIPE_SECRET_KEY", "")
+STRIPE_PUBLISHABLE_KEY = os.getenv("STRIPE_PUBLISHABLE_KEY", "")
+STRIPE_WEBHOOK_SECRET = os.getenv("STRIPE_WEBHOOK_SECRET", "")
+
+# Anthropic (AI content generation) -- ai_content views/tasks handle
+# AIProviderNotConfigured gracefully rather than crashing when unset.
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+
+# Stability AI (AI image/video generation) -- ai_content views/tasks
+# handle ImageProviderNotConfigured gracefully rather than crashing.
+STABILITY_API_KEY = os.getenv("STABILITY_API_KEY", "")
 
 # --------------------------------------------------
 # SECURITY
@@ -248,6 +323,13 @@ USE_X_FORWARDED_HOST = True
 # --------------------------------------------------
 # LOGGING
 # --------------------------------------------------
+# Console-only by default: Railway (and most PaaS) capture stdout/stderr
+# directly, and a container's filesystem may not have the log directory
+# a FileHandler would need. Set LOG_FILE to opt into logging to a file
+# too (e.g. on a self-hosted box with a mounted volume for it).
+LOG_FILE = os.getenv("LOG_FILE", "")
+
+_log_handlers = ["console"]
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -266,34 +348,38 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "verbose",
         },
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": os.getenv("LOG_FILE", "/var/log/django/crm.log"),
-            "formatter": "verbose",
-        },
     },
     "loggers": {
         "django": {
-            "handlers": ["console", "file"],
+            "handlers": _log_handlers,
             "level": "INFO",
             "propagate": True,
         },
         "crm": {
-            "handlers": ["console", "file"],
+            "handlers": _log_handlers,
             "level": "INFO",
             "propagate": True,
         },
         "celery": {
-            "handlers": ["console", "file"],
+            "handlers": _log_handlers,
             "level": "INFO",
             "propagate": True,
         },
     },
     "root": {
-        "handlers": ["console", "file"],
+        "handlers": _log_handlers,
         "level": "INFO",
     },
 }
+
+if LOG_FILE:
+    Path(LOG_FILE).parent.mkdir(parents=True, exist_ok=True)
+    LOGGING["handlers"]["file"] = {
+        "class": "logging.FileHandler",
+        "filename": LOG_FILE,
+        "formatter": "verbose",
+    }
+    _log_handlers.append("file")
 
 # --------------------------------------------------
 # ADDITIONAL PRODUCTION SETTINGS
