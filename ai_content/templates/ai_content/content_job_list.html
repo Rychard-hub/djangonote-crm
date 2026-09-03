@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mokėjimo nuorodos</title>
+    <title>AI turinys</title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
         .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
@@ -12,19 +12,18 @@
         .container { padding: 2rem; }
         .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
+        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
         .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
-        .pending { background: #fef3c7; color: #b45309; }
-        .paid { background: #dcfce7; color: #166534; }
-        .expired { background: #fee2e2; color: #b91c1c; }
-        .copy-btn { padding: 0.3rem 0.6rem; border: 1px solid #cbd5e1; border-radius: 6px; background: white; cursor: pointer; font-size: 0.85rem; }
+        .pending, .processing { background: #fef3c7; color: #b45309; }
+        .done { background: #dcfce7; color: #166534; }
+        .failed { background: #fee2e2; color: #b91c1c; }
+        .result-text { white-space: pre-wrap; max-width: 420px; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
         .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
         .modal-box form { display: grid; gap: 0.9rem; }
         .modal-box label { font-weight: 600; font-size: 0.95rem; }
         .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
         .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
-        .modal-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
         .modal-error { background: #fee2e2; color: #b91c1c; padding: 0.8rem; border-radius: 8px; margin-bottom: 0.9rem; }
     </style>
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
@@ -32,7 +31,7 @@
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <div id="modal"></div>
     <header class="topbar">
-        <h2>Mokėjimo nuorodos</h2>
+        <h2>AI turinys</h2>
         <nav class="nav">
             <a href="/dashboard/">Dashboard</a>
             <a href="/leads/">Lead'ai</a>
@@ -48,27 +47,20 @@
 
     <main class="container">
         <div class="toolbar">
-            <a href="/billing/payment-links/new/" hx-get="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;">
-                <button type="button">Sukurti mokėjimo nuorodą</button>
+            <a href="/ai-content/new/" hx-get="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;">
+                <button type="button">Generuoti turinį</button>
             </a>
             <span style="color:#64748b;">
-                Planas: <strong>{{ subscription.plan.name }}</strong>
-                {% if remaining is not None %} — liko {{ remaining }} nuorod(ų) šį mėnesį{% endif %}
-                — <a href="/billing/plans/">keisti planą</a>
+                {% if has_feature %}
+                    Planas: <strong>{{ subscription.plan.name }}</strong> — liko {{ remaining }} generavimų šį mėnesį
+                {% else %}
+                    AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano —
+                    <a href="/billing/plans/">peržiūrėti planus</a>
+                {% endif %}
             </span>
         </div>
 
-        {% include 'billing/partials/_payment_link_table.html' %}
+        {% include 'ai_content/partials/_content_job_table.html' %}
     </main>
-
-    <script>
-        function copyLink(btn, url) {
-            navigator.clipboard.writeText(url).then(function () {
-                var original = btn.textContent;
-                btn.textContent = 'Nukopijuota!';
-                setTimeout(function () { btn.textContent = original; }, 1500);
-            });
-        }
-    </script>
 </body>
 </html>

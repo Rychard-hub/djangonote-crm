@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'crm',
     'catalog',
     'billing',
+    'ai_content',
 ]
 
 MIDDLEWARE = [
@@ -264,6 +265,10 @@ DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'noreply@example.com')
 STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
 STRIPE_PUBLISHABLE_KEY = os.getenv('STRIPE_PUBLISHABLE_KEY', '')
 STRIPE_WEBHOOK_SECRET = os.getenv('STRIPE_WEBHOOK_SECRET', '')
+
+# Anthropic settings (AI content generation) -- unset in dev; ai_content
+# views/tasks handle AIProviderNotConfigured gracefully rather than crashing.
+ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 
 if not EMAIL_BACKEND:
     if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:

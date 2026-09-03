@@ -47,6 +47,7 @@ urlpatterns = [
     path('api/', include('crm.api_urls')),  # API endpoints
     path('catalog/', include('catalog.urls')),
     path('billing/', include('billing.urls')),
+    path('ai-content/', include('ai_content.urls')),
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),
     path('password-reset/', password_reset_view, name='password-reset'),
