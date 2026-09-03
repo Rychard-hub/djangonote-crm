@@ -1,10 +1,18 @@
 import logging
 
 from celery import shared_task
+from django.core.files.base import ContentFile
 from django.utils import timezone
 
 from .models import ContentJob
-from .services import AIProviderNotConfigured, generate_text
+from .services import (
+    AIProviderNotConfigured,
+    GenerationFailed,
+    ImageProviderNotConfigured,
+    generate_image_bytes,
+    generate_text,
+    generate_video_bytes,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,10 +28,22 @@ def run_content_job(job_id):
     job.status = 'processing'
     job.save(update_fields=['status'])
 
+    update_fields = ['status', 'error', 'completed_at']
+
     try:
-        job.result_text = generate_text(job.kind, job.prompt)
+        if job.kind == 'image':
+            file_bytes, _content_type = generate_image_bytes(job.prompt)
+            job.result_file.save(f'image-{job.pk}.png', ContentFile(file_bytes), save=False)
+            update_fields.append('result_file')
+        elif job.kind == 'video':
+            file_bytes, _content_type = generate_video_bytes(job.prompt)
+            job.result_file.save(f'video-{job.pk}.mp4', ContentFile(file_bytes), save=False)
+            update_fields.append('result_file')
+        else:
+            job.result_text = generate_text(job.kind, job.prompt)
+            update_fields.append('result_text')
         job.status = 'done'
-    except AIProviderNotConfigured as exc:
+    except (AIProviderNotConfigured, ImageProviderNotConfigured, GenerationFailed) as exc:
         job.status = 'failed'
         job.error = str(exc)
     except Exception as exc:
@@ -32,4 +52,4 @@ def run_content_job(job_id):
         job.error = str(exc)
 
     job.completed_at = timezone.now()
-    job.save(update_fields=['result_text', 'status', 'error', 'completed_at'])
+    job.save(update_fields=update_fields)
