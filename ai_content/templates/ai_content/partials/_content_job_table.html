@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+            <th>Tipas</th>
+            <th>Užklausa</th>
+            <th>Būsena</th>
+            <th>Rezultatas</th>
+            <th>Sukurta</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for job in jobs %}
+            {% include 'ai_content/partials/_content_job_row.html' %}
+        {% empty %}
+            <tr><td colspan="5">Kol kas nieko negeneruota</td></tr>
+        {% endfor %}
+    </tbody>
+</table>

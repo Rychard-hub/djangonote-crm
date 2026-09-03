@@ -14,6 +14,7 @@ from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
 
 from django.contrib.auth.models import User
+from accounts.models import get_organization
 from .models import Lead, Comment, Task, Activity, Profile, EmailVerification
 from .serializers import (
     LeadSerializer, LeadDetailSerializer, LeadCreateSerializer, LeadStatusUpdateSerializer,
@@ -36,7 +37,7 @@ class LeadViewSet(viewsets.ModelViewSet):
     ordering = ['-updated_at']
 
     def get_queryset(self):
-        return Lead.objects.filter(owner=self.request.user)
+        return Lead.objects.filter(organization=get_organization(self.request.user))
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -46,12 +47,12 @@ class LeadViewSet(viewsets.ModelViewSet):
         return LeadSerializer
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        serializer.save(owner=self.request.user, organization=get_organization(self.request.user))
 
     @action(detail=False, methods=['get'])
     def dashboard_stats(self, request):
         """Gauti dashboard statistiką"""
-        user_leads = Lead.objects.filter(owner=request.user)
+        user_leads = Lead.objects.filter(organization=get_organization(request.user))
         today = date.today()
         
         stats = {
@@ -177,7 +178,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Comment.objects.filter(lead__owner=self.request.user)
+        return Comment.objects.filter(lead__organization=get_organization(self.request.user))
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -187,7 +188,7 @@ class CommentViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Patikriname ar vartotojas turi teisę šiam lead'ui
         lead_id = serializer.validated_data['lead'].id
-        if not Lead.objects.filter(id=lead_id, owner=self.request.user).exists():
+        if not Lead.objects.filter(id=lead_id, organization=get_organization(self.request.user)).exists():
             raise permissions.PermissionDenied("Neturite teisės šiam lead'ui")
         
         serializer.save(created_by=self.request.user)
@@ -204,7 +205,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     ordering = ['completed', '-created_at']
 
     def get_queryset(self):
-        return Task.objects.filter(lead__owner=self.request.user)
+        return Task.objects.filter(lead__organization=get_organization(self.request.user))
 
     def get_serializer_class(self):
         if self.action == 'create':
@@ -214,7 +215,7 @@ class TaskViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         # Patikriname ar vartotojas turi teisę šiam lead'ui
         lead_id = serializer.validated_data['lead'].id
-        if not Lead.objects.filter(id=lead_id, owner=self.request.user).exists():
+        if not Lead.objects.filter(id=lead_id, organization=get_organization(self.request.user)).exists():
             raise permissions.PermissionDenied("Neturite teisės šiam lead'ui")
         
         serializer.save(created_by=self.request.user)
@@ -248,7 +249,7 @@ class ActivityViewSet(viewsets.ReadOnlyModelViewSet):
     ordering = ['-created_at']
 
     def get_queryset(self):
-        return Activity.objects.filter(lead__owner=self.request.user)
+        return Activity.objects.filter(lead__organization=get_organization(self.request.user))
 
 
 class ProfileViewSet(viewsets.ModelViewSet):

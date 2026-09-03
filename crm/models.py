@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
 
+from accounts.models import Organization
+
 
 class EmailVerification(models.Model):
     """El. pašto patvirtinimo token'ų modelis"""
@@ -50,6 +52,7 @@ class Lead(models.Model):
     budget = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     notes = models.TextField(blank=True)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='leads')
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='leads')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

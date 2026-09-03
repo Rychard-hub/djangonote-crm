@@ -1,0 +1,53 @@
+<div class="modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h2 style="margin:0;">Sukurti mokėjimo nuorodą</h2>
+            <button type="button" onclick="document.getElementById('modal').innerHTML=''"
+                    style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
+        </div>
+        {% if error %}
+            <div class="modal-error">Nepavyko sukurti mokėjimo nuorodos: {{ error }}</div>
+        {% endif %}
+        {% if quota_exceeded %}
+            <div class="modal-error">
+                Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas.
+                <a href="/billing/plans/">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.
+            </div>
+        {% endif %}
+        <form hx-post="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML" {% if quota_exceeded %}style="opacity:0.5; pointer-events:none;"{% endif %}>
+            <div>
+                <label for="description">Aprašymas</label>
+                <input id="description" name="description" placeholder="Pvz.: Landing page kūrimas">
+            </div>
+            <div class="row">
+                <div>
+                    <label for="amount">Suma</label>
+                    <input id="amount" name="amount" type="number" step="0.01" min="0.01" required>
+                </div>
+                <div>
+                    <label for="currency">Valiuta</label>
+                    <input id="currency" name="currency" value="EUR" maxlength="3">
+                </div>
+            </div>
+            <div>
+                <label for="lead">Susieti su lead'u (nebūtina)</label>
+                <select id="lead" name="lead">
+                    <option value="">-</option>
+                    {% for lead in leads %}
+                        <option value="{{ lead.pk }}" {% if selected_lead == lead.pk|stringformat:"s" %}selected{% endif %}>{{ lead.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label for="product">Susieti su preke/paslauga (nebūtina)</label>
+                <select id="product" name="product">
+                    <option value="">-</option>
+                    {% for product in products %}
+                        <option value="{{ product.pk }}">{{ product.name }} ({{ product.price }} {{ product.currency }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit">Sukurti nuorodą</button>
+        </form>
+    </div>
+</div>

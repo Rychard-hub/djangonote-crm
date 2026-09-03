@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planai</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+        .topbar a { color: white; text-decoration: none; }
+        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
+        .container { padding: 2rem; }
+        .current-plan { background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
+        .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+        .plan-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        .plan-card h3 { margin-top: 0; }
+        .price { font-size: 1.6rem; font-weight: bold; margin: 0.5rem 0; }
+        .plan-card ul { padding-left: 1.1rem; color: #475569; font-size: 0.9rem; }
+        .plan-card button { width: 100%; padding: 0.7rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; margin-top: 0.8rem; }
+        .modal-error { background: #fee2e2; color: #b91c1c; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <h2>Planai</h2>
+        <nav class="nav">
+            <a href="/dashboard/">Dashboard</a>
+            <a href="/leads/">Lead'ai</a>
+            <a href="/followups/">Follow-up</a>
+            <a href="/pipeline/">Pipeline</a>
+            <a href="/catalog/">Katalogas</a>
+            <a href="/billing/payment-links/">Mokėjimai</a>
+            <a href="/billing/plans/">Planas</a>
+            <a href="/ai-content/">AI turinys</a>
+            <a href="/assistant/">AI asistentas</a>
+            <a href="#">Nustatymai</a>
+        </nav>
+    </header>
+
+    <main class="container">
+        {% if error %}
+            <div class="modal-error">
+                Nepavyko pradėti prenumeratos: {{ error }}
+                <br>Nustatykite <code>STRIPE_SECRET_KEY</code> ir plano <code>stripe_price_id</code>, tada bandykite dar kartą.
+            </div>
+        {% endif %}
+
+        <div class="current-plan">
+            Dabartinis planas: <strong>{{ subscription.plan.name }}</strong>
+            (statusas: {{ subscription.get_status_display }})
+            {% if subscription.plan.max_payment_links_per_month > 0 %}
+                — {{ subscription.plan.max_payment_links_per_month }} mokėjimo nuorodos per mėnesį
+            {% else %}
+                — neribotai mokėjimo nuorodų
+            {% endif %}
+        </div>
+
+        <div class="plans">
+            {% for plan in plans %}
+                <div class="plan-card">
+                    <h3>{{ plan.name }}</h3>
+                    <div class="price">{{ plan.monthly_price }} € / mėn.</div>
+                    <ul>
+                        {% if plan.max_payment_links_per_month > 0 %}
+                            <li>{{ plan.max_payment_links_per_month }} mokėjimo nuorodos / mėn.</li>
+                        {% else %}
+                            <li>Neribotai mokėjimo nuorodų</li>
+                        {% endif %}
+                        {% if plan.ai_content_quota > 0 %}
+                            <li>{{ plan.ai_content_quota }} AI turinio generavimų / mėn.</li>
+                        {% endif %}
+                        {% for feature in plan.features %}
+                            <li>{{ feature }}</li>
+                        {% endfor %}
+                    </ul>
+                    <form method="post" action="{% url 'subscribe' plan.code %}">
+                        {% csrf_token %}
+                        <button type="submit">Pereiti į „{{ plan.name }}“</button>
+                    </form>
+                </div>
+            {% empty %}
+                <p>Kitų planų nėra.</p>
+            {% endfor %}
+        </div>
+    </main>
+</body>
+</html>

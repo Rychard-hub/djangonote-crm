@@ -1,0 +1,36 @@
+<div class="modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h2 style="margin:0;">Generuoti AI turinį</h2>
+            <button type="button" onclick="document.getElementById('modal').innerHTML=''"
+                    style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
+        </div>
+        {% if error %}
+            <div class="modal-error">{{ error }} <a href="/billing/plans/">Peržiūrėti planus</a>.</div>
+        {% elif not has_feature %}
+            <div class="modal-error">
+                AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano.
+                <a href="/billing/plans/">Pereiti į Pro planą</a>.
+            </div>
+        {% elif blocked %}
+            <div class="modal-error">
+                Pasiektas „{{ plan_name }}“ plano mėnesio AI generavimų limitas.
+                <a href="/billing/plans/">Pereiti į didesnį planą</a>.
+            </div>
+        {% endif %}
+        <form hx-post="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML" {% if blocked %}style="opacity:0.5; pointer-events:none;"{% endif %}>
+            <div>
+                <label for="kind">Tipas</label>
+                <select id="kind" name="kind">
+                    <option value="headline">Antraštė</option>
+                    <option value="script">Scenarijus</option>
+                </select>
+            </div>
+            <div>
+                <label for="prompt">Aprašykite, ko reikia</label>
+                <textarea id="prompt" name="prompt" rows="4" placeholder="Pvz.: rinkodaros antraštė naujo web dizaino paslaugai smulkiam verslui" required></textarea>
+            </div>
+            <button type="submit">Generuoti</button>
+        </form>
+    </div>
+</div>

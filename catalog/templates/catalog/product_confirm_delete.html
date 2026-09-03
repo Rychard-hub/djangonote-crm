@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ištrinti prekę/paslaugą</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
+        .container { max-width: 560px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
+        button { padding: 0.8rem 1rem; background: #dc2626; color: white; border: 0; border-radius: 8px; cursor: pointer; }
+        a { margin-left: 0.75rem; text-decoration: none; color: #2563eb; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Ištrinti „{{ product.name }}“?</h2>
+        <p>Ar tikrai norite ištrinti šį įrašą iš katalogo?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit">Taip, ištrinti</button>
+            <a href="/catalog/">Atšaukti</a>
+        </form>
+    </div>
+</body>
+</html>

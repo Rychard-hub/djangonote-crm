@@ -1,0 +1,47 @@
+<div class="modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
+    <div class="modal-box">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+            <h2 style="margin:0;">{% if mode == 'edit' %}Redaguoti{% else %}Pridėti{% endif %} prekę/paslaugą</h2>
+            <button type="button" onclick="document.getElementById('modal').innerHTML=''"
+                    style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
+        </div>
+        <form hx-post="{% if mode == 'edit' %}{% url 'product-edit' product.pk %}{% else %}{% url 'product-create' %}{% endif %}"
+              hx-target="#modal" hx-swap="innerHTML">
+            <div>
+                <label for="name">Pavadinimas</label>
+                <input id="name" name="name" value="{{ product.name|default:'' }}" required>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="kind">Tipas</label>
+                    <select id="kind" name="kind">
+                        <option value="product" {% if product.kind == 'product' %}selected{% endif %}>Produktas</option>
+                        <option value="service" {% if product.kind == 'service' or not product %}selected{% endif %}>Paslauga</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="active">Būsena</label>
+                    <select id="active" name="active">
+                        <option value="1" {% if product.active or not product %}selected{% endif %}>Aktyvus</option>
+                        <option value="" {% if product and not product.active %}selected{% endif %}>Neaktyvus</option>
+                    </select>
+                </div>
+            </div>
+            <div class="row">
+                <div>
+                    <label for="price">Kaina</label>
+                    <input id="price" name="price" type="number" step="0.01" value="{{ product.price|default:'0' }}">
+                </div>
+                <div>
+                    <label for="currency">Valiuta</label>
+                    <input id="currency" name="currency" value="{{ product.currency|default:'EUR' }}" maxlength="3">
+                </div>
+            </div>
+            <div>
+                <label for="description">Aprašymas</label>
+                <textarea id="description" name="description" rows="3">{{ product.description|default:'' }}</textarea>
+            </div>
+            <button type="submit">Išsaugoti</button>
+        </form>
+    </div>
+</div>
