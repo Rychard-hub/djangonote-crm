@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     'catalog',
     'billing',
     'ai_content',
+    'assistant',
 ]
 
 MIDDLEWARE = [

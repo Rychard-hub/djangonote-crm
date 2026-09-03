@@ -48,6 +48,7 @@ urlpatterns = [
     path('catalog/', include('catalog.urls')),
     path('billing/', include('billing.urls')),
     path('ai-content/', include('ai_content.urls')),
+    path('assistant/', include('assistant.urls')),
     path('', login_view, name='login'),
     path('register/', register_view, name='register'),
     path('password-reset/', password_reset_view, name='password-reset'),
