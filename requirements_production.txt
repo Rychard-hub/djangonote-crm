@@ -21,6 +21,13 @@ django-celery-results==2.6.0
 
 # Static files and media
 whitenoise==6.6.0
+django-storages==1.14.4
+boto3==1.35.36
+
+# AI content generation (Anthropic + Stability AI) and Stripe payments
+anthropic>=0.40.0
+stripe>=10.0.0
+requests>=2.31.0
 
 # Email
 # Add your email backend if needed (e.g., django-anymail for SendGrid, Mailgun, etc.)
