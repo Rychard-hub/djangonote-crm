@@ -19,9 +19,12 @@
     <div class="container">
         <h2>Sukurti mokėjimo nuorodą</h2>
         {% if error %}
+            <div class="modal-error">Nepavyko sukurti mokėjimo nuorodos: {{ error }}</div>
+        {% endif %}
+        {% if quota_exceeded %}
             <div class="modal-error">
-                Nepavyko sukurti mokėjimo nuorodos: {{ error }}
-                <br>Nustatykite <code>STRIPE_SECRET_KEY</code> aplinkos kintamąjį ir bandykite dar kartą.
+                Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas.
+                <a href="/billing/plans/">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.
             </div>
         {% endif %}
         <form method="post">

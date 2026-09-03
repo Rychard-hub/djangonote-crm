@@ -6,12 +6,15 @@
                     style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
         </div>
         {% if error %}
+            <div class="modal-error">Nepavyko sukurti mokėjimo nuorodos: {{ error }}</div>
+        {% endif %}
+        {% if quota_exceeded %}
             <div class="modal-error">
-                Nepavyko sukurti mokėjimo nuorodos: {{ error }}
-                <br>Nustatykite <code>STRIPE_SECRET_KEY</code> aplinkos kintamąjį ir bandykite dar kartą.
+                Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas.
+                <a href="/billing/plans/">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.
             </div>
         {% endif %}
-        <form hx-post="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML">
+        <form hx-post="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML" {% if quota_exceeded %}style="opacity:0.5; pointer-events:none;"{% endif %}>
             <div>
                 <label for="description">Aprašymas</label>
                 <input id="description" name="description" placeholder="Pvz.: Landing page kūrimas">

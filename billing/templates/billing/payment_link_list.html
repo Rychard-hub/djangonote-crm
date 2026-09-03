@@ -40,6 +40,7 @@
             <a href="/pipeline/">Pipeline</a>
             <a href="/catalog/">Katalogas</a>
             <a href="/billing/payment-links/">Mokėjimai</a>
+            <a href="/billing/plans/">Planas</a>
             <a href="#">Nustatymai</a>
         </nav>
     </header>
@@ -49,6 +50,11 @@
             <a href="/billing/payment-links/new/" hx-get="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;">
                 <button type="button">Sukurti mokėjimo nuorodą</button>
             </a>
+            <span style="color:#64748b;">
+                Planas: <strong>{{ subscription.plan.name }}</strong>
+                {% if remaining is not None %} — liko {{ remaining }} nuorod(ų) šį mėnesį{% endif %}
+                — <a href="/billing/plans/">keisti planą</a>
+            </span>
         </div>
 
         {% include 'billing/partials/_payment_link_table.html' %}
