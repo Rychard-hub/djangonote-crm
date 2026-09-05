@@ -25,3 +25,10 @@ debug_mcp.py
 demo_mcp.py
 demo_mcp_auth.py
 token_response.txt
+
+# Superseded React frontend -- per docs/bussynote-mvp-architecture.md
+# section 0, this was never wired into settings.py/URL routing and the
+# project went with server-rendered Django + HTMX instead. It's ~220MB,
+# mostly a committed node_modules, and would otherwise bloat every
+# Railway build's context and image for no runtime benefit.
+skybridge_crm/
