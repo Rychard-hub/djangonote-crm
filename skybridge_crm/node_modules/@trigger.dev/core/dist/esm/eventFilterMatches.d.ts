@@ -1,2 +1,0 @@
-import type { EventFilter } from "./schemas/eventFilter.js";
-export declare function eventFilterMatches(payload: any, filter: EventFilter): boolean;

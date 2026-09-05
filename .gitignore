@@ -9,3 +9,6 @@ db.sqlite3
 # Debug/auth artifacts
 cookies.txt
 token_response.txt
+
+# Node dependencies
+node_modules/
