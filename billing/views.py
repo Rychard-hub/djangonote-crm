@@ -180,7 +180,10 @@ def stripe_webhook_view(request):
         return HttpResponseBadRequest()
 
     event_type = event['type']
-    data = event['data']['object']
+    # stripe-python's typed resources (Session, Subscription, ...) don't support
+    # dict-style .get() -- _activate_subscription_from_session/_sync_subscription_status
+    # rely on it, so convert once here.
+    data = event['data']['object'].to_dict()
 
     if event_type == 'checkout.session.completed':
         if data.get('mode') == 'subscription':
