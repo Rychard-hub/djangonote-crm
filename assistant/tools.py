@@ -60,6 +60,9 @@ TOOL_DEFINITIONS = [
             'properties': {
                 'lead_id': {'type': 'integer'},
                 'status': {'type': 'string', 'enum': ['new', 'contacted', 'proposal', 'won', 'lost']},
+                'phone': {'type': 'string', 'description': "Lead'o telefono numeris."},
+                'company': {'type': 'string'},
+                'email': {'type': 'string'},
                 'notes': {'type': 'string'},
             },
             'required': ['lead_id'],
@@ -100,6 +103,7 @@ def _lead_to_dict(lead):
         'name': lead.name,
         'company': lead.company,
         'email': lead.email,
+        'phone': lead.phone, 
         'status': lead.status,
         'next_follow_up': str(lead.next_follow_up) if lead.next_follow_up else None,
         'budget': str(lead.budget),
@@ -130,13 +134,19 @@ def _create_lead(organization, user, name, company='', email='', phone='', notes
     return _lead_to_dict(lead)
 
 
-def _update_lead(organization, user, lead_id, status=None, notes=None):
+def _update_lead(organization, user, lead_id, status=None, phone=None, company=None, email=None, notes=None):
     try:
         lead = Lead.objects.get(pk=lead_id, organization=organization)
     except Lead.DoesNotExist:
         return {'error': f"Lead'as #{lead_id} nerastas."}
     if status:
         lead.status = status
+     if phone is not None:
+        lead.phone = phone
+    if company is not None:
+        lead.company = company
+    if email is not None:
+        lead.email = email
     if notes is not None:
         lead.notes = notes
     lead.save()
