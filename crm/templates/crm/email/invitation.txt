@@ -1,13 +1,13 @@
-Kvietimas prisijungti prie Freelancer CRM
+Kvietimas prisijungti prie Bussy'note
 
 Sveiki,
 
-Jūs buvote pakviesti prisijungti prie Freelancer CRM sistemos.
+Jūs buvote pakviesti prisijungti prie Bussy'note sistemos.
 
 Sukurkite savo paskyrą spusteldami žemiau esančią nuorodą:
 {{ invitation_link }}
 
-Kas yra Freelancer CRM?
+Kas yra Bussy'note?
 - Moderni klientų valdymo sistema
 - Lead'ų ir pardavimų pipeline valdymas
 - Automatiniai priminimai ir ataskaitos
@@ -20,4 +20,4 @@ Jei turite klausimų, susisiekite su mumis.
 
 Pagarbiai,
 {{ user.get_full_name|default:user.username }}
-Freelancer CRM komanda
+Bussy'note komanda

@@ -90,7 +90,7 @@ def password_reset_view(request):
                 # Galima siųsti tikru el. laišką jeigu nustatyta
                 try:
                     send_mail(
-                        'Slaptažodžio atkūrimas - Freelancer CRM',
+                        "Slaptažodžio atkūrimas - Bussy'note",
                         f'Sveiki,\n\nNorėdami atkurti savo slaptažodį, spauskite šią nuorodą:\n{reset_link}\n\nJei jūs neprašėte slaptažodžio atkūrimo, ignoruokite šį laišką.',
                         'noreply@freelancer-crm.lt',
                         [email],
