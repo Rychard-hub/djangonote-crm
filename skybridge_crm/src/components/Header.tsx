@@ -78,7 +78,7 @@ export const Header: React.FC<HeaderProps> = ({
             <div className="flex-shrink-0">
               <h1 className="text-xl font-bold text-gray-900 flex items-center">
                 <span className="text-blue-600 mr-2">🏢</span>
-                Freelancer CRM
+                Bussy'note
               </h1>
             </div>
           </div>

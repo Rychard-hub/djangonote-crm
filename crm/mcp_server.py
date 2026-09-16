@@ -67,7 +67,7 @@ class MCPServer:
                 'tools': {}
             },
             'serverInfo': {
-                'name': 'Freelancer CRM MCP Server',
+                'name': "Bussy'note MCP Server",
                 'version': '1.0.0'
             }
         }

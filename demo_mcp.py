@@ -10,7 +10,7 @@ async def demo_mcp_integration():
     """
     Demonstracija MCP integracijos su Django CRM
     """
-    print("🤖 MCP Server Demo - Freelancer CRM Integration")
+    print("🤖 MCP Server Demo - Bussy'note Integration")
     print("=" * 50)
     
     # Sukuriam CRM integraciją

@@ -91,7 +91,7 @@ class MCPServerV2:
                 }
             },
             'serverInfo': {
-                'name': 'Freelancer CRM MCP Server v2',
+                'name': "Bussy'note MCP Server v2",
                 'version': '2.0.0',
                 'devMode': DEV_MODE
             }
