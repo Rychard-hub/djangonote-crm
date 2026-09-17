@@ -8,7 +8,6 @@
         body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
         .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .topbar a { color: white; text-decoration: none; }
-        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
         .container { padding: 2rem; }
         .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
         .chip { display: inline-block; padding: 0.5rem 0.8rem; border-radius: 999px; text-decoration: none; background: #e2e8f0; color: #0f172a; }
@@ -25,18 +24,7 @@
 <body>
     <header class="topbar">
         <h2>Follow-up priminimai</h2>
-        <nav class="nav">
-            <a href="/dashboard/">Dashboard</a>
-            <a href="/leads/">Lead'ai</a>
-            <a href="/followups/">Follow-up</a>
-            <a href="/pipeline/">Pipeline</a>
-            <a href="/catalog/">Katalogas</a>
-            <a href="/billing/payment-links/">Mokėjimai</a>
-            <a href="/billing/plans/">Planas</a>
-            <a href="/ai-content/">AI turinys</a>
-            <a href="/assistant/">AI asistentas</a>
-            <a href="#">Nustatymai</a>
-        </nav>
+        {% include "crm/partials/_nav.html" %}
     </header>
 
     <main class="container">

@@ -8,7 +8,6 @@
         body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
         .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
         .topbar a { color: white; text-decoration: none; }
-        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
         .container { padding: 2rem; }
         .kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: start; }
         .column { background: white; border-radius: 12px; padding: 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
@@ -26,18 +25,7 @@
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
     <header class="topbar">
         <h2>Pipeline / Kanban</h2>
-        <nav class="nav">
-            <a href="/dashboard/">Dashboard</a>
-            <a href="/leads/">Lead'ai</a>
-            <a href="/followups/">Follow-up</a>
-            <a href="/pipeline/">Pipeline</a>
-            <a href="/catalog/">Katalogas</a>
-            <a href="/billing/payment-links/">Mokėjimai</a>
-            <a href="/billing/plans/">Planas</a>
-            <a href="/ai-content/">AI turinys</a>
-            <a href="/assistant/">AI asistentas</a>
-            <a href="#">Nustatymai</a>
-        </nav>
+        {% include "crm/partials/_nav.html" %}
     </header>
 
     <main class="container">

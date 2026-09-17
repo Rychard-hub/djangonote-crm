@@ -7,8 +7,6 @@
     <style>
         body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
         .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .nav a { color: white; text-decoration: none; }
         .container { padding: 2rem; }
         .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
         .card { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
@@ -24,18 +22,7 @@
         <div>
             <h2>Bussy'note</h2>
         </div>
-        <nav class="nav">
-            <a href="/dashboard/">Dashboard</a>
-            <a href="/leads/">Lead'ai</a>
-            <a href="/followups/">Follow-up</a>
-            <a href="/pipeline/">Pipeline</a>
-            <a href="/catalog/">Katalogas</a>
-            <a href="/billing/payment-links/">Mokėjimai</a>
-            <a href="/billing/plans/">Planas</a>
-            <a href="/ai-content/">AI turinys</a>
-            <a href="/assistant/">AI asistentas</a>
-            <a href="#">Nustatymai</a>
-        </nav>
+        {% include "crm/partials/_nav.html" %}
     </header>
 
     <main class="container">
