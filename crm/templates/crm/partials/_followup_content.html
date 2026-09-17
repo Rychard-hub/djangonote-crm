@@ -7,6 +7,7 @@
        hx-get="{% url 'followup-list' %}?filter=week" hx-target="#followup-content" hx-push-url="true">Šią savaitę</a>
 </div>
 
+<div id="followup-table-wrap">
 <table>
     <thead>
         <tr>
@@ -46,3 +47,4 @@
         {% endfor %}
     </tbody>
 </table>
+</div>
