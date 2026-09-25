@@ -1,41 +1,42 @@
-<div class="modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
-    <div class="modal-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-            <h2 style="margin:0;">{% if mode == 'edit' %}Redaguoti leadą{% else %}Pridėti leadą{% endif %}</h2>
-            <button type="button" onclick="document.getElementById('modal').innerHTML=''"
-                    style="background:none; border:0; font-size:1.3rem; cursor:pointer; color:#64748b;">✕</button>
+<div class="bn-modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
+    <div class="bn-modal">
+        <div class="bn-modal-head">
+            <h2 class="bn-modal-title">{% if mode == 'edit' %}Redaguoti leadą{% else %}Naujas leadas{% endif %}</h2>
+            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="Uždaryti">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
+            </button>
         </div>
         <form hx-post="{% if mode == 'edit' %}{% url 'lead-edit' lead.pk %}{% else %}{% url 'lead-create' %}{% endif %}"
-              hx-target="#modal" hx-swap="innerHTML">
-            <div class="row">
-                <div>
-                    <label for="name">Vardas / įmonė</label>
-                    <input id="name" name="name" value="{{ lead.name|default:'' }}" required>
-                    <div class="hint">Pavyzdžiui: Mantas ar „Studio X“</div>
+              hx-target="#modal" hx-swap="innerHTML" style="display:grid;gap:14px">
+            <div class="bn-form-row">
+                <div class="bn-field">
+                    <label for="name">Vardas</label>
+                    <input id="name" name="name" class="bn-input" value="{{ lead.name|default:'' }}" required>
+                    <div class="bn-hint">Pavyzdžiui: Mantas ar „Studio X“</div>
                 </div>
-                <div>
+                <div class="bn-field">
                     <label for="company">Įmonė</label>
-                    <input id="company" name="company" value="{{ lead.company|default:'' }}">
+                    <input id="company" name="company" class="bn-input" value="{{ lead.company|default:'' }}">
                 </div>
             </div>
-            <div class="row">
-                <div>
+            <div class="bn-form-row">
+                <div class="bn-field">
                     <label for="email">El. paštas</label>
-                    <input id="email" name="email" type="email" value="{{ lead.email|default:'' }}">
+                    <input id="email" name="email" type="email" class="bn-input" value="{{ lead.email|default:'' }}">
                 </div>
-                <div>
+                <div class="bn-field">
                     <label for="phone">Telefonas</label>
-                    <input id="phone" name="phone" value="{{ lead.phone|default:'' }}">
+                    <input id="phone" name="phone" class="bn-input" value="{{ lead.phone|default:'' }}">
                 </div>
             </div>
-            <div class="row">
-                <div>
+            <div class="bn-form-row">
+                <div class="bn-field">
                     <label for="source">Šaltinis</label>
-                    <input id="source" name="source" value="{{ lead.source|default:'' }}" placeholder="LinkedIn, rekomendacija, svetainė">
+                    <input id="source" name="source" class="bn-input" value="{{ lead.source|default:'' }}" placeholder="LinkedIn, rekomendacija, svetainė">
                 </div>
-                <div>
+                <div class="bn-field">
                     <label for="status">Statusas</label>
-                    <select id="status" name="status">
+                    <select id="status" name="status" class="bn-select">
                         <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
                         <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
                         <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
@@ -44,21 +45,24 @@
                     </select>
                 </div>
             </div>
-            <div class="row">
-                <div>
-                    <label for="budget">Biudžetas</label>
-                    <input id="budget" name="budget" type="number" step="0.01" value="{{ lead.budget|default:'0' }}">
+            <div class="bn-form-row">
+                <div class="bn-field">
+                    <label for="budget">Biudžetas, €</label>
+                    <input id="budget" name="budget" type="number" step="0.01" class="bn-input" value="{{ lead.budget|default:'0' }}">
                 </div>
-                <div>
+                <div class="bn-field">
                     <label for="next_follow_up">Kitas follow-up</label>
-                    <input id="next_follow_up" name="next_follow_up" type="date" value="{{ lead.next_follow_up|default:'' }}">
+                    <input id="next_follow_up" name="next_follow_up" type="date" class="bn-input" value="{{ lead.next_follow_up|date:'Y-m-d'|default:'' }}">
                 </div>
             </div>
-            <div>
-                <label for="notes">Pastabos</label>
-                <textarea id="notes" name="notes" rows="3" placeholder="Trumpa pastaba apie poreikį ar susitarimą">{{ lead.notes|default:'' }}</textarea>
+            <div class="bn-field">
+                <label for="notes">Poreikiai ir pastabos</label>
+                <textarea id="notes" name="notes" rows="3" class="bn-textarea" placeholder="Trumpa pastaba apie poreikį ar susitarimą">{{ lead.notes|default:'' }}</textarea>
             </div>
-            <button type="submit">Išsaugoti</button>
+            <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
+                <button type="button" class="bn-btn" onclick="document.getElementById('modal').innerHTML=''">Atšaukti</button>
+                <button type="submit" class="bn-btn bn-btn-primary">Išsaugoti</button>
+            </div>
         </form>
     </div>
 </div>

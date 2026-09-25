@@ -1,8 +1,9 @@
 from django import forms
 from datetime import date, timedelta
 
+from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
 from django.contrib.auth.models import User
@@ -47,6 +48,8 @@ def health_check(request):
 
 
 def login_view(request):
+    error = None
+    email = ''
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
@@ -56,7 +59,16 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard')
 
-    return render(request, 'crm/login.html')
+        error = 'Neteisingas el. paštas arba slaptažodis.'
+
+    return render(request, 'crm/login.html', {'error': error, 'email': email})
+
+
+@login_required(login_url='login')
+def logout_view(request):
+    if request.method == 'POST':
+        logout(request)
+    return redirect('login')
 
 
 def register_view(request):
@@ -109,6 +121,19 @@ def password_reset_view(request):
     return render(request, 'crm/password_reset.html', {'form': form})
 
 
+def _pipeline_stage_stats(user_leads):
+    """Per-status count/budget/percentage breakdown for the dashboard pipeline card."""
+    stages = []
+    for code, label in Lead.STATUS_CHOICES:
+        count = user_leads.filter(status=code).count()
+        budget_sum = user_leads.filter(status=code).aggregate(total=Sum('budget'))['total'] or 0
+        stages.append({'code': code, 'label': label, 'count': count, 'budget_sum': budget_sum})
+    total = sum(s['count'] for s in stages) or 1
+    for s in stages:
+        s['pct'] = round(s['count'] * 100 / total, 1)
+    return stages
+
+
 @login_required(login_url='login')
 def dashboard_view(request):
     organization = get_organization(request.user)
@@ -137,6 +162,16 @@ def dashboard_view(request):
             lead__organization=organization,
             completed=False
         ).order_by('created_at')[:5],
+        # Šiandien + vėluojantys follow-up'ai vienoje sąraše (dashboard fokusui)
+        'due_today': user_leads.filter(
+            next_follow_up__lte=today
+        ).exclude(status__in=['won', 'lost']).order_by('next_follow_up')[:6],
+        # Pipeline etapų suvestinė (kortelėms/juostoms dashboard'e)
+        'pipeline_stages': _pipeline_stage_stats(user_leads),
+        # Paskutinė veikla (aktyvumo žurnalas)
+        'recent_activity': Activity.objects.filter(
+            lead__organization=organization
+        ).select_related('lead').order_by('-created_at')[:6],
         'today': today,
     }
     return render(request, 'crm/dashboard.html', context)

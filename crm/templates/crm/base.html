@@ -1,0 +1,168 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Bussy'Note{% endblock %}</title>
+<script>
+(function () {
+  var t = localStorage.getItem('bn-theme') || 'light';
+  document.documentElement.dataset.theme = t;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'crm/css/theme.css' %}">
+<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+{% block extra_head %}{% endblock %}
+</head>
+<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
+<div id="modal"></div>
+
+<div class="bn-shell">
+  <aside class="bn-sidebar">
+    <a class="bn-brand" href="{% url 'dashboard' %}">
+      <span class="bn-brand-mark">B</span>
+      <span class="bn-brand-name">Bussy<em>'Note</em></span>
+    </a>
+
+    <div class="bn-org">
+      <span class="bn-org-mark">{{ request.user.profile.organization|default:request.user.username|first|upper }}</span>
+      <span class="bn-org-name">{{ request.user.profile.organization|default:"Mano verslas" }}</span>
+    </div>
+
+    <nav>
+      <div class="bn-nav-group-label">Pardavimai</div>
+      <div class="bn-nav">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}" href="{% url 'dashboard' %}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"></path></svg>
+          <span class="bn-nav-label">Apžvalga</span>
+        </a>
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'lead-list' or request.resolver_match.url_name == 'lead-detail' %}is-active{% endif %}" href="{% url 'lead-list' %}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+          <span class="bn-nav-label">Leadai</span>
+        </a>
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'followup-list' %}is-active{% endif %}" href="{% url 'followup-list' %}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+          <span class="bn-nav-label">Follow-up</span>
+        </a>
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'pipeline' %}is-active{% endif %}" href="{% url 'pipeline' %}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 5v11M12 5v6M18 5v14"></path></svg>
+          <span class="bn-nav-label">Pipeline</span>
+        </a>
+      </div>
+
+      <div class="bn-nav-group-label">Įrankiai</div>
+      <div class="bn-nav">
+        <a class="bn-nav-item" href="/ai-content/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"></path></svg>
+          <span class="bn-nav-label">AI turinys</span>
+        </a>
+        <a class="bn-nav-item" href="/assistant/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+          <span class="bn-nav-label">AI asistentas</span>
+        </a>
+        <a class="bn-nav-item" href="/catalog/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.3 7 12 12l8.7-5M12 22V12"></path></svg>
+          <span class="bn-nav-label">Katalogas</span>
+        </a>
+        <a class="bn-nav-item" href="/billing/payment-links/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>
+          <span class="bn-nav-label">Mokėjimai</span>
+        </a>
+        <a class="bn-nav-item" href="/billing/plans/">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5"></path></svg>
+          <span class="bn-nav-label">Planas</span>
+        </a>
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'settings' %}is-active{% endif %}" href="{% url 'settings' %}">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>
+          <span class="bn-nav-label">Nustatymai</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="bn-sidebar-bottom">
+      <button type="button" class="bn-theme-btn" data-theme-toggle>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-theme-icon></svg>
+        <span style="flex:1;text-align:left" data-theme-label>Tamsi tema</span>
+      </button>
+      <div class="bn-user-row">
+        <span class="bn-avatar">{{ request.user.first_name|default:request.user.username|first|upper }}</span>
+        <div style="flex:1;min-width:0">
+          <div class="bn-user-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+          <div class="bn-user-email">{{ request.user.email }}</div>
+        </div>
+        <form method="post" action="{% url 'logout' %}">
+          {% csrf_token %}
+          <button type="submit" class="bn-logout-btn" title="Atsijungti" aria-label="Atsijungti">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>
+          </button>
+        </form>
+      </div>
+    </div>
+  </aside>
+
+  <div class="bn-main">
+    <header class="bn-topbar-mobile">
+      <a class="bn-brand" href="{% url 'dashboard' %}">
+        <span class="bn-brand-mark" style="width:28px;height:28px;font-size:20px">B</span>
+        <span class="bn-brand-name" style="font-size:16px">Bussy<em>'Note</em></span>
+      </a>
+      <button type="button" class="bn-icon-btn" data-theme-toggle aria-label="Keisti temą">
+        <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-theme-icon></svg>
+      </button>
+    </header>
+
+    <main class="bn-container">
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+
+<nav class="bn-bottomnav">
+  <a class="bn-tab {% if request.resolver_match.url_name == 'dashboard' %}is-active{% endif %}" href="{% url 'dashboard' %}">
+    <span class="bn-tab-pill"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h7v9H3zM14 3h7v5h-7zM14 12h7v9h-7zM3 16h7v5H3z"></path></svg></span>
+    <span class="bn-tab-label">Apžvalga</span>
+  </a>
+  <a class="bn-tab {% if request.resolver_match.url_name == 'lead-list' %}is-active{% endif %}" href="{% url 'lead-list' %}">
+    <span class="bn-tab-pill"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 3a4 4 0 1 0 0 8 4 4 0 0 0 0-8M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path></svg></span>
+    <span class="bn-tab-label">Leadai</span>
+  </a>
+  <a class="bn-tab is-fab" href="{% url 'lead-create' %}" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML">
+    <span class="bn-tab-pill"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg></span>
+    <span class="bn-tab-label">Naujas</span>
+  </a>
+  <a class="bn-tab {% if request.resolver_match.url_name == 'followup-list' %}is-active{% endif %}" href="{% url 'followup-list' %}">
+    <span class="bn-tab-pill"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg></span>
+    <span class="bn-tab-label">Follow-up</span>
+  </a>
+  <button type="button" class="bn-tab" data-open-more>
+    <span class="bn-tab-pill"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h.01M12 12h.01M19 12h.01"></path></svg></span>
+    <span class="bn-tab-label">Daugiau</span>
+  </button>
+</nav>
+
+<div class="bn-sheet-overlay" id="bn-more-sheet">
+  <div class="bn-sheet-backdrop" data-close-more></div>
+  <div class="bn-sheet">
+    <div class="bn-sheet-handle"></div>
+    <a class="bn-sheet-item" href="{% url 'pipeline' %}">Pipeline</a>
+    <a class="bn-sheet-item" href="/ai-content/">AI turinys</a>
+    <a class="bn-sheet-item" href="/assistant/">AI asistentas</a>
+    <a class="bn-sheet-item" href="/catalog/">Katalogas</a>
+    <a class="bn-sheet-item" href="/billing/payment-links/">Mokėjimai</a>
+    <a class="bn-sheet-item" href="/billing/plans/">Planas</a>
+    <a class="bn-sheet-item" href="{% url 'settings' %}">Nustatymai</a>
+    <div style="height:1px;background:var(--line);margin:6px 0"></div>
+    <form method="post" action="{% url 'logout' %}">
+      {% csrf_token %}
+      <button type="submit" class="bn-sheet-item is-danger" style="width:100%">Atsijungti</button>
+    </form>
+  </div>
+</div>
+
+<script src="{% static 'crm/js/app.js' %}"></script>
+{% block extra_body %}{% endblock %}
+</body>
+</html>

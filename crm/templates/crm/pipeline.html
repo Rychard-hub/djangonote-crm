@@ -1,35 +1,8 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pipeline / Kanban</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; align-items: start; }
-        .column { background: white; border-radius: 12px; padding: 0.8rem; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        .column h3 { margin-top: 0; font-size: 1rem; }
-        .card { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 0.7rem; margin-bottom: 0.7rem; }
-        .card strong { display: block; margin-bottom: 0.2rem; }
-        .meta { font-size: 0.85rem; color: #475569; margin-top: 0.3rem; }
-        .empty { color: #64748b; font-size: 0.9rem; }
-        .move-buttons { display: flex; gap: 0.4rem; margin-top: 0.5rem; }
-        .move-btn { padding: 0.3rem 0.5rem; border: 0; border-radius: 6px; background: #2563eb; color: white; cursor: pointer; font-size: 0.8rem; }
-    </style>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <header class="topbar">
-        <h2>Pipeline / Kanban</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
-
-    <main class="container">
-        {% include 'crm/partials/_kanban_board.html' %}
-    </main>
-</body>
-</html>
+{% extends 'crm/base.html' %}
+{% block title %}Pipeline | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <h1 class="bn-h1" style="font-size:36px">Pipeline</h1>
+  {% include 'crm/partials/_kanban_board.html' %}
+</div>
+{% endblock %}

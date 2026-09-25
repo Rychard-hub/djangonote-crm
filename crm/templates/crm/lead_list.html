@@ -1,100 +1,60 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leadų sąrašas</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        .controls input, .controls select, .controls button { padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .controls button { background: #2563eb; color: white; border: 0; cursor: pointer; }
-        #lead-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        table { width: auto; min-width: 100%; border-collapse: collapse; background: white; }
-        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; white-space: nowrap; }
-        @media (max-width: 640px) {
-            .container { padding: 1rem; }
-            .topbar { padding: 1rem; }
-            .toolbar { flex-direction: column; align-items: stretch; }
-            .controls { flex-direction: column; }
-            /* overflow-x: auto can't clip to a rounded corner, so the radius
-               only shows once the table stops needing to scroll (see also
-               notecrm.app's sm:rounded-lg for the same reason). */
-            #lead-table-wrap { border-radius: 0; }
-        }
-        .lead-name-link { color: #0f172a; text-decoration: none; }
-        .lead-name-link:hover { color: #2563eb; text-decoration: underline; }
-        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
-        .new { background: #dbeafe; color: #1d4ed8; }
-        .contacted { background: #fef3c7; color: #b45309; }
-        .proposal { background: #dcfce7; color: #166534; }
-        .won { background: #dcfce7; color: #166534; }
-        .lost { background: #fee2e2; color: #b91c1c; }
-        .late { color: #dc2626; font-weight: bold; }
-        .overdue-row { background: #fef2f2; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
-        .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 680px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-box form { display: grid; gap: 0.9rem; }
-        .modal-box label { font-weight: 600; font-size: 0.95rem; }
-        .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
-        .modal-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-        .modal-box .hint { font-size: 0.85rem; color: #64748b; margin-top: 0.2rem; }
-    </style>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <div id="modal"></div>
-    <header class="topbar">
-        <h2>Leadų sąrašas</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
+{% extends 'crm/base.html' %}
+{% block title %}Leadai | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <div class="bn-toolbar">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <h1 class="bn-h1" style="font-size:36px">Leadai</h1>
+      <span style="color:var(--mut);font-size:15px" id="total-leads-count">Viso leadų: {{ total_leads }}</span>
+    </div>
+    <a class="bn-btn bn-btn-primary" href="{% url 'lead-create' %}" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      Pridėti leadą
+    </a>
+  </div>
 
-    <main class="container">
-        <div class="toolbar">
-            <div>
-                <a href="/leads/new/" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;"><button type="button">Pridėti leadą</button></a>
-                <span id="total-leads-count" style="margin-left: 1rem; color: #64748b;">Viso leadų: {{ total_leads }}</span>
-            </div>
-            <form class="controls" method="get"
-                  hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true"
-                  hx-trigger="change from:find select, submit">
-                <input type="search" name="q" value="{{ query }}" placeholder="Paieška pagal vardą, įmonę, el. paštą"
-                       hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true"
-                       hx-trigger="keyup changed delay:400ms" />
-                <select name="status">
-                    <option value="">Visi statusai</option>
-                    <option value="new" {% if status == 'new' %}selected{% endif %}>Naujas</option>
-                    <option value="contacted" {% if status == 'contacted' %}selected{% endif %}>Susisiekta</option>
-                    <option value="proposal" {% if status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
-                    <option value="won" {% if status == 'won' %}selected{% endif %}>Laimėtas</option>
-                    <option value="lost" {% if status == 'lost' %}selected{% endif %}>Prarastas</option>
-                </select>
-                <select name="followup">
-                    <option value="">Visi follow-up'ai</option>
-                    <option value="today" {% if followup_filter == 'today' %}selected{% endif %}>Šiandien</option>
-                    <option value="overdue" {% if followup_filter == 'overdue' %}selected{% endif %}>Vėluojantys</option>
-                    <option value="upcoming" {% if followup_filter == 'upcoming' %}selected{% endif %}>Būsimi</option>
-                </select>
-                <select name="sort">
-                    <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Paskutiniai atnaujinti</option>
-                    <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Pagal vardą A-Z</option>
-                    <option value="-name" {% if sort_by == '-name' %}selected{% endif %}>Pagal vardą Z-A</option>
-                    <option value="next_follow_up" {% if sort_by == 'next_follow_up' %}selected{% endif %}>Artimiausi follow-up'ai</option>
-                    <option value="-budget" {% if sort_by == '-budget' %}selected{% endif %}>Didžiausias biudžetas</option>
-                </select>
-                <button type="submit">Filtruoti</button>
-            </form>
-        </div>
+  <form class="bn-toolgrid" method="get" hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true" hx-trigger="change from:find select, submit">
+    <label class="bn-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16M21 21l-4.3-4.3"></path></svg>
+      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="Paieška: vardas, įmonė, el. paštas"
+             hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true" hx-trigger="keyup changed delay:400ms">
+    </label>
+    <select class="bn-select" name="followup">
+      <option value="">Visi follow-up'ai</option>
+      <option value="today" {% if followup_filter == 'today' %}selected{% endif %}>Šiandien + vėluojantys</option>
+      <option value="overdue" {% if followup_filter == 'overdue' %}selected{% endif %}>Tik vėluojantys</option>
+      <option value="upcoming" {% if followup_filter == 'upcoming' %}selected{% endif %}>Būsimi</option>
+    </select>
+    <select class="bn-select" name="sort">
+      <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Paskutiniai atnaujinti</option>
+      <option value="next_follow_up" {% if sort_by == 'next_follow_up' %}selected{% endif %}>Artimiausi follow-up'ai</option>
+      <option value="-budget" {% if sort_by == '-budget' %}selected{% endif %}>Didžiausias biudžetas</option>
+      <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Vardas A–Z</option>
+    </select>
+  </form>
 
-        <div id="lead-table-wrap">
-            {% include 'crm/partials/_lead_table.html' %}
-        </div>
-    </main>
-</body>
-</html>
+  <div class="bn-filters">
+    <a class="bn-chip {% if not status %}is-active{% endif %}" href="?status=&q={{ query }}&followup={{ followup_filter }}&sort={{ sort_by }}"
+       hx-get="{% url 'lead-list' %}?status=&q={{ query }}&followup={{ followup_filter }}&sort={{ sort_by }}" hx-target="#lead-table-wrap" hx-push-url="true">Visi</a>
+    <a class="bn-chip {% if status == 'new' %}is-active{% endif %}" href="?status=new" hx-get="{% url 'lead-list' %}?status=new" hx-target="#lead-table-wrap" hx-push-url="true">
+      <span class="bn-dot bn-dot-new"></span> Naujas
+    </a>
+    <a class="bn-chip {% if status == 'contacted' %}is-active{% endif %}" href="?status=contacted" hx-get="{% url 'lead-list' %}?status=contacted" hx-target="#lead-table-wrap" hx-push-url="true">
+      <span class="bn-dot bn-dot-contacted"></span> Susisiekta
+    </a>
+    <a class="bn-chip {% if status == 'proposal' %}is-active{% endif %}" href="?status=proposal" hx-get="{% url 'lead-list' %}?status=proposal" hx-target="#lead-table-wrap" hx-push-url="true">
+      <span class="bn-dot bn-dot-proposal"></span> Pasiūlymas
+    </a>
+    <a class="bn-chip {% if status == 'won' %}is-active{% endif %}" href="?status=won" hx-get="{% url 'lead-list' %}?status=won" hx-target="#lead-table-wrap" hx-push-url="true">
+      <span class="bn-dot bn-dot-won"></span> Laimėtas
+    </a>
+    <a class="bn-chip {% if status == 'lost' %}is-active{% endif %}" href="?status=lost" hx-get="{% url 'lead-list' %}?status=lost" hx-target="#lead-table-wrap" hx-push-url="true">
+      <span class="bn-dot bn-dot-lost"></span> Prarastas
+    </a>
+  </div>
+
+  <div id="lead-table-wrap">
+    {% include 'crm/partials/_lead_table.html' %}
+  </div>
+</div>
+{% endblock %}

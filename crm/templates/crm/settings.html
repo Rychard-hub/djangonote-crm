@@ -1,52 +1,45 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nustatymai</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .container { padding: 2rem; max-width: 760px; margin: 0 auto; }
-        .card { background: white; padding: 1rem 1.2rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); margin-bottom: 1rem; }
-        label { display: block; margin-top: 0.7rem; font-weight: 600; }
-        input, select { width: 100%; padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; margin-top: 0.3rem; }
-        button { margin-top: 0.9rem; padding: 0.7rem 1rem; border: 0; border-radius: 8px; background: #2563eb; color: white; cursor: pointer; }
-    </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <header class="topbar">
-        <h2>Nustatymai</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
-
-    <main class="container">
-        <div class="card">
-            <h3>Profilis</h3>
-            <form method="post">
-                {% csrf_token %}
-                <label>Vardas / pavardė</label>
-                <input type="text" name="full_name" value="{{ full_name }}" placeholder="Tavo vardas" />
-
-                <label>El. paštas</label>
-                <input type="email" name="email" value="{{ email }}" placeholder="tavo@email.com" />
-
-                <label>Naujas slaptažodis</label>
-                <input type="password" name="password" placeholder="Palik tuščią, jei nekeičiamas" />
-
-                <label>Priminimų intervalas (dienos)</label>
-                <input type="number" name="reminder_days" min="1" value="{{ reminder_days }}" />
-
-                <label>Laiko zona</label>
-                <select name="timezone">
-                    <option value="Europe/Vilnius" {% if timezone == 'Europe/Vilnius' %}selected{% endif %}>Europe/Vilnius</option>
-                    <option value="UTC" {% if timezone == 'UTC' %}selected{% endif %}>UTC</option>
-                </select>
-
-                <button type="submit">Išsaugoti</button>
-            </form>
+{% extends 'crm/base.html' %}
+{% block title %}Nustatymai | Bussy'Note{% endblock %}
+{% block content %}
+<div style="max-width:640px;margin:0 auto;display:grid;gap:16px">
+  <h1 class="bn-h1" style="font-size:36px">Nustatymai</h1>
+  <section class="bn-card">
+    <h2 class="bn-card-title">Profilis</h2>
+    <form method="post" style="display:grid;gap:14px">
+      {% csrf_token %}
+      <div class="bn-field">
+        <label>Vardas / pavardė</label>
+        <input class="bn-input" type="text" name="full_name" value="{{ full_name }}" placeholder="Tavo vardas">
+      </div>
+      <div class="bn-field">
+        <label>El. paštas</label>
+        <input class="bn-input" type="email" name="email" value="{{ email }}" placeholder="tavo@email.com">
+      </div>
+      <div class="bn-field">
+        <label>Naujas slaptažodis</label>
+        <input class="bn-input" type="password" name="password" placeholder="Palik tuščią, jei nekeičiamas">
+      </div>
+      <div class="bn-field">
+        <label>Organizacija</label>
+        <input class="bn-input" type="text" name="organization" value="{{ organization }}" placeholder="pvz. studioX">
+      </div>
+      <div class="bn-form-row">
+        <div class="bn-field">
+          <label>Priminimų intervalas (dienos)</label>
+          <input class="bn-input" type="number" name="reminder_days" min="1" value="{{ reminder_days }}">
         </div>
-    </main>
-</body>
-</html>
+        <div class="bn-field">
+          <label>Laiko zona</label>
+          <select class="bn-select" name="timezone">
+            <option value="Europe/Vilnius" {% if timezone == 'Europe/Vilnius' %}selected{% endif %}>Europe/Vilnius</option>
+            <option value="UTC" {% if timezone == 'UTC' %}selected{% endif %}>UTC</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <button type="submit" class="bn-btn bn-btn-primary">Išsaugoti</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}

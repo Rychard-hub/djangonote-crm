@@ -37,10 +37,11 @@ class DashboardPageTests(TestCase):
         response = self.client.get(reverse('dashboard'))
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'Šiandienos follow-up')
-        self.assertContains(response, 'Nauji leadai')
-        self.assertContains(response, "Artimiausi follow-up'ai")
-        self.assertContains(response, 'Vėluojantys kontaktai')
+        self.assertContains(response, 'Šiandien susisiekti')
+        self.assertContains(response, 'Nauji')
+        self.assertContains(response, 'Pipeline')
+        self.assertContains(response, 'Šiandienos užduotys')
+        self.assertContains(response, 'Paskutinė veikla')
 
 
 class AccessControlTests(TestCase):
@@ -132,7 +133,7 @@ class LeadManagementTests(TestCase):
         self.assertContains(response, 'Redaguoti')
         self.assertContains(response, 'Nauja užduotis')
         self.assertContains(response, 'Laimėtas')
-        self.assertContains(response, 'Komunikacijos istorija')
+        self.assertContains(response, 'Komunikacija')
 
     def test_task_toggle_and_activity_log_and_quick_actions(self):
         user = authenticate_test_client(self.client)
