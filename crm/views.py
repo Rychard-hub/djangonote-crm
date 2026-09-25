@@ -1,5 +1,5 @@
 from django import forms
-from datetime import date, timedelta
+from datetime import timedelta
 
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +12,7 @@ from django.contrib.auth.views import PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
@@ -138,7 +139,7 @@ def _pipeline_stage_stats(user_leads):
 def dashboard_view(request):
     organization = get_organization(request.user)
     user_leads = Lead.objects.filter(organization=organization)
-    today = date.today()
+    today = timezone.localdate()
     
     # Realūs duomenys metrikoms
     context = {
@@ -179,7 +180,7 @@ def dashboard_view(request):
 
 @login_required(login_url='login')
 def followup_list_view(request):
-    today = date.today()
+    today = timezone.localdate()
     filter_type = request.GET.get('filter', 'today')
     queryset = Lead.objects.filter(organization=get_organization(request.user), next_follow_up__isnull=False)
 
@@ -279,7 +280,7 @@ def settings_view(request):
 @login_required(login_url='login')
 def lead_list_view(request):
     leads = Lead.objects.filter(organization=get_organization(request.user))
-    today = date.today()
+    today = timezone.localdate()
     
     # Filtrai
     query = request.GET.get('q', '').strip()
@@ -358,7 +359,7 @@ def lead_create_view(request):
 @login_required(login_url='login')
 def lead_detail_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
-    today = date.today()
+    today = timezone.localdate()
     
     # Papildomi duomenys
     comments = lead.comments.all()

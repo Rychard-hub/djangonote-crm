@@ -12,7 +12,8 @@ DB access -- is enforced directly in each function below instead.
 """
 
 import json
-from datetime import date
+
+from django.utils import timezone
 
 from crm.models import Activity, Comment, Lead, Task
 
@@ -164,7 +165,7 @@ def _add_note(organization, user, lead_id, body):
 
 
 def _list_due_followups(organization, user):
-    today = date.today()
+    today = timezone.localdate()
     qs = Lead.objects.filter(organization=organization, next_follow_up__isnull=False, next_follow_up__lte=today)
     return [_lead_to_dict(lead) for lead in qs.order_by('next_follow_up')[:20]]
 

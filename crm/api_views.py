@@ -5,10 +5,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from django.db import models
 from django.db.models import Count, Q, Sum
-from datetime import date, timedelta
+from datetime import timedelta
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.tokens import default_token_generator
+from django.utils import timezone
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
 from django.template.loader import render_to_string
@@ -53,7 +54,7 @@ class LeadViewSet(viewsets.ModelViewSet):
     def dashboard_stats(self, request):
         """Gauti dashboard statistiką"""
         user_leads = Lead.objects.filter(organization=get_organization(request.user))
-        today = date.today()
+        today = timezone.localdate()
         
         stats = {
             'total_leads': user_leads.count(),
@@ -73,7 +74,7 @@ class LeadViewSet(viewsets.ModelViewSet):
     def upcoming_followups(self, request):
         """Gauti artėjančius follow-up'us"""
         days = int(request.query_params.get('days', 7))
-        today = date.today()
+        today = timezone.localdate()
         end_date = today + timedelta(days=days)
         
         leads = self.get_queryset().filter(
@@ -87,7 +88,7 @@ class LeadViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'])
     def overdue_followups(self, request):
         """Gauti vėluojančius follow-up'us"""
-        today = date.today()
+        today = timezone.localdate()
         leads = self.get_queryset().filter(
             next_follow_up__lt=today
         ).order_by('next_follow_up')
