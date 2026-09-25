@@ -1,132 +1,128 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CRM Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .nav a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .card { background: white; padding: 1rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        .metric { font-size: 1.8rem; font-weight: bold; margin-top: 0.4rem; }
-        .sections { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-        ul { padding-left: 1rem; }
-        li { margin-bottom: 0.5rem; }
-    </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <header class="topbar">
-        <div>
-            <h2>Bussy'note</h2>
+{% extends 'crm/base.html' %}
+{% block title %}Apžvalga | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <div class="bn-toolbar">
+    <div>
+      <div class="bn-eyebrow">{{ today|date:"l, Y-m-d" }}</div>
+      <h1 class="bn-h1">Laba diena, {{ request.user.first_name|default:request.user.username }}.</h1>
+      <div class="bn-lead-line">
+        {% if due_today %}Šiandien laukia {{ due_today|length }} follow-up'{% if due_today|length == 1 %}as{% else %}ai{% endif %}.{% else %}Šiandien follow-up'ų nėra.{% endif %}
+      </div>
+    </div>
+    <a class="bn-btn bn-btn-primary" href="{% url 'lead-create' %}" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      Naujas leadas
+    </a>
+  </div>
+
+  <div class="bn-kpi-row">
+    <a class="bn-kpi is-hl" href="{% url 'lead-list' %}?followup=today">
+      <span class="bn-kpi-label">Šiandien susisiekti</span>
+      <span class="bn-kpi-value">{{ due_today|length }}</span>
+      <span class="bn-kpi-sub">follow-up'ai</span>
+    </a>
+    <a class="bn-kpi" href="{% url 'lead-list' %}?status=new">
+      <span class="bn-kpi-label">Nauji</span>
+      <span class="bn-kpi-value">{{ new_leads }}</span>
+      <span class="bn-kpi-sub">leadai</span>
+    </a>
+    <a class="bn-kpi" href="{% url 'lead-list' %}?status=contacted">
+      <span class="bn-kpi-label">Laukia atsakymo</span>
+      <span class="bn-kpi-value">{{ waiting_leads }}</span>
+      <span class="bn-kpi-sub">leadai</span>
+    </a>
+    <a class="bn-kpi" href="{% url 'lead-list' %}?status=won">
+      <span class="bn-kpi-label">Laimėti</span>
+      <span class="bn-kpi-value">{{ won_projects }}</span>
+      <span class="bn-kpi-sub">projektai</span>
+    </a>
+    <a class="bn-kpi" href="{% url 'lead-list' %}?status=lost">
+      <span class="bn-kpi-label">Prarasti</span>
+      <span class="bn-kpi-value">{{ lost_projects }}</span>
+      <span class="bn-kpi-sub">projektai</span>
+    </a>
+  </div>
+
+  <div class="bn-grid-2">
+    <section class="bn-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
+        <h2 class="bn-card-title" style="margin:0">Šiandien susisiekti</h2>
+        <a href="{% url 'lead-list' %}?followup=today" style="color:var(--mut);font-size:13px;text-decoration:none">Visi →</a>
+      </div>
+      {% for lead in due_today %}
+        <div class="bn-row-item">
+          <a class="bn-row-main" href="{% url 'lead-detail' lead.pk %}">
+            <span class="bn-avatar">{{ lead.name|first|upper }}</span>
+            <span>
+              <span class="bn-row-name" style="display:block">{{ lead.name }}</span>
+              <span class="bn-row-sub">{{ lead.company|default:"—" }}</span>
+            </span>
+          </a>
+          {% if lead.next_follow_up < today %}
+            <span class="bn-fu bn-fu-overdue">Vėluoja {{ today|timesince:lead.next_follow_up }}</span>
+          {% else %}
+            <span class="bn-fu bn-fu-today">Šiandien</span>
+          {% endif %}
         </div>
-        <nav class="nav">
-            <a href="/dashboard/">Dashboard</a>
-            <a href="/leads/">Lead'ai</a>
-            <a href="/followups/">Follow-up</a>
-            <a href="/pipeline/">Pipeline</a>
-            <a href="/catalog/">Katalogas</a>
-            <a href="/billing/payment-links/">Mokėjimai</a>
-            <a href="/billing/plans/">Planas</a>
-            <a href="/ai-content/">AI turinys</a>
-            <a href="/assistant/">AI asistentas</a>
-            <a href="#">Nustatymai</a>
-        </nav>
-    </header>
+      {% empty %}
+        <div class="bn-empty-hero">
+          <div class="bn-empty-hero-title">Viskas sutvarkyta.</div>
+          <div style="color:var(--mut);margin-top:2px">Šiandien niekam skambinti nereikia.</div>
+        </div>
+      {% endfor %}
+    </section>
 
-    <main class="container">
-        <section class="grid">
-            <div class="card">
-                <div>Šiandienos follow-up</div>
-                <div class="metric">{{ today_followups }}</div>
-            </div>
-            <div class="card">
-                <div>Nauji leadai</div>
-                <div class="metric">{{ new_leads }}</div>
-            </div>
-            <div class="card">
-                <div>Laukiantys atsakymo lead'ai</div>
-                <div class="metric">{{ waiting_leads }}</div>
-            </div>
-            <div class="card">
-                <div>Laimėti projektai</div>
-                <div class="metric">{{ won_projects }}</div>
-            </div>
-            <div class="card">
-                <div>Prarasti projektai</div>
-                <div class="metric">{{ lost_projects }}</div>
-            </div>
-        </section>
+    <section class="bn-card">
+      <h2 class="bn-card-title">Pipeline</h2>
+      <div style="display:flex;height:10px;border-radius:99px;overflow:hidden;margin:0 0 14px;background:var(--sunk);gap:2px">
+        {% for stage in pipeline_stages %}
+          <div class="bn-dot-{{ stage.code }}" style="width:{{ stage.pct }}%"></div>
+        {% endfor %}
+      </div>
+      {% for stage in pipeline_stages %}
+        <a href="{% url 'lead-list' %}?status={{ stage.code }}" style="display:flex;align-items:center;gap:10px;min-height:38px;border-top:1px solid var(--line);text-decoration:none;color:inherit">
+          <span class="bn-dot bn-dot-{{ stage.code }}"></span>
+          <span style="flex:1">{{ stage.label }}</span>
+          <span style="color:var(--mut);font-size:13px;min-width:24px;text-align:right">{{ stage.count }}</span>
+          <span style="font-weight:600;min-width:74px;text-align:right">{{ stage.budget_sum|default:0 }} €</span>
+        </a>
+      {% endfor %}
+    </section>
+  </div>
 
-        <section class="sections">
-            <div class="card">
-                <h3>Artimiausi follow-up'ai</h3>
-                <ul>
-                    {% for lead in upcoming_followups %}
-                        <li>
-                            <strong>{{ lead.name }}</strong> — 
-                            {% if lead.next_follow_up == today %}
-                                Šiandien
-                            {% else %}
-                                {{ lead.next_follow_up }}
-                            {% endif %}
-                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
-                        </li>
-                    {% empty %}
-                        <li>Nėra artimų follow-up'ų</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Vėluojantys kontaktai</h3>
-                <ul>
-                    {% for lead in overdue_contacts %}
-                        <li>
-                            <strong style="color: #dc2626;">{{ lead.name }}</strong> — 
-                            <span style="color: #dc2626;">{{ today|timesince:lead.next_follow_up }} vėluoja</span>
-                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
-                        </li>
-                    {% empty %}
-                        <li>Visi kontaktai tvarkingi</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
+  <div class="bn-grid-2-even">
+    <section class="bn-card">
+      <h2 class="bn-card-title">Šiandienos užduotys</h2>
+      {% for task in today_tasks %}
+        <div class="bn-task-row">
+          <span class="bn-task-box" style="cursor:default">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" style="visibility:hidden"><path d="M20 6 9 17l-5-5"></path></svg>
+          </span>
+          <div style="flex:1;min-width:0">
+            <div>{{ task.title }}</div>
+            <a href="{% url 'lead-detail' task.lead.pk %}" style="border:0;background:none;padding:0;font-size:12.5px;color:var(--mut);text-decoration:none">{{ task.lead.name }}</a>
+          </div>
+        </div>
+      {% empty %}
+        <div class="bn-empty">Nėra šiandienos užduočių.</div>
+      {% endfor %}
+    </section>
 
-        <section class="sections">
-            <div class="card">
-                <h3>Paskutiniai atnaujinti lead'ai</h3>
-                <ul>
-                    {% for lead in recent_leads %}
-                        <li>
-                            <a href="/leads/{{ lead.pk }}/">{{ lead.name }}</a> — 
-                            <span class="badge {{ lead.status }}">{{ lead.get_status_display }}</span>
-                            {% if lead.company %}<br><small>{{ lead.company }}</small>{% endif %}
-                        </li>
-                    {% empty %}
-                        <li>Kol kas nėra leadų</li>
-                    {% endfor %}
-                </ul>
-            </div>
-            <div class="card">
-                <h3>Šiandienos užduotys</h3>
-                <ul>
-                    {% for task in today_tasks %}
-                        <li>
-                            <input type="checkbox" {% if task.completed %}checked{% endif %} disabled>
-                            {{ task.title }}
-                            <br><small>Lead: <a href="/leads/{{ task.lead.pk }}/">{{ task.lead.name }}</a></small>
-                        </li>
-                    {% empty %}
-                        <li>Nėra šiandienos užduočių</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        </section>
-    </main>
-</body>
-</html>
+    <section class="bn-card">
+      <h2 class="bn-card-title">Paskutinė veikla</h2>
+      {% for activity in recent_activity %}
+        <div style="display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)">
+          <div style="font-size:12px;color:var(--mut);padding-top:1px">{{ activity.created_at|date:"m-d H:i" }}</div>
+          <div>
+            {% if activity.lead %}<a href="{% url 'lead-detail' activity.lead.pk %}" style="font-weight:600;text-decoration:none;color:inherit">{{ activity.lead.name }}</a>{% endif %}
+            <span style="color:var(--mut)"> — {{ activity.details|default:activity.action }}</span>
+          </div>
+        </div>
+      {% empty %}
+        <div class="bn-empty">Kol kas veiklos įrašų nėra.</div>
+      {% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

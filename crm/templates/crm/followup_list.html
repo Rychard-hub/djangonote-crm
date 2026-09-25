@@ -1,48 +1,10 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Follow-up priminimai</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .nav { display: flex; gap: 1rem; flex-wrap: wrap; }
-        .container { padding: 2rem; }
-        .filters { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; }
-        .chip { display: inline-block; padding: 0.5rem 0.8rem; border-radius: 999px; text-decoration: none; background: #e2e8f0; color: #0f172a; }
-        .chip.active { background: #2563eb; color: white; }
-        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; background: #fef3c7; color: #b45309; }
-        .late { color: #dc2626; font-weight: bold; }
-        button { padding: 0.4rem 0.7rem; border: 0; border-radius: 6px; background: #16a34a; color: white; cursor: pointer; }
-    </style>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <header class="topbar">
-        <h2>Follow-up priminimai</h2>
-        <nav class="nav">
-            <a href="/dashboard/">Dashboard</a>
-            <a href="/leads/">Lead'ai</a>
-            <a href="/followups/">Follow-up</a>
-            <a href="/pipeline/">Pipeline</a>
-            <a href="/catalog/">Katalogas</a>
-            <a href="/billing/payment-links/">Mokėjimai</a>
-            <a href="/billing/plans/">Planas</a>
-            <a href="/ai-content/">AI turinys</a>
-            <a href="/assistant/">AI asistentas</a>
-            <a href="#">Nustatymai</a>
-        </nav>
-    </header>
-
-    <main class="container">
-        <div id="followup-content">
-            {% include 'crm/partials/_followup_content.html' %}
-        </div>
-    </main>
-</body>
-</html>
+{% extends 'crm/base.html' %}
+{% block title %}Follow-up | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <h1 class="bn-h1" style="font-size:36px">Follow-up priminimai</h1>
+  <div id="followup-content">
+    {% include 'crm/partials/_followup_content.html' %}
+  </div>
+</div>
+{% endblock %}

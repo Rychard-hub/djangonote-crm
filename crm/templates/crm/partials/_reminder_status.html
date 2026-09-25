@@ -1,5 +1,5 @@
 {% if sent %}
-    <span id="reminder-status" style="color:#16a34a;">Priminimas išsiųstas ✓</span>
+    <span id="reminder-status" style="color:var(--success);font-weight:600">Priminimas išsiųstas ✓</span>
 {% else %}
-    <span id="reminder-status" style="color:#dc2626;">Nepavyko išsiųsti (nėra el. pašto)</span>
+    <span id="reminder-status" style="color:var(--danger);font-weight:600">Nepavyko išsiųsti (nėra el. pašto)</span>
 {% endif %}

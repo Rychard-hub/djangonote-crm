@@ -1,13 +1,14 @@
-<div class="filters">
-    <a class="chip {% if filter_type == 'today' %}active{% endif %}" href="/followups/?filter=today"
+<div class="bn-filters">
+    <a class="bn-chip {% if filter_type == 'today' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=today"
        hx-get="{% url 'followup-list' %}?filter=today" hx-target="#followup-content" hx-push-url="true">Šiandien</a>
-    <a class="chip {% if filter_type == 'overdue' %}active{% endif %}" href="/followups/?filter=overdue"
+    <a class="bn-chip {% if filter_type == 'overdue' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=overdue"
        hx-get="{% url 'followup-list' %}?filter=overdue" hx-target="#followup-content" hx-push-url="true">Vėluoja</a>
-    <a class="chip {% if filter_type == 'week' %}active{% endif %}" href="/followups/?filter=week"
+    <a class="bn-chip {% if filter_type == 'week' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=week"
        hx-get="{% url 'followup-list' %}?filter=week" hx-target="#followup-content" hx-push-url="true">Šią savaitę</a>
 </div>
 
-<table>
+<div class="bn-table-wrap">
+<table class="bn-table">
     <thead>
         <tr>
             <th>Klientas</th>
@@ -19,30 +20,46 @@
     </thead>
     <tbody>
         {% for lead in followups %}
-            <tr>
+            <tr class="{% if lead.next_follow_up and lead.next_follow_up < today %}is-overdue{% endif %}">
                 <td>
-                    <strong>{{ lead.name }}</strong><br>
-                    <small>{{ lead.company }}</small>
+                    <a href="{% url 'lead-detail' lead.pk %}" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit">
+                        <span class="bn-avatar">{{ lead.name|first|upper }}</span>
+                        <span>
+                            <span class="bn-row-name" style="display:block">{{ lead.name }}</span>
+                            <span class="bn-row-sub">{{ lead.company|default:"—" }}</span>
+                        </span>
+                    </a>
                 </td>
-                <td>{{ lead.last_contacted|default:"-" }}</td>
+                <td>{{ lead.last_contacted|default:"—" }}</td>
                 <td>
                     {% if lead.next_follow_up %}
-                        <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
+                        {% if lead.next_follow_up < today %}
+                            <span class="bn-fu bn-fu-overdue">{{ lead.next_follow_up }}</span>
+                        {% elif lead.next_follow_up == today %}
+                            <span class="bn-fu bn-fu-today">Šiandien</span>
+                        {% else %}
+                            <span class="bn-fu bn-fu-upcoming">{{ lead.next_follow_up }}</span>
+                        {% endif %}
                     {% else %}
-                        -
+                        —
                     {% endif %}
                 </td>
-                <td><span class="badge">{{ lead.get_status_display }}</span></td>
+                <td><span class="bn-badge bn-badge-{{ lead.status }}">{{ lead.get_status_display }}</span></td>
                 <td>
-                    <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="display:inline;">
+                    <form method="post" action="{% url 'lead-quick-action' lead.pk %}">
                         {% csrf_token %}
-                        <input type="hidden" name="action" value="reminder" />
-                        <button type="submit">Pažymėti atlikta</button>
+                        <input type="hidden" name="action" value="reminder">
+                        <button type="submit" class="bn-btn bn-btn-sm">Pažymėti atlikta</button>
                     </form>
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="5">Nėra priminimų šiame filtre</td></tr>
+            <tr><td colspan="5">
+                <div style="padding:40px 20px;text-align:center">
+                    <div class="bn-serif-i" style="font-size:26px">Nėra priminimų šiame filtre.</div>
+                </div>
+            </td></tr>
         {% endfor %}
     </tbody>
 </table>
+</div>

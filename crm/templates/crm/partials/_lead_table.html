@@ -1,4 +1,5 @@
-<table>
+<div class="bn-table-wrap">
+<table class="bn-table">
     <thead>
         <tr>
             <th>Vardas / Įmonė</th>
@@ -12,19 +13,24 @@
     </thead>
     <tbody>
         {% for lead in leads %}
-            <tr class="{% if lead.next_follow_up and lead.next_follow_up < today %}overdue-row{% endif %}">
+            <tr class="{% if lead.next_follow_up and lead.next_follow_up < today %}is-overdue{% endif %}">
                 <td>
-                    <strong>{{ lead.name }}</strong><br>
-                    <small>{{ lead.company }}</small>
+                    <a href="{% url 'lead-detail' lead.pk %}" style="display:flex;align-items:center;gap:11px;text-decoration:none;color:inherit">
+                        <span class="bn-avatar">{{ lead.name|first|upper }}</span>
+                        <span>
+                            <span class="bn-row-name" style="display:block">{{ lead.name }}</span>
+                            <span class="bn-row-sub">{{ lead.company|default:"—" }}</span>
+                        </span>
+                    </a>
                 </td>
                 <td>
-                    {{ lead.email }}<br>
-                    <small>{{ lead.phone }}</small>
+                    {{ lead.email|default:"—" }}<br>
+                    <small style="color:var(--mut)">{{ lead.phone }}</small>
                 </td>
                 <td>
-                    <form method="post" action="/leads/{{ lead.pk }}/status/" style="display:inline;">
+                    <form method="post" action="{% url 'lead-status-update' lead.pk %}" style="display:inline;">
                         {% csrf_token %}
-                        <select name="status" onchange="this.form.submit()">
+                        <select name="status" onchange="this.form.submit()" class="bn-badge bn-badge-{{ lead.status }}" style="border:0;appearance:none;-webkit-appearance:none;cursor:pointer">
                             <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
                             <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
                             <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
@@ -33,26 +39,41 @@
                         </select>
                     </form>
                 </td>
-                <td>{{ lead.last_contacted|default:"-" }}</td>
+                <td>{{ lead.last_contacted|default:"—" }}</td>
                 <td>
                     {% if lead.next_follow_up %}
-                        <span class="{% if lead.next_follow_up < today %}late{% endif %}">{{ lead.next_follow_up }}</span>
+                        {% if lead.next_follow_up < today %}
+                            <span class="bn-fu bn-fu-overdue">{{ lead.next_follow_up }}</span>
+                        {% elif lead.next_follow_up == today %}
+                            <span class="bn-fu bn-fu-today">Šiandien</span>
+                        {% else %}
+                            <span class="bn-fu bn-fu-upcoming">{{ lead.next_follow_up }}</span>
+                        {% endif %}
                     {% else %}
-                        -
+                        <span class="bn-fu-none">—</span>
                     {% endif %}
                 </td>
-                <td>{{ lead.budget }} €</td>
+                <td style="font-weight:600">{{ lead.budget }} €</td>
                 <td>
-                    <a href="/leads/{{ lead.pk }}/">Peržiūrėti</a><br>
-                    <form method="post" action="/leads/{{ lead.pk }}/quick-action/" style="margin-top:0.35rem;">
-                        {% csrf_token %}
-                        <input type="hidden" name="action" value="reminder" />
-                        <button type="submit" style="padding:0.3rem 0.5rem; border:0; border-radius:6px; background:#2563eb; color:white; cursor:pointer;">Priminti</button>
-                    </form>
+                    <div style="display:flex;gap:8px;align-items:center">
+                        <a href="{% url 'lead-detail' lead.pk %}" class="bn-btn bn-btn-ghost bn-btn-sm">Peržiūrėti</a>
+                        <form method="post" action="{% url 'lead-quick-action' lead.pk %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="reminder">
+                            <button type="submit" class="bn-btn bn-btn-sm" title="Priminti" aria-label="Priminti">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+                            </button>
+                        </form>
+                    </div>
                 </td>
             </tr>
         {% empty %}
-            <tr><td colspan="7">Nėra leadų</td></tr>
+            <tr><td colspan="7">
+                <div style="padding:40px 20px;text-align:center">
+                    <div class="bn-serif-i" style="font-size:26px">Nieko nerasta.</div>
+                </div>
+            </td></tr>
         {% endfor %}
     </tbody>
 </table>
+</div>

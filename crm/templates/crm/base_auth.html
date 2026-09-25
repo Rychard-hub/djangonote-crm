@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="lt">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Bussy'Note{% endblock %}</title>
+<script>
+(function () {
+  var t = localStorage.getItem('bn-theme') || 'light';
+  document.documentElement.dataset.theme = t;
+})();
+</script>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'crm/css/theme.css' %}">
+</head>
+<body>
+<div class="bn-auth-shell">
+  <div class="bn-auth-panel">
+    <a class="bn-brand" href="{% url 'login' %}" style="text-decoration:none">
+      <span class="bn-brand-mark">B</span>
+      <span class="bn-brand-name">Bussy<em>'Note</em></span>
+    </a>
+    <div>
+      <h1 class="bn-auth-headline">{% block headline %}Kiekvienas klientas — <em>vienoje užrašinėje.</em>{% endblock %}</h1>
+      <p style="font-size:16px;color:var(--mut);max-width:38ch;margin:18px 0 0">{% block subheadline %}Leadai, follow-up'ai ir užduotys smulkiam paslaugų verslui. Be skaičiuoklių, be pamirštų skambučių.{% endblock %}</p>
+    </div>
+    <div></div>
+  </div>
+  <div class="bn-auth-form-side">
+    <div class="bn-auth-box">
+      {% block box %}{% endblock %}
+    </div>
+  </div>
+</div>
+<script src="{% static 'crm/js/app.js' %}"></script>
+</body>
+</html>
