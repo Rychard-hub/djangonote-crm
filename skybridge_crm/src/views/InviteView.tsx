@@ -84,7 +84,7 @@ export const InviteView: React.FC = () => {
             Paskyra sukurta!
           </h2>
           <p className="text-gray-600 mb-4">
-            Sėkmingai prisijungėte prie Freelancer CRM
+            Sėkmingai prisijungėte prie Bussy'note
           </p>
           <p className="text-sm text-gray-500">
             Perkeliate į dashboard...
@@ -103,7 +103,7 @@ export const InviteView: React.FC = () => {
             Sukurk naują paskyrą
           </h1>
           <p className="text-gray-600 mt-2">
-            Jūs buvote pakviesti prisijungti prie Freelancer CRM
+            Jūs buvote pakviesti prisijungti prie Bussy'note
           </p>
         </div>
 

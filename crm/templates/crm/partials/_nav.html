@@ -1,0 +1,131 @@
+<style>
+    .nav { display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; }
+    .nav a { color: white; text-decoration: none; }
+
+    .crm-nav-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 2.25rem;
+        height: 2.25rem;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.08);
+        color: white;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+    .crm-nav-toggle:hover { background: rgba(255, 255, 255, 0.16); }
+    .crm-nav-toggle svg { width: 1.25rem; height: 1.25rem; }
+
+    .crm-drawer-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 200ms ease;
+        z-index: 40;
+    }
+    .crm-drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
+    .crm-drawer {
+        position: fixed;
+        top: 0;
+        right: 0;
+        height: 100vh;
+        width: 300px;
+        max-width: 45vw;
+        background: #0b1220;
+        color: #e2e8f0;
+        box-shadow: -8px 0 24px rgba(0, 0, 0, 0.35);
+        transform: translateX(100%);
+        transition: transform 220ms ease;
+        z-index: 50;
+        display: flex;
+        flex-direction: column;
+        padding: 1.5rem;
+        box-sizing: border-box;
+    }
+    .crm-drawer.open { transform: translateX(0); }
+
+    .crm-drawer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .crm-drawer-header h3 {
+        margin: 0;
+        font-size: 0.8rem;
+        color: #94a3b8;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+    .crm-drawer-close {
+        border: none;
+        background: transparent;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        line-height: 1;
+        cursor: pointer;
+        padding: 0.25rem;
+    }
+    .crm-drawer-close:hover { color: white; }
+
+    .crm-drawer-nav { display: flex; flex-direction: column; gap: 0.25rem; }
+    .crm-drawer-nav a {
+        color: #e2e8f0;
+        text-decoration: none;
+        padding: 0.75rem;
+        border-radius: 8px;
+    }
+    .crm-drawer-nav a:hover { background: rgba(255, 255, 255, 0.08); }
+</style>
+
+<nav class="nav">
+    <a href="/dashboard/">Dashboard</a>
+    <a href="/leads/">Lead'ai</a>
+    <a href="/followups/">Follow-up</a>
+    <a href="/ai-content/">AI turinys</a>
+    <a href="/assistant/">AI asistentas</a>
+    <button type="button" class="crm-nav-toggle" onclick="crmOpenDrawer()" aria-label="Daugiau meniu punktų" aria-expanded="false" aria-controls="crm-side-drawer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+    </button>
+</nav>
+
+<div id="crm-drawer-overlay" class="crm-drawer-overlay" onclick="crmCloseDrawer()"></div>
+<aside id="crm-side-drawer" class="crm-drawer" aria-hidden="true">
+    <div class="crm-drawer-header">
+        <h3>Daugiau</h3>
+        <button type="button" class="crm-drawer-close" onclick="crmCloseDrawer()" aria-label="Uždaryti meniu">&times;</button>
+    </div>
+    <nav class="crm-drawer-nav">
+        <a href="/pipeline/">Pipeline</a>
+        <a href="/catalog/">Katalogas</a>
+        <a href="/billing/payment-links/">Mokėjimai</a>
+        <a href="/billing/plans/">Planas</a>
+        <a href="/settings/">Nustatymai</a>
+    </nav>
+</aside>
+
+<script>
+    function crmOpenDrawer() {
+        document.getElementById('crm-side-drawer').classList.add('open');
+        document.getElementById('crm-drawer-overlay').classList.add('open');
+        document.getElementById('crm-side-drawer').setAttribute('aria-hidden', 'false');
+    }
+    function crmCloseDrawer() {
+        document.getElementById('crm-side-drawer').classList.remove('open');
+        document.getElementById('crm-drawer-overlay').classList.remove('open');
+        document.getElementById('crm-side-drawer').setAttribute('aria-hidden', 'true');
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') crmCloseDrawer();
+    });
+</script>

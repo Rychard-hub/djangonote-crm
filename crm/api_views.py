@@ -286,7 +286,7 @@ class ProfileViewSet(viewsets.ModelViewSet):
             invitation_link = f"{settings.FRONTEND_URL}/invite/{uid}/{token}/"
             
             # Siunčiame el. laišką
-            subject = "Kvietimas prisijungti prie Freelancer CRM"
+            subject = "Kvietimas prisijungti prie Bussy'note"
             
             context = {
                 'user': request.user,
@@ -385,7 +385,7 @@ class RegistrationViewSet(viewsets.ViewSet):
                     'verification_link': verification_link,
                 }
                 
-                subject = "Patvirtinkite savo el. paštą - Freelancer CRM"
+                subject = "Patvirtinkite savo el. paštą - Bussy'note"
                 message = render_to_string('crm/email/email_verification.txt', context)
                 html_message = render_to_string('crm/email/email_verification.html', context)
                 
