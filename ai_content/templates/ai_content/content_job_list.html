@@ -1,56 +1,38 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI turinys</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; vertical-align: top; }
-        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
-        .pending, .processing { background: #fef3c7; color: #b45309; }
-        .done { background: #dcfce7; color: #166534; }
-        .failed { background: #fee2e2; color: #b91c1c; }
-        .result-text { white-space: pre-wrap; max-width: 420px; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
-        .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 560px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-box form { display: grid; gap: 0.9rem; }
-        .modal-box label { font-weight: 600; font-size: 0.95rem; }
-        .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
-        .modal-error { background: #fee2e2; color: #b91c1c; padding: 0.8rem; border-radius: 8px; margin-bottom: 0.9rem; }
-    </style>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <div id="modal"></div>
-    <header class="topbar">
-        <h2>AI turinys</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
+{% extends 'crm/base.html' %}
+{% block title %}AI turinys | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <div class="bn-toolbar">
+    <div>
+      <h1 class="bn-h1" style="font-size:36px">AI turinys</h1>
+      <div class="bn-lead-line">Antraštės, scenarijai ir vaizdai jūsų rinkodarai — pagal jūsų aprašymą.</div>
+    </div>
+    {% if has_feature %}
+      <span class="bn-chip" style="cursor:default">Liko {{ remaining }} iš {{ subscription.plan.ai_content_quota }}</span>
+    {% endif %}
+  </div>
 
-    <main class="container">
-        <div class="toolbar">
-            <a href="/ai-content/new/" hx-get="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;">
-                <button type="button">Generuoti turinį</button>
-            </a>
-            <span style="color:#64748b;">
-                {% if has_feature %}
-                    Planas: <strong>{{ subscription.plan.name }}</strong> — liko {{ remaining }} generavimų šį mėnesį
-                {% else %}
-                    AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano —
-                    <a href="/billing/plans/">peržiūrėti planus</a>
-                {% endif %}
-            </span>
-        </div>
+  {% if has_feature %}
+    <div>
+      <a class="bn-btn bn-btn-primary" href="{% url 'content-job-create' %}" hx-get="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+        Generuoti turinį
+      </a>
+    </div>
+  {% else %}
+    <div class="bn-lock-card">
+      <div class="bn-lock-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>
+      </div>
+      <div class="bn-lock-title">AI turinys pasiekiamas nuo Pro plano.</div>
+      <div style="color:var(--mut);max-width:48ch">Dabar naudojate „{{ subscription.plan.name }}“ planą. Pereikite į didesnį — pakeitimas įsigalioja iškart.</div>
+      <a class="bn-btn bn-btn-primary" href="{% url 'plan-list' %}" style="margin-top:6px">Peržiūrėti planus</a>
+    </div>
+  {% endif %}
 
-        {% include 'ai_content/partials/_content_job_table.html' %}
-    </main>
-</body>
-</html>
+  <div>
+    <h2 class="bn-card-title">Istorija</h2>
+    {% include 'ai_content/partials/_content_job_table.html' %}
+  </div>
+</div>
+{% endblock %}

@@ -1,18 +1,20 @@
 <tr id="job-{{ job.pk }}"
     {% if job.in_progress %}hx-get="{% url 'content-job-status' job.pk %}" hx-trigger="every 2s" hx-target="this" hx-swap="outerHTML"{% endif %}>
     <td>{{ job.get_kind_display }}</td>
-    <td>{{ job.prompt|truncatechars:80 }}</td>
-    <td><span class="badge {{ job.status }}">{{ job.get_status_display }}</span></td>
-    <td class="result-text">
+    <td style="max-width:260px">{{ job.prompt|truncatechars:80 }}</td>
+    <td><span class="bn-badge bn-badge-{{ job.status }}">{{ job.get_status_display }}</span></td>
+    <td style="max-width:320px">
         {% if job.status == 'done' and job.is_media and job.result_file %}
             {% if job.kind == 'image' %}
-                <img src="{{ job.result_file.url }}" alt="{{ job.prompt|truncatechars:80 }}" style="max-width:160px; border-radius:6px;">
+                <img class="bn-media-box" src="{{ job.result_file.url }}" alt="{{ job.prompt|truncatechars:80 }}">
             {% elif job.kind == 'video' %}
-                <video controls src="{{ job.result_file.url }}" style="max-width:220px; border-radius:6px;"></video>
+                <video class="bn-media-box" controls src="{{ job.result_file.url }}"></video>
             {% endif %}
-        {% elif job.status == 'done' %}{{ job.result_text }}{% endif %}
-        {% if job.status == 'failed' %}<span style="color:#b91c1c;">{{ job.error }}</span>{% endif %}
-        {% if job.in_progress %}<em>Generuojama...</em>{% endif %}
+        {% elif job.status == 'done' %}
+            <div class="bn-result-box" style="margin-top:0">{{ job.result_text }}</div>
+        {% endif %}
+        {% if job.status == 'failed' %}<span style="color:var(--danger)">{{ job.error }}</span>{% endif %}
+        {% if job.in_progress %}<em style="color:var(--mut)">Generuojama...</em>{% endif %}
     </td>
-    <td>{{ job.created_at|date:"Y-m-d H:i" }}</td>
+    <td style="color:var(--mut)">{{ job.created_at|date:"Y-m-d H:i" }}</td>
 </tr>

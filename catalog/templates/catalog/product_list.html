@@ -1,72 +1,38 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Katalogas</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .toolbar { display: flex; justify-content: space-between; gap: 1rem; align-items: center; flex-wrap: wrap; margin-bottom: 1rem; }
-        .controls { display: flex; gap: 0.75rem; flex-wrap: wrap; }
-        .controls input, .controls select, .controls button { padding: 0.6rem; border-radius: 8px; border: 1px solid #cbd5e1; }
-        .controls button { background: #2563eb; color: white; border: 0; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        th, td { padding: 0.8rem; border-bottom: 1px solid #e2e8f0; text-align: left; }
-        .badge { display: inline-block; padding: 0.25rem 0.6rem; border-radius: 999px; font-size: 0.8rem; }
-        .product { background: #dbeafe; color: #1d4ed8; }
-        .service { background: #dcfce7; color: #166534; }
-        .active-yes { color: #166534; }
-        .active-no { color: #b91c1c; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(15,23,42,0.5); display: flex; align-items: center; justify-content: center; padding: 1rem; z-index: 50; }
-        .modal-box { background: white; border-radius: 12px; padding: 1.5rem; max-width: 640px; width: 100%; max-height: 90vh; overflow-y: auto; }
-        .modal-box form { display: grid; gap: 0.9rem; }
-        .modal-box label { font-weight: 600; font-size: 0.95rem; }
-        .modal-box input, .modal-box select, .modal-box textarea { padding: 0.7rem; border: 1px solid #cbd5e1; border-radius: 8px; width: 100%; box-sizing: border-box; }
-        .modal-box button[type="submit"] { padding: 0.8rem 1rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; }
-        .modal-box .row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; }
-    </style>
-    <script src="https://unpkg.com/htmx.org@2.0.4"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
-    <div id="modal"></div>
-    <header class="topbar">
-        <h2>Katalogas</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
+{% extends 'crm/base.html' %}
+{% block title %}Katalogas | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <div class="bn-toolbar">
+    <div style="display:flex;align-items:baseline;gap:12px">
+      <h1 class="bn-h1" style="font-size:36px">Katalogas</h1>
+      <span style="color:var(--mut);font-size:15px" id="total-products-count">Viso: {{ total_products }}</span>
+    </div>
+    <a class="bn-btn bn-btn-primary" href="{% url 'product-create' %}" hx-get="{% url 'product-create' %}" hx-target="#modal" hx-swap="innerHTML">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
+      Pridėti prekę/paslaugą
+    </a>
+  </div>
 
-    <main class="container">
-        <div class="toolbar">
-            <div>
-                <a href="/catalog/new/" hx-get="{% url 'product-create' %}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none;"><button type="button">Pridėti prekę/paslaugą</button></a>
-                <span id="total-products-count" style="margin-left: 1rem; color: #64748b;">Viso: {{ total_products }}</span>
-            </div>
-            <form class="controls" method="get"
-                  hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true"
-                  hx-trigger="change from:find select, submit">
-                <input type="search" name="q" value="{{ query }}" placeholder="Paieška pagal pavadinimą ar aprašymą"
-                       hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true"
-                       hx-trigger="keyup changed delay:400ms" />
-                <select name="kind">
-                    <option value="">Visi tipai</option>
-                    <option value="product" {% if kind == 'product' %}selected{% endif %}>Produktas</option>
-                    <option value="service" {% if kind == 'service' %}selected{% endif %}>Paslauga</option>
-                </select>
-                <select name="active">
-                    <option value="">Visi</option>
-                    <option value="yes" {% if active == 'yes' %}selected{% endif %}>Aktyvūs</option>
-                    <option value="no" {% if active == 'no' %}selected{% endif %}>Neaktyvūs</option>
-                </select>
-                <button type="submit">Filtruoti</button>
-            </form>
-        </div>
+  <form class="bn-toolgrid" method="get" hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true" hx-trigger="change from:find select, submit">
+    <label class="bn-search">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16M21 21l-4.3-4.3"></path></svg>
+      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="Paieška pagal pavadinimą ar aprašymą"
+             hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true" hx-trigger="keyup changed delay:400ms">
+    </label>
+    <select class="bn-select" name="kind">
+      <option value="">Visi tipai</option>
+      <option value="product" {% if kind == 'product' %}selected{% endif %}>Produktas</option>
+      <option value="service" {% if kind == 'service' %}selected{% endif %}>Paslauga</option>
+    </select>
+    <select class="bn-select" name="active">
+      <option value="">Visi</option>
+      <option value="yes" {% if active == 'yes' %}selected{% endif %}>Aktyvūs</option>
+      <option value="no" {% if active == 'no' %}selected{% endif %}>Neaktyvūs</option>
+    </select>
+  </form>
 
-        <div id="product-table-wrap">
-            {% include 'catalog/partials/_product_table.html' %}
-        </div>
-    </main>
-</body>
-</html>
+  <div id="product-table-wrap">
+    {% include 'catalog/partials/_product_table.html' %}
+  </div>
+</div>
+{% endblock %}
