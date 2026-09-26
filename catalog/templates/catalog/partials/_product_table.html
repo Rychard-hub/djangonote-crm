@@ -1,36 +1,40 @@
-<table>
-    <thead>
-        <tr>
-            <th>Pavadinimas</th>
-            <th>Tipas</th>
-            <th>Kaina</th>
-            <th>Būsena</th>
-            <th>Veiksmai</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for product in products %}
+<div class="bn-table-wrap">
+    <table class="bn-table">
+        <thead>
             <tr>
-                <td>
-                    <strong>{{ product.name }}</strong><br>
-                    <small>{{ product.description|default:""|truncatechars:80 }}</small>
-                </td>
-                <td><span class="badge {{ product.kind }}">{{ product.get_kind_display }}</span></td>
-                <td>{{ product.price }} {{ product.currency }}</td>
-                <td>
-                    {% if product.active %}
-                        <span class="active-yes">Aktyvus</span>
-                    {% else %}
-                        <span class="active-no">Neaktyvus</span>
-                    {% endif %}
-                </td>
-                <td>
-                    <a href="/catalog/{{ product.pk }}/edit/" hx-get="{% url 'product-edit' product.pk %}" hx-target="#modal" hx-swap="innerHTML">Redaguoti</a><br>
-                    <a href="/catalog/{{ product.pk }}/delete/">Ištrinti</a>
-                </td>
+                <th>Pavadinimas</th>
+                <th>Tipas</th>
+                <th>Kaina</th>
+                <th>Būsena</th>
+                <th>Veiksmai</th>
             </tr>
-        {% empty %}
-            <tr><td colspan="5">Kol kas nieko nėra kataloge</td></tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for product in products %}
+                <tr>
+                    <td>
+                        <div class="bn-row-name">{{ product.name }}</div>
+                        <div class="bn-row-sub">{{ product.description|default:""|truncatechars:80 }}</div>
+                    </td>
+                    <td><span class="bn-badge" style="{% if product.kind == 'product' %}background:var(--st-new-bg);color:var(--st-new-fg){% else %}background:var(--st-won-bg);color:var(--st-won-fg){% endif %}">{{ product.get_kind_display }}</span></td>
+                    <td>{{ product.price }} {{ product.currency }}</td>
+                    <td>
+                        {% if product.active %}
+                            <span class="bn-status-yes">Aktyvus</span>
+                        {% else %}
+                            <span class="bn-status-no">Neaktyvus</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:6px">
+                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-edit' product.pk %}" hx-get="{% url 'product-edit' product.pk %}" hx-target="#modal" hx-swap="innerHTML">Redaguoti</a>
+                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-delete' product.pk %}">Ištrinti</a>
+                        </div>
+                    </td>
+                </tr>
+            {% empty %}
+                <tr><td colspan="5" class="bn-empty">Kol kas nieko nėra kataloge</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

@@ -1,76 +1,87 @@
-<!DOCTYPE html>
-<html lang="lt">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planai</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; background: #f4f7fb; color: #0f172a; }
-        .topbar { background: #0f172a; color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-        .topbar a { color: white; text-decoration: none; }
-        .container { padding: 2rem; }
-        .current-plan { background: white; padding: 1rem 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); margin-bottom: 1.5rem; }
-        .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
-        .plan-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.06); }
-        .plan-card h3 { margin-top: 0; }
-        .price { font-size: 1.6rem; font-weight: bold; margin: 0.5rem 0; }
-        .plan-card ul { padding-left: 1.1rem; color: #475569; font-size: 0.9rem; }
-        .plan-card button { width: 100%; padding: 0.7rem; background: #2563eb; color: white; border: 0; border-radius: 8px; cursor: pointer; margin-top: 0.8rem; }
-        .modal-error { background: #fee2e2; color: #b91c1c; padding: 0.8rem; border-radius: 8px; margin-bottom: 1rem; }
-    </style>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<body>
-    <header class="topbar">
-        <h2>Planai</h2>
-        {% include "crm/partials/_nav.html" %}
-    </header>
+{% extends 'crm/base.html' %}
+{% block title %}Planas | Bussy'Note{% endblock %}
+{% block content %}
+<div style="display:grid;gap:16px">
+  <div class="bn-toolbar">
+    <div>
+      <h1 class="bn-h1" style="font-size:36px">Planas</h1>
+      <div class="bn-lead-line">Mokama per Stripe. Keisti galite bet kada.</div>
+    </div>
+  </div>
 
-    <main class="container">
-        {% if error %}
-            <div class="modal-error">
-                Nepavyko pradėti prenumeratos: {{ error }}
-                <br>Nustatykite <code>STRIPE_SECRET_KEY</code> ir plano <code>stripe_price_id</code>, tada bandykite dar kartą.
-            </div>
+  {% if error %}
+    <div class="bn-error-slot">
+      Nepavyko pradėti prenumeratos: {{ error }}
+      <br>Nustatykite <code>STRIPE_SECRET_KEY</code> ir plano <code>stripe_price_id</code>, tada bandykite dar kartą.
+    </div>
+  {% endif %}
+
+  <div class="bn-card bn-plan-top">
+    <div>
+      <div class="bn-eyebrow">Dabartinis planas</div>
+      <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-top:2px">
+        <div class="bn-serif" style="font-size:40px;line-height:1">{{ subscription.plan.name }}</div>
+        <span class="bn-badge bn-badge-{% if subscription.status == 'active' %}done{% elif subscription.status == 'past_due' %}pending{% else %}expired{% endif %}">{{ subscription.get_status_display }}</span>
+      </div>
+      <div style="color:var(--mut);font-size:13.5px;margin-top:6px">
+        {{ subscription.plan.monthly_price }} € / mėn.
+        {% if subscription.plan.max_payment_links_per_month > 0 %}
+          — {{ subscription.plan.max_payment_links_per_month }} mokėjimo nuorodos per mėnesį
+        {% else %}
+          — neribotai mokėjimo nuorodų
         {% endif %}
+      </div>
+    </div>
+    <div>
+      {% with remaining=subscription.payment_links_remaining %}
+        {% if remaining is not None %}
+          <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px">
+            <span style="font-weight:600">Mokėjimo nuorodos</span>
+            <span style="color:var(--mut)">liko {{ remaining }} iš {{ subscription.plan.max_payment_links_per_month }}</span>
+          </div>
+          <div class="bn-usage-bar"><div class="bn-usage-fill" style="width:{% widthratio remaining subscription.plan.max_payment_links_per_month 100 %}%"></div></div>
+        {% endif %}
+      {% endwith %}
+      {% if subscription.plan.ai_content_quota > 0 %}
+        <div style="margin-top:10px;font-size:13px;color:var(--mut)">{{ subscription.plan.ai_content_quota }} AI turinio generavimų / mėn.</div>
+      {% endif %}
+    </div>
+  </div>
 
-        <div class="current-plan">
-            Dabartinis planas: <strong>{{ subscription.plan.name }}</strong>
-            (statusas: {{ subscription.get_status_display }})
-            {% if subscription.plan.max_payment_links_per_month > 0 %}
-                — {{ subscription.plan.max_payment_links_per_month }} mokėjimo nuorodos per mėnesį
-            {% else %}
-                — neribotai mokėjimo nuorodų
-            {% endif %}
+  <div class="bn-plan-grid">
+    {% for plan in plans %}
+      <div class="bn-plan-card">
+        <div>
+          <div style="font-size:17px;font-weight:700">{{ plan.name }}</div>
         </div>
-
-        <div class="plans">
-            {% for plan in plans %}
-                <div class="plan-card">
-                    <h3>{{ plan.name }}</h3>
-                    <div class="price">{{ plan.monthly_price }} € / mėn.</div>
-                    <ul>
-                        {% if plan.max_payment_links_per_month > 0 %}
-                            <li>{{ plan.max_payment_links_per_month }} mokėjimo nuorodos / mėn.</li>
-                        {% else %}
-                            <li>Neribotai mokėjimo nuorodų</li>
-                        {% endif %}
-                        {% if plan.ai_content_quota > 0 %}
-                            <li>{{ plan.ai_content_quota }} AI turinio generavimų / mėn.</li>
-                        {% endif %}
-                        {% for feature in plan.features %}
-                            <li>{{ feature }}</li>
-                        {% endfor %}
-                    </ul>
-                    <form method="post" action="{% url 'subscribe' plan.code %}">
-                        {% csrf_token %}
-                        <button type="submit">Pereiti į „{{ plan.name }}“</button>
-                    </form>
-                </div>
-            {% empty %}
-                <p>Kitų planų nėra.</p>
-            {% endfor %}
+        <div class="bn-plan-price">{{ plan.monthly_price }} €<span style="font-size:13px;color:var(--mut);font-family:'Hanken Grotesk',sans-serif"> / mėn.</span></div>
+        <div class="bn-plan-items">
+          {% if plan.max_payment_links_per_month > 0 %}
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{{ plan.max_payment_links_per_month }} mokėjimo nuorodos / mėn.</div>
+          {% else %}
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>Neribotai mokėjimo nuorodų</div>
+          {% endif %}
+          {% if plan.ai_content_quota > 0 %}
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{{ plan.ai_content_quota }} AI turinio generavimų / mėn.</div>
+          {% endif %}
+          {% for feature in plan.features %}
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>
+              {% if feature == 'ai_content' %}AI turinys
+              {% elif feature == 'assistant' %}AI asistentas
+              {% elif feature == 'ai_video' %}AI video generavimas
+              {% else %}{{ feature }}
+              {% endif %}
+            </div>
+          {% endfor %}
         </div>
-    </main>
-</body>
-</html>
+        <form method="post" action="{% url 'subscribe' plan.code %}" style="margin-top:auto">
+          {% csrf_token %}
+          <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Pereiti į „{{ plan.name }}“</button>
+        </form>
+      </div>
+    {% empty %}
+      <p style="color:var(--mut)">Kitų planų nėra.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

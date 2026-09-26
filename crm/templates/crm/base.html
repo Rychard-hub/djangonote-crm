@@ -55,23 +55,23 @@
 
       <div class="bn-nav-group-label">Įrankiai</div>
       <div class="bn-nav">
-        <a class="bn-nav-item" href="/ai-content/">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'content-job-list' %}is-active{% endif %}" href="{% url 'content-job-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"></path></svg>
           <span class="bn-nav-label">AI turinys</span>
         </a>
-        <a class="bn-nav-item" href="/assistant/">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'assistant' %}is-active{% endif %}" href="{% url 'assistant' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
           <span class="bn-nav-label">AI asistentas</span>
         </a>
-        <a class="bn-nav-item" href="/catalog/">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'product-list' %}is-active{% endif %}" href="{% url 'product-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.3 7 12 12l8.7-5M12 22V12"></path></svg>
           <span class="bn-nav-label">Katalogas</span>
         </a>
-        <a class="bn-nav-item" href="/billing/payment-links/">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'payment-link-list' %}is-active{% endif %}" href="{% url 'payment-link-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>
           <span class="bn-nav-label">Mokėjimai</span>
         </a>
-        <a class="bn-nav-item" href="/billing/plans/">
+        <a class="bn-nav-item {% if request.resolver_match.url_name == 'plan-list' %}is-active{% endif %}" href="{% url 'plan-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5"></path></svg>
           <span class="bn-nav-label">Planas</span>
         </a>
@@ -148,11 +148,11 @@
   <div class="bn-sheet">
     <div class="bn-sheet-handle"></div>
     <a class="bn-sheet-item" href="{% url 'pipeline' %}">Pipeline</a>
-    <a class="bn-sheet-item" href="/ai-content/">AI turinys</a>
-    <a class="bn-sheet-item" href="/assistant/">AI asistentas</a>
-    <a class="bn-sheet-item" href="/catalog/">Katalogas</a>
-    <a class="bn-sheet-item" href="/billing/payment-links/">Mokėjimai</a>
-    <a class="bn-sheet-item" href="/billing/plans/">Planas</a>
+    <a class="bn-sheet-item" href="{% url 'content-job-list' %}">AI turinys</a>
+    <a class="bn-sheet-item" href="{% url 'assistant' %}">AI asistentas</a>
+    <a class="bn-sheet-item" href="{% url 'product-list' %}">Katalogas</a>
+    <a class="bn-sheet-item" href="{% url 'payment-link-list' %}">Mokėjimai</a>
+    <a class="bn-sheet-item" href="{% url 'plan-list' %}">Planas</a>
     <a class="bn-sheet-item" href="{% url 'settings' %}">Nustatymai</a>
     <div style="height:1px;background:var(--line);margin:6px 0"></div>
     <form method="post" action="{% url 'logout' %}">
