@@ -24,6 +24,7 @@
   --radius: 16px;
   --radius-sm: 10px;
   --shadow-card: 0 6px 20px rgba(28, 27, 24, .06);
+  --shadow-sm: 0 2px 8px 2px rgba(28, 27, 24, .24);
   --shadow-pop: 0 24px 60px rgba(0, 0, 0, .22);
 }
 
@@ -45,6 +46,10 @@
   --st-proposal-bg: rgba(170, 140, 255, .17); --st-proposal-fg: #cab8ff;
   --st-won-bg: rgba(110, 210, 140, .15);    --st-won-fg: #94dfaa;
   --st-lost-bg: rgba(237, 235, 228, .08);   --st-lost-fg: #a39f95;
+
+  /* Real drop shadows barely read on a dark surface, so cards get a soft
+     light-colored highlight ring instead of shadow-sm's dark blur. */
+  --shadow-sm: 0 0 0 1px rgba(237, 235, 228, .07);
 }
 
 * { box-sizing: border-box; }
@@ -162,12 +167,13 @@ input::placeholder, textarea::placeholder { color: var(--mut); }
 }
 
 /* ---------- cards / kpis ---------- */
-.bn-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; }
+.bn-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow-sm); }
 .bn-card-title { font-size: 15px; font-weight: 700; margin: 0 0 10px; }
 .bn-kpi-row { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
 .bn-kpi {
   text-align: left; padding: 14px 16px 13px; border: 1px solid var(--line); border-radius: 14px;
   background: var(--surface); color: var(--ink); cursor: pointer; display: grid; gap: 2px; text-decoration: none;
+  box-shadow: var(--shadow-sm);
 }
 .bn-kpi.is-hl { background: var(--acc); color: var(--acc-ink); border-color: var(--acc); }
 .bn-kpi-label { font-size: 12.5px; font-weight: 600; opacity: .8; }
@@ -253,7 +259,7 @@ input::placeholder, textarea::placeholder { color: var(--mut); }
 .bn-search input { padding-left: 38px; }
 
 /* ---------- table ---------- */
-.bn-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; overflow-x: auto; }
+.bn-table-wrap { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; overflow-x: auto; box-shadow: var(--shadow-sm); }
 table.bn-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 .bn-table thead th {
   text-align: left; font-size: 12px; font-weight: 700; color: var(--mut); padding: 11px 18px; background: var(--sunk);
@@ -263,7 +269,7 @@ table.bn-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 
 /* ---------- kanban ---------- */
 .bn-kanban { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; align-items: start; }
-.bn-kanban-col { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; }
+.bn-kanban-col { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px; box-shadow: var(--shadow-sm); }
 .bn-kanban-col h3 { margin: 0 0 10px; font-size: 14px; display: flex; align-items: center; gap: 8px; }
 .bn-kanban-card { background: var(--sunk); border-radius: 12px; padding: 12px; margin-bottom: 10px; }
 .bn-kanban-card strong { display: block; margin-bottom: 4px; }
@@ -349,7 +355,7 @@ table.bn-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 .bn-lock-title { font-family: 'Instrument Serif', serif; font-style: italic; font-size: 30px; line-height: 1.1; max-width: 26ch; }
 
 /* ---------- chat ---------- */
-.bn-chat-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; height: 65vh; }
+.bn-chat-card { display: flex; flex-direction: column; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; height: 65vh; box-shadow: var(--shadow-sm); }
 .bn-chat-messages { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
 .bn-msg { max-width: 80%; padding: 10px 14px; white-space: pre-wrap; line-height: 1.5; }
 .bn-msg.user { align-self: flex-end; background: var(--ink); color: var(--bg); border-radius: 16px 16px 4px 16px; }
@@ -364,7 +370,7 @@ table.bn-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 .bn-usage-bar { height: 8px; border-radius: 99px; background: var(--sunk); overflow: hidden; margin-top: 6px; }
 .bn-usage-fill { height: 100%; background: var(--acc); }
 .bn-plan-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
-.bn-plan-card { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); }
+.bn-plan-card { position: relative; display: flex; flex-direction: column; gap: 14px; padding: 20px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line); box-shadow: var(--shadow-sm); }
 .bn-plan-card.is-current { border: 2px solid var(--acc); }
 .bn-plan-tag { position: absolute; top: 18px; right: 18px; font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 6px; background: var(--acc); color: var(--acc-ink); }
 .bn-plan-price { font-family: 'Instrument Serif', serif; font-size: 44px; line-height: 1; }
