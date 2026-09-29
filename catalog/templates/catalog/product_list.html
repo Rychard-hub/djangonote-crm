@@ -1,33 +1,34 @@
 {% extends 'crm/base.html' %}
-{% block title %}Katalogas | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Katalogas" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div style="display:flex;align-items:baseline;gap:12px">
-      <h1 class="bn-h1" style="font-size:36px">Katalogas</h1>
-      <span style="color:var(--mut);font-size:15px" id="total-products-count">Viso: {{ total_products }}</span>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "Katalogas" %}</h1>
+      <span style="color:var(--mut);font-size:15px" id="total-products-count">{% blocktranslate %}Viso: {{ total_products }}{% endblocktranslate %}</span>
     </div>
     <a class="bn-btn bn-btn-primary" href="{% url 'product-create' %}" hx-get="{% url 'product-create' %}" hx-target="#modal" hx-swap="innerHTML">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-      Pridėti prekę/paslaugą
+      {% translate "Pridėti prekę/paslaugą" %}
     </a>
   </div>
 
   <form class="bn-toolgrid" method="get" hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true" hx-trigger="change from:find select, submit">
     <label class="bn-search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16M21 21l-4.3-4.3"></path></svg>
-      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="Paieška pagal pavadinimą ar aprašymą"
+      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Paieška pagal pavadinimą ar aprašymą' %}"
              hx-get="{% url 'product-list' %}" hx-target="#product-table-wrap" hx-push-url="true" hx-trigger="keyup changed delay:400ms">
     </label>
     <select class="bn-select" name="kind">
-      <option value="">Visi tipai</option>
-      <option value="product" {% if kind == 'product' %}selected{% endif %}>Produktas</option>
-      <option value="service" {% if kind == 'service' %}selected{% endif %}>Paslauga</option>
+      <option value="">{% translate "Visi tipai" %}</option>
+      <option value="product" {% if kind == 'product' %}selected{% endif %}>{% translate "Produktas" %}</option>
+      <option value="service" {% if kind == 'service' %}selected{% endif %}>{% translate "Paslauga" %}</option>
     </select>
     <select class="bn-select" name="active">
-      <option value="">Visi</option>
-      <option value="yes" {% if active == 'yes' %}selected{% endif %}>Aktyvūs</option>
-      <option value="no" {% if active == 'no' %}selected{% endif %}>Neaktyvūs</option>
+      <option value="">{% translate "Visi" %}</option>
+      <option value="yes" {% if active == 'yes' %}selected{% endif %}>{% translate "Aktyvūs" %}</option>
+      <option value="no" {% if active == 'no' %}selected{% endif %}>{% translate "Neaktyvūs" %}</option>
     </select>
   </form>
 

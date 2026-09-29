@@ -1,5 +1,6 @@
 {% extends 'crm/base.html' %}
-{% block title %}AI asistentas | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "AI asistentas" %} | Bussy'Note{% endblock %}
 {% block extra_head %}
 <script defer src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js"></script>
 {% endblock %}
@@ -7,8 +8,8 @@
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div>
-      <h1 class="bn-h1" style="font-size:36px">AI asistentas</h1>
-      <div class="bn-lead-line">Klauskite apie savo leadus, follow-up'us ir užduotis — atsakymai iš jūsų duomenų.</div>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "AI asistentas" %}</h1>
+      <div class="bn-lead-line">{% translate "Klauskite apie savo leadus, follow-up'us ir užduotis — atsakymai iš jūsų duomenų." %}</div>
     </div>
   </div>
 
@@ -16,23 +17,26 @@
   <div class="bn-chat-card" x-data="chatWidget()" x-init="init()">
     <div class="bn-chat-messages" x-ref="messagesEl">
       <template x-if="messages.length === 0">
-        <p class="bn-chat-empty">Paklauskite apie savo leadus, follow-up'us ar užduotis — pvz. „kokie follow-up'ai vėluoja?“</p>
+        <p class="bn-chat-empty">{% translate "Paklauskite apie savo leadus, follow-up'us ar užduotis — pvz. „kokie follow-up'ai vėluoja?“" %}</p>
       </template>
       <template x-for="msg in messages" :key="msg.id">
         <div class="bn-msg" :class="msg.role">
-          <span class="bn-msg-role" x-text="msg.role === 'user' ? 'Jūs' : 'Asistentas'"></span>
+          <span class="bn-msg-role" x-text="msg.role === 'user' ? youLabel : assistantLabel"></span>
           <span x-text="msg.content"></span>
         </div>
       </template>
-      <div class="bn-msg assistant" x-show="sending" style="font-style:italic;color:var(--mut)">Asistentas rašo...</div>
+      <div class="bn-msg assistant" x-show="sending" style="font-style:italic;color:var(--mut)">{% translate "Asistentas rašo..." %}</div>
     </div>
     <form class="bn-chat-form" @submit.prevent="send()">
-      <input type="text" class="bn-input" style="flex:1" x-model="draft" placeholder="Klauskite apie savo leadus..." :disabled="sending" autofocus>
-      <button type="submit" class="bn-btn bn-btn-primary" :disabled="sending || !draft.trim()">Siųsti</button>
+      <input type="text" class="bn-input" style="flex:1" x-model="draft" placeholder="{% translate 'Klauskite apie savo leadus...' %}" :disabled="sending" autofocus>
+      <button type="submit" class="bn-btn bn-btn-primary" :disabled="sending || !draft.trim()">{% translate "Siųsti" %}</button>
     </form>
   </div>
 </div>
 
+{% translate "Jūs" as you_label %}
+{% translate "Asistentas" as assistant_label %}
+{% translate "Atsiprašau, nepavyko prisijungti. Bandykite dar kartą." as connect_error_label %}
 <script>
     function chatWidget() {
         return {
@@ -40,6 +44,9 @@
             draft: '',
             sending: false,
             nextId: 1,
+            youLabel: '{{ you_label|escapejs }}',
+            assistantLabel: '{{ assistant_label|escapejs }}',
+            errorLabel: '{{ connect_error_label|escapejs }}',
             init() {
                 this.messages = JSON.parse(document.getElementById('initial-messages').textContent);
                 this.nextId = this.messages.length + 1;
@@ -68,7 +75,7 @@
                     const data = await resp.json();
                     this.messages.push({ id: this.nextId++, role: 'assistant', content: data.reply });
                 } catch (e) {
-                    this.messages.push({ id: this.nextId++, role: 'assistant', content: 'Atsiprašau, nepavyko prisijungti. Bandykite dar kartą.' });
+                    this.messages.push({ id: this.nextId++, role: 'assistant', content: this.errorLabel });
                 } finally {
                     this.sending = false;
                     this.$nextTick(() => this.scrollToBottom());

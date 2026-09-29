@@ -1,12 +1,13 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Organization
 
 
 class Product(models.Model):
     KIND_CHOICES = [
-        ('product', 'Produktas'),
-        ('service', 'Paslauga'),
+        ('product', _('Produktas')),
+        ('service', _('Paslauga')),
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='products')

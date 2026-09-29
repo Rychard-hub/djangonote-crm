@@ -1,13 +1,14 @@
+{% load i18n %}
 <div class="bn-table-wrap">
     <table class="bn-table">
         <thead>
             <tr>
-                <th>Aprašymas</th>
-                <th>Suma</th>
-                <th>Susieta su</th>
-                <th>Būsena</th>
-                <th>Sukurta</th>
-                <th>Nuoroda</th>
+                <th>{% translate "Aprašymas" %}</th>
+                <th>{% translate "Suma" %}</th>
+                <th>{% translate "Susieta su" %}</th>
+                <th>{% translate "Būsena" %}</th>
+                <th>{% translate "Sukurta" %}</th>
+                <th>{% translate "Nuoroda" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -24,14 +25,14 @@
                     <td style="color:var(--mut)">{{ link.created_at|date:"Y-m-d H:i" }}</td>
                     <td>
                         {% if link.url %}
-                            <button type="button" class="bn-btn bn-btn-ghost bn-btn-sm" onclick="copyLink(this, '{{ link.url }}')">Kopijuoti nuorodą</button>
+                            <button type="button" class="bn-btn bn-btn-ghost bn-btn-sm" onclick="copyLink(this, '{{ link.url }}')">{% translate "Kopijuoti nuorodą" %}</button>
                         {% else %}
                             -
                         {% endif %}
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="6" class="bn-empty">Kol kas mokėjimo nuorodų nėra</td></tr>
+                <tr><td colspan="6" class="bn-empty">{% translate "Kol kas mokėjimo nuorodų nėra" %}</td></tr>
             {% endfor %}
         </tbody>
     </table>

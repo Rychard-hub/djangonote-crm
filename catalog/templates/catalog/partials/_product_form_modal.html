@@ -1,50 +1,51 @@
+{% load i18n %}
 <div class="bn-modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
     <div class="bn-modal">
         <div class="bn-modal-head">
-            <h2 class="bn-modal-title">{% if mode == 'edit' %}Redaguoti{% else %}Pridėti{% endif %} prekę/paslaugą</h2>
-            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="Uždaryti">
+            <h2 class="bn-modal-title">{% if mode == 'edit' %}{% translate "Redaguoti prekę/paslaugą" %}{% else %}{% translate "Pridėti prekę/paslaugą" %}{% endif %}</h2>
+            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="{% translate 'Uždaryti' %}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
             </button>
         </div>
         <form hx-post="{% if mode == 'edit' %}{% url 'product-edit' product.pk %}{% else %}{% url 'product-create' %}{% endif %}"
               hx-target="#modal" hx-swap="innerHTML" style="display:grid;gap:14px">
             <div class="bn-field">
-                <label for="name">Pavadinimas</label>
+                <label for="name">{% translate "Pavadinimas" %}</label>
                 <input id="name" name="name" class="bn-input" value="{{ product.name|default:'' }}" required>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="kind">Tipas</label>
+                    <label for="kind">{% translate "Tipas" %}</label>
                     <select id="kind" name="kind" class="bn-select">
-                        <option value="product" {% if product.kind == 'product' %}selected{% endif %}>Produktas</option>
-                        <option value="service" {% if product.kind == 'service' or not product %}selected{% endif %}>Paslauga</option>
+                        <option value="product" {% if product.kind == 'product' %}selected{% endif %}>{% translate "Produktas" %}</option>
+                        <option value="service" {% if product.kind == 'service' or not product %}selected{% endif %}>{% translate "Paslauga" %}</option>
                     </select>
                 </div>
                 <div class="bn-field">
-                    <label for="active">Būsena</label>
+                    <label for="active">{% translate "Būsena" %}</label>
                     <select id="active" name="active" class="bn-select">
-                        <option value="1" {% if product.active or not product %}selected{% endif %}>Aktyvus</option>
-                        <option value="" {% if product and not product.active %}selected{% endif %}>Neaktyvus</option>
+                        <option value="1" {% if product.active or not product %}selected{% endif %}>{% translate "Aktyvus" %}</option>
+                        <option value="" {% if product and not product.active %}selected{% endif %}>{% translate "Neaktyvus" %}</option>
                     </select>
                 </div>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="price">Kaina</label>
+                    <label for="price">{% translate "Kaina" %}</label>
                     <input id="price" name="price" type="number" step="0.01" class="bn-input" value="{{ product.price|default:'0' }}">
                 </div>
                 <div class="bn-field">
-                    <label for="currency">Valiuta</label>
+                    <label for="currency">{% translate "Valiuta" %}</label>
                     <input id="currency" name="currency" class="bn-input" value="{{ product.currency|default:'EUR' }}" maxlength="3">
                 </div>
             </div>
             <div class="bn-field">
-                <label for="description">Aprašymas</label>
+                <label for="description">{% translate "Aprašymas" %}</label>
                 <textarea id="description" name="description" rows="3" class="bn-textarea">{{ product.description|default:'' }}</textarea>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
-                <button type="button" class="bn-btn" onclick="document.getElementById('modal').innerHTML=''">Atšaukti</button>
-                <button type="submit" class="bn-btn bn-btn-primary">Išsaugoti</button>
+                <button type="button" class="bn-btn" onclick="document.getElementById('modal').innerHTML=''">{% translate "Atšaukti" %}</button>
+                <button type="submit" class="bn-btn bn-btn-primary">{% translate "Išsaugoti" %}</button>
             </div>
         </form>
     </div>

@@ -1,34 +1,35 @@
 {% extends 'crm/base.html' %}
-{% block title %}Planas | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Planas" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div>
-      <h1 class="bn-h1" style="font-size:36px">Planas</h1>
-      <div class="bn-lead-line">Mokama per Stripe. Keisti galite bet kada.</div>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "Planas" %}</h1>
+      <div class="bn-lead-line">{% translate "Mokama per Stripe. Keisti galite bet kada." %}</div>
     </div>
   </div>
 
   {% if error %}
     <div class="bn-error-slot">
-      Nepavyko pradėti prenumeratos: {{ error }}
-      <br>Nustatykite <code>STRIPE_SECRET_KEY</code> ir plano <code>stripe_price_id</code>, tada bandykite dar kartą.
+      {% blocktranslate %}Nepavyko pradėti prenumeratos: {{ error }}{% endblocktranslate %}
+      <br>{% blocktranslate %}Nustatykite <code>STRIPE_SECRET_KEY</code> ir plano <code>stripe_price_id</code>, tada bandykite dar kartą.{% endblocktranslate %}
     </div>
   {% endif %}
 
   <div class="bn-card bn-plan-top">
     <div>
-      <div class="bn-eyebrow">Dabartinis planas</div>
+      <div class="bn-eyebrow">{% translate "Dabartinis planas" %}</div>
       <div style="display:flex;flex-wrap:wrap;align-items:baseline;gap:10px;margin-top:2px">
         <div class="bn-serif" style="font-size:40px;line-height:1">{{ subscription.plan.name }}</div>
         <span class="bn-badge bn-badge-{% if subscription.status == 'active' %}done{% elif subscription.status == 'past_due' %}pending{% else %}expired{% endif %}">{{ subscription.get_status_display }}</span>
       </div>
       <div style="color:var(--mut);font-size:13.5px;margin-top:6px">
-        {{ subscription.plan.monthly_price }} € / mėn.
+        {% blocktranslate with price=subscription.plan.monthly_price %}{{ price }} € / mėn.{% endblocktranslate %}
         {% if subscription.plan.max_payment_links_per_month > 0 %}
-          — {{ subscription.plan.max_payment_links_per_month }} mokėjimo nuorodos per mėnesį
+          {% blocktranslate with n=subscription.plan.max_payment_links_per_month %}— {{ n }} mokėjimo nuorodos per mėnesį{% endblocktranslate %}
         {% else %}
-          — neribotai mokėjimo nuorodų
+          {% translate "— neribotai mokėjimo nuorodų" %}
         {% endif %}
       </div>
     </div>
@@ -36,14 +37,14 @@
       {% with remaining=subscription.payment_links_remaining %}
         {% if remaining is not None %}
           <div style="display:flex;justify-content:space-between;gap:12px;font-size:13px">
-            <span style="font-weight:600">Mokėjimo nuorodos</span>
-            <span style="color:var(--mut)">liko {{ remaining }} iš {{ subscription.plan.max_payment_links_per_month }}</span>
+            <span style="font-weight:600">{% translate "Mokėjimo nuorodos" %}</span>
+            <span style="color:var(--mut)">{% blocktranslate with limit=subscription.plan.max_payment_links_per_month %}liko {{ remaining }} iš {{ limit }}{% endblocktranslate %}</span>
           </div>
           <div class="bn-usage-bar"><div class="bn-usage-fill" style="width:{% widthratio remaining subscription.plan.max_payment_links_per_month 100 %}%"></div></div>
         {% endif %}
       {% endwith %}
       {% if subscription.plan.ai_content_quota > 0 %}
-        <div style="margin-top:10px;font-size:13px;color:var(--mut)">{{ subscription.plan.ai_content_quota }} AI turinio generavimų / mėn.</div>
+        <div style="margin-top:10px;font-size:13px;color:var(--mut)">{% blocktranslate with quota=subscription.plan.ai_content_quota %}{{ quota }} AI turinio generavimų / mėn.{% endblocktranslate %}</div>
       {% endif %}
     </div>
   </div>
@@ -54,21 +55,21 @@
         <div>
           <div style="font-size:17px;font-weight:700">{{ plan.name }}</div>
         </div>
-        <div class="bn-plan-price">{{ plan.monthly_price }} €<span style="font-size:13px;color:var(--mut);font-family:'Hanken Grotesk',sans-serif"> / mėn.</span></div>
+        <div class="bn-plan-price">{{ plan.monthly_price }} €<span style="font-size:13px;color:var(--mut);font-family:'Hanken Grotesk',sans-serif"> / {% translate "mėn." %}</span></div>
         <div class="bn-plan-items">
           {% if plan.max_payment_links_per_month > 0 %}
-            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{{ plan.max_payment_links_per_month }} mokėjimo nuorodos / mėn.</div>
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{% blocktranslate with n=plan.max_payment_links_per_month %}{{ n }} mokėjimo nuorodos / mėn.{% endblocktranslate %}</div>
           {% else %}
-            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>Neribotai mokėjimo nuorodų</div>
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{% translate "Neribotai mokėjimo nuorodų" %}</div>
           {% endif %}
           {% if plan.ai_content_quota > 0 %}
-            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{{ plan.ai_content_quota }} AI turinio generavimų / mėn.</div>
+            <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>{% blocktranslate with quota=plan.ai_content_quota %}{{ quota }} AI turinio generavimų / mėn.{% endblocktranslate %}</div>
           {% endif %}
           {% for feature in plan.features %}
             <div class="bn-plan-item"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:1px"><path d="M20 6 9 17l-5-5"></path></svg>
-              {% if feature == 'ai_content' %}AI turinys
-              {% elif feature == 'assistant' %}AI asistentas
-              {% elif feature == 'ai_video' %}AI video generavimas
+              {% if feature == 'ai_content' %}{% translate "AI turinys" %}
+              {% elif feature == 'assistant' %}{% translate "AI asistentas" %}
+              {% elif feature == 'ai_video' %}{% translate "AI video generavimas" %}
               {% else %}{{ feature }}
               {% endif %}
             </div>
@@ -76,11 +77,11 @@
         </div>
         <form method="post" action="{% url 'subscribe' plan.code %}" style="margin-top:auto">
           {% csrf_token %}
-          <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Pereiti į „{{ plan.name }}“</button>
+          <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% blocktranslate with name=plan.name %}Pereiti į „{{ name }}“{% endblocktranslate %}</button>
         </form>
       </div>
     {% empty %}
-      <p style="color:var(--mut)">Kitų planų nėra.</p>
+      <p style="color:var(--mut)">{% translate "Kitų planų nėra." %}</p>
     {% endfor %}
   </div>
 </div>
