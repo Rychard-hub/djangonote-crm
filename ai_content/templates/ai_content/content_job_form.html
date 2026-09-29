@@ -1,38 +1,39 @@
 {% extends 'crm/base.html' %}
-{% block title %}Generuoti AI turinį | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Generuoti AI turinį" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="max-width:560px;margin:0 auto">
     <div class="bn-card">
-        <h2 class="bn-card-title" style="font-size:20px">Generuoti AI turinį</h2>
+        <h2 class="bn-card-title" style="font-size:20px">{% translate "Generuoti AI turinį" %}</h2>
         {% if error %}
-            <div class="bn-error-slot" style="margin-bottom:14px">{{ error }} <a href="{% url 'plan-list' %}">Peržiūrėti planus</a>.</div>
+            <div class="bn-error-slot" style="margin-bottom:14px">{{ error }} <a href="{% url 'plan-list' %}">{% translate "Peržiūrėti planus" %}</a>.</div>
         {% elif not has_feature %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano.
-                <a href="{% url 'plan-list' %}">Pereiti į Pro planą</a>.
+                {% blocktranslate %}AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano.{% endblocktranslate %}
+                <a href="{% url 'plan-list' %}">{% translate "Pereiti į Pro planą" %}</a>.
             </div>
         {% elif blocked %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                Pasiektas „{{ plan_name }}“ plano mėnesio AI generavimų limitas.
-                <a href="{% url 'plan-list' %}">Pereiti į didesnį planą</a>.
+                {% blocktranslate %}Pasiektas „{{ plan_name }}“ plano mėnesio AI generavimų limitas.{% endblocktranslate %}
+                <a href="{% url 'plan-list' %}">{% translate "Pereiti į didesnį planą" %}</a>.
             </div>
         {% endif %}
         <form method="post" style="display:grid;gap:14px;{% if blocked %}opacity:0.5;pointer-events:none;{% endif %}">
             {% csrf_token %}
             <div class="bn-field">
-                <label for="kind">Tipas</label>
+                <label for="kind">{% translate "Tipas" %}</label>
                 <select id="kind" name="kind" class="bn-select">
-                    <option value="headline">Antraštė</option>
-                    <option value="script">Scenarijus</option>
-                    <option value="image">Vaizdas</option>
-                    <option value="video">Video</option>
+                    <option value="headline">{% translate "Antraštė" %}</option>
+                    <option value="script">{% translate "Scenarijus" %}</option>
+                    <option value="image">{% translate "Vaizdas" %}</option>
+                    <option value="video">{% translate "Video" %}</option>
                 </select>
             </div>
             <div class="bn-field">
-                <label for="prompt">Aprašykite, ko reikia</label>
-                <textarea id="prompt" name="prompt" rows="4" class="bn-textarea" placeholder="Pvz.: rinkodaros antraštė naujo web dizaino paslaugai smulkiam verslui" required></textarea>
+                <label for="prompt">{% translate "Aprašykite, ko reikia" %}</label>
+                <textarea id="prompt" name="prompt" rows="4" class="bn-textarea" placeholder="{% translate 'Pvz.: rinkodaros antraštė naujo web dizaino paslaugai smulkiam verslui' %}" required></textarea>
             </div>
-            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Generuoti</button>
+            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% translate "Generuoti" %}</button>
         </form>
     </div>
 </div>

@@ -113,6 +113,9 @@ input::placeholder, textarea::placeholder { color: var(--mut); }
 .bn-nav-count.is-danger { background: var(--danger); color: #fff; }
 
 .bn-sidebar-bottom { margin-top: auto; display: grid; gap: 8px; }
+.bn-lang-switch { display: flex; gap: 4px; border: 1px solid var(--line); border-radius: 9px; padding: 3px; }
+.bn-lang-btn { flex: 1; min-height: 30px; border: 0; border-radius: 7px; background: transparent; color: var(--mut); font-weight: 700; font-size: 12px; cursor: pointer; }
+.bn-lang-btn.is-active { background: var(--sunk); color: var(--ink); }
 .bn-theme-btn {
   display: flex; align-items: center; gap: 10px; min-height: 38px; padding: 0 10px;
   border: 1px solid var(--line); border-radius: 9px; background: transparent; cursor: pointer; color: var(--ink);

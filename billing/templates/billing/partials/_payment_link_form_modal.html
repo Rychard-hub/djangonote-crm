@@ -1,37 +1,38 @@
+{% load i18n %}
 <div class="bn-modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
     <div class="bn-modal">
         <div class="bn-modal-head">
-            <h2 class="bn-modal-title">Sukurti mokėjimo nuorodą</h2>
-            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="Uždaryti">
+            <h2 class="bn-modal-title">{% translate "Sukurti mokėjimo nuorodą" %}</h2>
+            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="{% translate 'Uždaryti' %}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
             </button>
         </div>
         {% if error %}
-            <div class="bn-error-slot" style="margin-bottom:14px">Nepavyko sukurti mokėjimo nuorodos: {{ error }}</div>
+            <div class="bn-error-slot" style="margin-bottom:14px">{% blocktranslate %}Nepavyko sukurti mokėjimo nuorodos: {{ error }}{% endblocktranslate %}</div>
         {% endif %}
         {% if quota_exceeded %}
+            {% url 'plan-list' as plan_list_url %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas.
-                <a href="{% url 'plan-list' %}">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.
+                {% blocktranslate %}Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas. <a href="{{ plan_list_url }}">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.{% endblocktranslate %}
             </div>
         {% endif %}
         <form hx-post="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML" style="display:grid;gap:14px;{% if quota_exceeded %}opacity:0.5;pointer-events:none;{% endif %}">
             <div class="bn-field">
-                <label for="description">Aprašymas</label>
-                <input id="description" name="description" class="bn-input" placeholder="Pvz.: Landing page kūrimas">
+                <label for="description">{% translate "Aprašymas" %}</label>
+                <input id="description" name="description" class="bn-input" placeholder="{% translate 'Pvz.: Landing page kūrimas' %}">
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="amount">Suma</label>
+                    <label for="amount">{% translate "Suma" %}</label>
                     <input id="amount" name="amount" type="number" step="0.01" min="0.01" class="bn-input" required>
                 </div>
                 <div class="bn-field">
-                    <label for="currency">Valiuta</label>
+                    <label for="currency">{% translate "Valiuta" %}</label>
                     <input id="currency" name="currency" class="bn-input" value="EUR" maxlength="3">
                 </div>
             </div>
             <div class="bn-field">
-                <label for="lead">Susieti su lead'u (nebūtina)</label>
+                <label for="lead">{% translate "Susieti su lead'u (nebūtina)" %}</label>
                 <select id="lead" name="lead" class="bn-select">
                     <option value="">-</option>
                     {% for lead in leads %}
@@ -40,7 +41,7 @@
                 </select>
             </div>
             <div class="bn-field">
-                <label for="product">Susieti su preke/paslauga (nebūtina)</label>
+                <label for="product">{% translate "Susieti su preke/paslauga (nebūtina)" %}</label>
                 <select id="product" name="product" class="bn-select">
                     <option value="">-</option>
                     {% for product in products %}
@@ -48,7 +49,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Sukurti nuorodą</button>
+            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% translate "Sukurti nuorodą" %}</button>
         </form>
     </div>
 </div>

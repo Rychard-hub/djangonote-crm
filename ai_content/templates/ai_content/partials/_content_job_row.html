@@ -1,3 +1,4 @@
+{% load i18n %}
 <tr id="job-{{ job.pk }}"
     {% if job.in_progress %}hx-get="{% url 'content-job-status' job.pk %}" hx-trigger="every 2s" hx-target="this" hx-swap="outerHTML"{% endif %}>
     <td>{{ job.get_kind_display }}</td>
@@ -14,7 +15,7 @@
             <div class="bn-result-box" style="margin-top:0">{{ job.result_text }}</div>
         {% endif %}
         {% if job.status == 'failed' %}<span style="color:var(--danger)">{{ job.error }}</span>{% endif %}
-        {% if job.in_progress %}<em style="color:var(--mut)">Generuojama...</em>{% endif %}
+        {% if job.in_progress %}<em style="color:var(--mut)">{% translate "Generuojama..." %}</em>{% endif %}
     </td>
     <td style="color:var(--mut)">{{ job.created_at|date:"Y-m-d H:i" }}</td>
 </tr>

@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Organization
 from catalog.models import Product
@@ -27,9 +28,9 @@ class Plan(models.Model):
 
 class Subscription(models.Model):
     STATUS_CHOICES = [
-        ('active', 'Aktyvi'),
-        ('past_due', 'Vėluoja mokėjimas'),
-        ('canceled', 'Atšaukta'),
+        ('active', _('Aktyvi')),
+        ('past_due', _('Vėluoja mokėjimas')),
+        ('canceled', _('Atšaukta')),
     ]
 
     organization = models.OneToOneField(Organization, on_delete=models.CASCADE, related_name='subscription')
@@ -57,9 +58,9 @@ class Subscription(models.Model):
 
 class PaymentLink(models.Model):
     STATUS_CHOICES = [
-        ('pending', 'Laukiama'),
-        ('paid', 'Apmokėta'),
-        ('expired', 'Nebegalioja'),
+        ('pending', _('Laukiama')),
+        ('paid', _('Apmokėta')),
+        ('expired', _('Nebegalioja')),
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='payment_links')

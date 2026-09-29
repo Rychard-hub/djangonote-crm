@@ -1,36 +1,37 @@
 {% extends 'crm/base.html' %}
-{% block title %}Sukurti mokėjimo nuorodą | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Sukurti mokėjimo nuorodą" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="max-width:560px;margin:0 auto">
     <div class="bn-card">
-        <h2 class="bn-card-title" style="font-size:20px">Sukurti mokėjimo nuorodą</h2>
+        <h2 class="bn-card-title" style="font-size:20px">{% translate "Sukurti mokėjimo nuorodą" %}</h2>
         {% if error %}
-            <div class="bn-error-slot" style="margin-bottom:14px">Nepavyko sukurti mokėjimo nuorodos: {{ error }}</div>
+            <div class="bn-error-slot" style="margin-bottom:14px">{% blocktranslate %}Nepavyko sukurti mokėjimo nuorodos: {{ error }}{% endblocktranslate %}</div>
         {% endif %}
         {% if quota_exceeded %}
+            {% url 'plan-list' as plan_list_url %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas.
-                <a href="{% url 'plan-list' %}">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.
+                {% blocktranslate %}Pasiektas „{{ plan_name }}“ plano mėnesio mokėjimo nuorodų limitas. <a href="{{ plan_list_url }}">Pereiti į didesnį planą</a>, kad galėtumėte kurti daugiau.{% endblocktranslate %}
             </div>
         {% endif %}
         <form method="post" style="display:grid;gap:14px">
             {% csrf_token %}
             <div class="bn-field">
-                <label for="description">Aprašymas</label>
-                <input id="description" name="description" class="bn-input" placeholder="Pvz.: Landing page kūrimas">
+                <label for="description">{% translate "Aprašymas" %}</label>
+                <input id="description" name="description" class="bn-input" placeholder="{% translate 'Pvz.: Landing page kūrimas' %}">
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="amount">Suma</label>
+                    <label for="amount">{% translate "Suma" %}</label>
                     <input id="amount" name="amount" type="number" step="0.01" min="0.01" class="bn-input" required>
                 </div>
                 <div class="bn-field">
-                    <label for="currency">Valiuta</label>
+                    <label for="currency">{% translate "Valiuta" %}</label>
                     <input id="currency" name="currency" class="bn-input" value="EUR" maxlength="3">
                 </div>
             </div>
             <div class="bn-field">
-                <label for="lead">Susieti su lead'u (nebūtina)</label>
+                <label for="lead">{% translate "Susieti su lead'u (nebūtina)" %}</label>
                 <select id="lead" name="lead" class="bn-select">
                     <option value="">-</option>
                     {% for lead in leads %}
@@ -39,7 +40,7 @@
                 </select>
             </div>
             <div class="bn-field">
-                <label for="product">Susieti su preke/paslauga (nebūtina)</label>
+                <label for="product">{% translate "Susieti su preke/paslauga (nebūtina)" %}</label>
                 <select id="product" name="product" class="bn-select">
                     <option value="">-</option>
                     {% for product in products %}
@@ -47,7 +48,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Sukurti nuorodą</button>
+            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% translate "Sukurti nuorodą" %}</button>
         </form>
     </div>
 </div>

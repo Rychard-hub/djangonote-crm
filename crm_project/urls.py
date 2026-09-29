@@ -45,6 +45,7 @@ from crm.views import (
 )
 
 urlpatterns = [
+    path('i18n/', include('django.conf.urls.i18n')),
     path('admin/', admin.site.urls),
     path('api/health/', health_check, name='health-check'),
     path('api/', include('crm.api_urls')),  # API endpoints

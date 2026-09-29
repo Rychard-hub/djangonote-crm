@@ -1,2 +1,3 @@
+{% load i18n %}
 {% include 'catalog/partials/_product_table.html' %}
-<span id="total-products-count" hx-swap-oob="true" style="margin-left: 1rem; color: var(--mut);">Viso: {{ total_products }}</span>
+<span id="total-products-count" hx-swap-oob="true" style="margin-left: 1rem; color: var(--mut);">{% blocktranslate %}Viso: {{ total_products }}{% endblocktranslate %}</span>

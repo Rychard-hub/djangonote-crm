@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
+from django.utils.translation import gettext as _
 from django.views.decorators.csrf import csrf_exempt
 
 from accounts.models import get_organization
@@ -50,7 +51,10 @@ def payment_link_create_view(request):
 
     if request.method == 'POST':
         if quota_exceeded:
-            error = f'Pasiektas „{subscription.plan.name}“ plano mėnesio mokėjimo nuorodų limitas ({subscription.plan.max_payment_links_per_month}).'
+            error = _('Pasiektas „%(plan)s“ plano mėnesio mokėjimo nuorodų limitas (%(limit)s).') % {
+                'plan': subscription.plan.name,
+                'limit': subscription.plan.max_payment_links_per_month,
+            }
             context = {'error': error, 'products': products, 'leads': leads}
             if request.headers.get('HX-Request'):
                 return render(request, 'billing/partials/_payment_link_form_modal.html', context)
@@ -62,7 +66,7 @@ def payment_link_create_view(request):
             amount = Decimal('0')
 
         if amount <= 0:
-            context = {'error': 'Suma turi būti didesnė už 0.', 'products': products, 'leads': leads}
+            context = {'error': _('Suma turi būti didesnė už 0.'), 'products': products, 'leads': leads}
             if request.headers.get('HX-Request'):
                 return render(request, 'billing/partials/_payment_link_form_modal.html', context)
             return render(request, 'billing/payment_link_form.html', context)
@@ -89,7 +93,7 @@ def payment_link_create_view(request):
                 return render(request, 'billing/partials/_payment_link_form_modal.html', context)
             return render(request, 'billing/payment_link_form.html', context)
         except stripe.StripeError as exc:
-            context = {'error': f'Stripe klaida: {exc.user_message or str(exc)}', 'products': products, 'leads': leads}
+            context = {'error': _('Stripe klaida: %(reason)s') % {'reason': exc.user_message or str(exc)}, 'products': products, 'leads': leads}
             if request.headers.get('HX-Request'):
                 return render(request, 'billing/partials/_payment_link_form_modal.html', context)
             return render(request, 'billing/payment_link_form.html', context)
@@ -159,7 +163,7 @@ def subscribe_view(request, plan_code):
             context = {
                 'subscription': subscription,
                 'plans': Plan.objects.exclude(code=subscription.plan.code).order_by('monthly_price'),
-                'error': f'Stripe klaida: {exc.user_message or str(exc)}',
+                'error': _('Stripe klaida: %(reason)s') % {'reason': exc.user_message or str(exc)},
             }
             return render(request, 'billing/plan_list.html', context)
         return redirect(session.url)

@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from accounts.models import get_organization
 from billing.decorators import require_plan_feature
@@ -41,9 +42,12 @@ def content_job_create_view(request):
     if request.method == 'POST':
         if blocked:
             if not has_feature:
-                error = f'AI turinio generavimas nepasiekiamas „{subscription.plan.name}“ plane.'
+                error = _('AI turinio generavimas nepasiekiamas „%(plan)s“ plane.') % {'plan': subscription.plan.name}
             else:
-                error = f'Pasiektas „{subscription.plan.name}“ plano mėnesio AI generavimų limitas ({subscription.plan.ai_content_quota}).'
+                error = _('Pasiektas „%(plan)s“ plano mėnesio AI generavimų limitas (%(quota)s).') % {
+                    'plan': subscription.plan.name,
+                    'quota': subscription.plan.ai_content_quota,
+                }
             context = {'error': error, 'has_feature': has_feature, 'blocked': True}
             if request.headers.get('HX-Request'):
                 return render(request, 'ai_content/partials/_content_job_form_modal.html', context)

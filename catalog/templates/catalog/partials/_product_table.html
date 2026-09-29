@@ -1,12 +1,13 @@
+{% load i18n %}
 <div class="bn-table-wrap">
     <table class="bn-table">
         <thead>
             <tr>
-                <th>Pavadinimas</th>
-                <th>Tipas</th>
-                <th>Kaina</th>
-                <th>Būsena</th>
-                <th>Veiksmai</th>
+                <th>{% translate "Pavadinimas" %}</th>
+                <th>{% translate "Tipas" %}</th>
+                <th>{% translate "Kaina" %}</th>
+                <th>{% translate "Būsena" %}</th>
+                <th>{% translate "Veiksmai" %}</th>
             </tr>
         </thead>
         <tbody>
@@ -20,20 +21,20 @@
                     <td>{{ product.price }} {{ product.currency }}</td>
                     <td>
                         {% if product.active %}
-                            <span class="bn-status-yes">Aktyvus</span>
+                            <span class="bn-status-yes">{% translate "Aktyvus" %}</span>
                         {% else %}
-                            <span class="bn-status-no">Neaktyvus</span>
+                            <span class="bn-status-no">{% translate "Neaktyvus" %}</span>
                         {% endif %}
                     </td>
                     <td>
                         <div style="display:flex;gap:6px">
-                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-edit' product.pk %}" hx-get="{% url 'product-edit' product.pk %}" hx-target="#modal" hx-swap="innerHTML">Redaguoti</a>
-                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-delete' product.pk %}">Ištrinti</a>
+                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-edit' product.pk %}" hx-get="{% url 'product-edit' product.pk %}" hx-target="#modal" hx-swap="innerHTML">{% translate "Redaguoti" %}</a>
+                            <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'product-delete' product.pk %}">{% translate "Ištrinti" %}</a>
                         </div>
                     </td>
                 </tr>
             {% empty %}
-                <tr><td colspan="5" class="bn-empty">Kol kas nieko nėra kataloge</td></tr>
+                <tr><td colspan="5" class="bn-empty">{% translate "Kol kas nieko nėra kataloge" %}</td></tr>
             {% endfor %}
         </tbody>
     </table>

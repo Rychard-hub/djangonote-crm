@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="lt">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -57,23 +57,23 @@
       <div class="bn-nav">
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'content-job-list' %}is-active{% endif %}" href="{% url 'content-job-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"></path></svg>
-          <span class="bn-nav-label">AI turinys</span>
+          <span class="bn-nav-label">{% translate "AI turinys" %}</span>
         </a>
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'assistant' %}is-active{% endif %}" href="{% url 'assistant' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
-          <span class="bn-nav-label">AI asistentas</span>
+          <span class="bn-nav-label">{% translate "AI asistentas" %}</span>
         </a>
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'product-list' %}is-active{% endif %}" href="{% url 'product-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16zM3.3 7 12 12l8.7-5M12 22V12"></path></svg>
-          <span class="bn-nav-label">Katalogas</span>
+          <span class="bn-nav-label">{% translate "Katalogas" %}</span>
         </a>
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'payment-link-list' %}is-active{% endif %}" href="{% url 'payment-link-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>
-          <span class="bn-nav-label">Mokėjimai</span>
+          <span class="bn-nav-label">{% translate "Mokėjimai" %}</span>
         </a>
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'plan-list' %}is-active{% endif %}" href="{% url 'plan-list' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9zM14 3v6h6M8 13h8M8 17h5"></path></svg>
-          <span class="bn-nav-label">Planas</span>
+          <span class="bn-nav-label">{% translate "Planas" %}</span>
         </a>
         <a class="bn-nav-item {% if request.resolver_match.url_name == 'settings' %}is-active{% endif %}" href="{% url 'settings' %}">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"></path></svg>
@@ -87,6 +87,13 @@
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" data-theme-icon></svg>
         <span style="flex:1;text-align:left" data-theme-label>Tamsi tema</span>
       </button>
+      {% get_current_language as CURRENT_LANGUAGE %}
+      <form method="post" action="{% url 'set_language' %}" class="bn-lang-switch">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" name="language" value="lt" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'lt' %}is-active{% endif %}">LT</button>
+        <button type="submit" name="language" value="en" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'en' %}is-active{% endif %}">EN</button>
+      </form>
       <div class="bn-user-row">
         <span class="bn-avatar">{{ request.user.first_name|default:request.user.username|first|upper }}</span>
         <div style="flex:1;min-width:0">
@@ -148,13 +155,20 @@
   <div class="bn-sheet">
     <div class="bn-sheet-handle"></div>
     <a class="bn-sheet-item" href="{% url 'pipeline' %}">Pipeline</a>
-    <a class="bn-sheet-item" href="{% url 'content-job-list' %}">AI turinys</a>
-    <a class="bn-sheet-item" href="{% url 'assistant' %}">AI asistentas</a>
-    <a class="bn-sheet-item" href="{% url 'product-list' %}">Katalogas</a>
-    <a class="bn-sheet-item" href="{% url 'payment-link-list' %}">Mokėjimai</a>
-    <a class="bn-sheet-item" href="{% url 'plan-list' %}">Planas</a>
+    <a class="bn-sheet-item" href="{% url 'content-job-list' %}">{% translate "AI turinys" %}</a>
+    <a class="bn-sheet-item" href="{% url 'assistant' %}">{% translate "AI asistentas" %}</a>
+    <a class="bn-sheet-item" href="{% url 'product-list' %}">{% translate "Katalogas" %}</a>
+    <a class="bn-sheet-item" href="{% url 'payment-link-list' %}">{% translate "Mokėjimai" %}</a>
+    <a class="bn-sheet-item" href="{% url 'plan-list' %}">{% translate "Planas" %}</a>
     <a class="bn-sheet-item" href="{% url 'settings' %}">Nustatymai</a>
     <div style="height:1px;background:var(--line);margin:6px 0"></div>
+    {% get_current_language as CURRENT_LANGUAGE %}
+    <form method="post" action="{% url 'set_language' %}" class="bn-lang-switch" style="margin:0 10px 6px">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <button type="submit" name="language" value="lt" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'lt' %}is-active{% endif %}">LT</button>
+      <button type="submit" name="language" value="en" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'en' %}is-active{% endif %}">EN</button>
+    </form>
     <form method="post" action="{% url 'logout' %}">
       {% csrf_token %}
       <button type="submit" class="bn-sheet-item is-danger" style="width:100%">Atsijungti</button>

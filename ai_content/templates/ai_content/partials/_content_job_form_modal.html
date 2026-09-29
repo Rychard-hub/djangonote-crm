@@ -1,39 +1,40 @@
+{% load i18n %}
 <div class="bn-modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
     <div class="bn-modal">
         <div class="bn-modal-head">
-            <h2 class="bn-modal-title">Generuoti AI turinį</h2>
-            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="Uždaryti">
+            <h2 class="bn-modal-title">{% translate "Generuoti AI turinį" %}</h2>
+            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="{% translate 'Uždaryti' %}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
             </button>
         </div>
         {% if error %}
-            <div class="bn-error-slot" style="margin-bottom:14px">{{ error }} <a href="{% url 'plan-list' %}">Peržiūrėti planus</a>.</div>
+            <div class="bn-error-slot" style="margin-bottom:14px">{{ error }} <a href="{% url 'plan-list' %}">{% translate "Peržiūrėti planus" %}</a>.</div>
         {% elif not has_feature %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano.
-                <a href="{% url 'plan-list' %}">Pereiti į Pro planą</a>.
+                {% blocktranslate %}AI turinio generavimas prieinamas nuo <strong>Pro</strong> plano.{% endblocktranslate %}
+                <a href="{% url 'plan-list' %}">{% translate "Pereiti į Pro planą" %}</a>.
             </div>
         {% elif blocked %}
             <div class="bn-error-slot" style="margin-bottom:14px">
-                Pasiektas „{{ plan_name }}“ plano mėnesio AI generavimų limitas.
-                <a href="{% url 'plan-list' %}">Pereiti į didesnį planą</a>.
+                {% blocktranslate %}Pasiektas „{{ plan_name }}“ plano mėnesio AI generavimų limitas.{% endblocktranslate %}
+                <a href="{% url 'plan-list' %}">{% translate "Pereiti į didesnį planą" %}</a>.
             </div>
         {% endif %}
         <form hx-post="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML" style="display:grid;gap:14px;{% if blocked %}opacity:0.5;pointer-events:none;{% endif %}">
             <div class="bn-field">
-                <label for="kind">Tipas</label>
+                <label for="kind">{% translate "Tipas" %}</label>
                 <select id="kind" name="kind" class="bn-select">
-                    <option value="headline">Antraštė</option>
-                    <option value="script">Scenarijus</option>
-                    <option value="image">Vaizdas</option>
-                    <option value="video">Video</option>
+                    <option value="headline">{% translate "Antraštė" %}</option>
+                    <option value="script">{% translate "Scenarijus" %}</option>
+                    <option value="image">{% translate "Vaizdas" %}</option>
+                    <option value="video">{% translate "Video" %}</option>
                 </select>
             </div>
             <div class="bn-field">
-                <label for="prompt">Aprašykite, ko reikia</label>
-                <textarea id="prompt" name="prompt" rows="4" class="bn-textarea" placeholder="Pvz.: rinkodaros antraštė naujo web dizaino paslaugai smulkiam verslui" required></textarea>
+                <label for="prompt">{% translate "Aprašykite, ko reikia" %}</label>
+                <textarea id="prompt" name="prompt" rows="4" class="bn-textarea" placeholder="{% translate 'Pvz.: rinkodaros antraštė naujo web dizaino paslaugai smulkiam verslui' %}" required></textarea>
             </div>
-            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Generuoti</button>
+            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% translate "Generuoti" %}</button>
         </form>
     </div>
 </div>

@@ -1,14 +1,15 @@
 {% extends 'crm/base.html' %}
-{% block title %}AI turinys | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "AI turinys" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div>
-      <h1 class="bn-h1" style="font-size:36px">AI turinys</h1>
-      <div class="bn-lead-line">Antraštės, scenarijai ir vaizdai jūsų rinkodarai — pagal jūsų aprašymą.</div>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "AI turinys" %}</h1>
+      <div class="bn-lead-line">{% translate "Antraštės, scenarijai ir vaizdai jūsų rinkodarai — pagal jūsų aprašymą." %}</div>
     </div>
     {% if has_feature %}
-      <span class="bn-chip" style="cursor:default">Liko {{ remaining }} iš {{ subscription.plan.ai_content_quota }}</span>
+      <span class="bn-chip" style="cursor:default">{% blocktranslate with quota=subscription.plan.ai_content_quota %}Liko {{ remaining }} iš {{ quota }}{% endblocktranslate %}</span>
     {% endif %}
   </div>
 
@@ -16,7 +17,7 @@
     <div>
       <a class="bn-btn bn-btn-primary" href="{% url 'content-job-create' %}" hx-get="{% url 'content-job-create' %}" hx-target="#modal" hx-swap="innerHTML">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-        Generuoti turinį
+        {% translate "Generuoti turinį" %}
       </a>
     </div>
   {% else %}
@@ -24,14 +25,14 @@
       <div class="bn-lock-icon">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11h14v10H5zM8 11V7a4 4 0 0 1 8 0v4"></path></svg>
       </div>
-      <div class="bn-lock-title">AI turinys pasiekiamas nuo Pro plano.</div>
-      <div style="color:var(--mut);max-width:48ch">Dabar naudojate „{{ subscription.plan.name }}“ planą. Pereikite į didesnį — pakeitimas įsigalioja iškart.</div>
-      <a class="bn-btn bn-btn-primary" href="{% url 'plan-list' %}" style="margin-top:6px">Peržiūrėti planus</a>
+      <div class="bn-lock-title">{% translate "AI turinys pasiekiamas nuo Pro plano." %}</div>
+      <div style="color:var(--mut);max-width:48ch">{% blocktranslate with plan_name=subscription.plan.name %}Dabar naudojate „{{ plan_name }}“ planą. Pereikite į didesnį — pakeitimas įsigalioja iškart.{% endblocktranslate %}</div>
+      <a class="bn-btn bn-btn-primary" href="{% url 'plan-list' %}" style="margin-top:6px">{% translate "Peržiūrėti planus" %}</a>
     </div>
   {% endif %}
 
   <div>
-    <h2 class="bn-card-title">Istorija</h2>
+    <h2 class="bn-card-title">{% translate "Istorija" %}</h2>
     {% include 'ai_content/partials/_content_job_table.html' %}
   </div>
 </div>

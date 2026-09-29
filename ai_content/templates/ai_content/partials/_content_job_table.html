@@ -1,19 +1,20 @@
+{% load i18n %}
 <div class="bn-table-wrap">
     <table class="bn-table">
         <thead>
             <tr>
-                <th>Tipas</th>
-                <th>Užklausa</th>
-                <th>Būsena</th>
-                <th>Rezultatas</th>
-                <th>Sukurta</th>
+                <th>{% translate "Tipas" %}</th>
+                <th>{% translate "Užklausa" %}</th>
+                <th>{% translate "Būsena" %}</th>
+                <th>{% translate "Rezultatas" %}</th>
+                <th>{% translate "Sukurta" %}</th>
             </tr>
         </thead>
         <tbody>
             {% for job in jobs %}
                 {% include 'ai_content/partials/_content_job_row.html' %}
             {% empty %}
-                <tr><td colspan="5" class="bn-empty">Kol kas nieko negeneruota</td></tr>
+                <tr><td colspan="5" class="bn-empty">{% translate "Kol kas nieko negeneruota" %}</td></tr>
             {% endfor %}
         </tbody>
     </table>

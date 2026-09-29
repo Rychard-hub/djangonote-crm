@@ -1,21 +1,25 @@
 {% extends 'crm/base.html' %}
-{% block title %}Mokėjimai | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Mokėjimai" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div>
-      <h1 class="bn-h1" style="font-size:36px">Mokėjimai</h1>
-      <div class="bn-lead-line">Stripe mokėjimo nuorodos klientams — apmokėjimas be sąskaitų siuntinėjimo.</div>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "Mokėjimai" %}</h1>
+      <div class="bn-lead-line">{% translate "Stripe mokėjimo nuorodos klientams — apmokėjimas be sąskaitų siuntinėjimo." %}</div>
     </div>
     <a class="bn-btn bn-btn-primary" href="{% url 'payment-link-create' %}" hx-get="{% url 'payment-link-create' %}" hx-target="#modal" hx-swap="innerHTML">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-      Sukurti mokėjimo nuorodą
+      {% translate "Sukurti mokėjimo nuorodą" %}
     </a>
   </div>
 
   <div class="bn-card" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:14px 18px">
-    <div>Planas: <strong>{{ subscription.plan.name }}</strong>{% if remaining is not None %} — liko {{ remaining }} nuorod(ų) šį mėnesį{% endif %}</div>
-    <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'plan-list' %}">Keisti planą</a>
+    <div>
+      {% blocktranslate with plan_name=subscription.plan.name %}Planas: <strong>{{ plan_name }}</strong>{% endblocktranslate %}
+      {% if remaining is not None %}{% blocktranslate %}— liko {{ remaining }} nuorod(ų) šį mėnesį{% endblocktranslate %}{% endif %}
+    </div>
+    <a class="bn-btn bn-btn-ghost bn-btn-sm" href="{% url 'plan-list' %}">{% translate "Keisti planą" %}</a>
   </div>
 
   <div id="payment-link-table-wrap">
@@ -23,11 +27,12 @@
   </div>
 </div>
 
+{% translate "Nukopijuota!" as copied_label %}
 <script>
     function copyLink(btn, url) {
         navigator.clipboard.writeText(url).then(function () {
             var original = btn.textContent;
-            btn.textContent = 'Nukopijuota!';
+            btn.textContent = '{{ copied_label|escapejs }}';
             setTimeout(function () { btn.textContent = original; }, 1500);
         });
     }

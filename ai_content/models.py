@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from accounts.models import Organization
 
@@ -11,16 +12,16 @@ class ContentJob(models.Model):
     # -- see the PIPELINE_STAGES fix in crm for what happens when a choice
     # ships ahead of the code that handles it.
     KIND_CHOICES = [
-        ('script', 'Scenarijus'),
-        ('headline', 'Antraštė'),
-        ('image', 'Vaizdas'),
-        ('video', 'Video'),
+        ('script', _('Scenarijus')),
+        ('headline', _('Antraštė')),
+        ('image', _('Vaizdas')),
+        ('video', _('Video')),
     ]
     STATUS_CHOICES = [
-        ('pending', 'Laukia'),
-        ('processing', 'Vykdoma'),
-        ('done', 'Atlikta'),
-        ('failed', 'Klaida'),
+        ('pending', _('Laukia')),
+        ('processing', _('Vykdoma')),
+        ('done', _('Atlikta')),
+        ('failed', _('Klaida')),
     ]
 
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='content_jobs')

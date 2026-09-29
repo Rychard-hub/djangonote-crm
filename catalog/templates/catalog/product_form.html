@@ -1,46 +1,47 @@
 {% extends 'crm/base.html' %}
-{% block title %}{% if mode == 'edit' %}Redaguoti{% else %}Nauja{% endif %} prekė/paslauga | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% if mode == 'edit' %}{% translate "Redaguoti" %}{% else %}{% translate "Nauja" %}{% endif %} {% translate "prekė/paslauga" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="max-width:640px;margin:0 auto">
     <div class="bn-card">
-        <h2 class="bn-card-title" style="font-size:20px">{% if mode == 'edit' %}Redaguoti prekę/paslaugą{% else %}Pridėti prekę/paslaugą{% endif %}</h2>
+        <h2 class="bn-card-title" style="font-size:20px">{% if mode == 'edit' %}{% translate "Redaguoti prekę/paslaugą" %}{% else %}{% translate "Pridėti prekę/paslaugą" %}{% endif %}</h2>
         <form method="post" style="display:grid;gap:14px">
             {% csrf_token %}
             <div class="bn-field">
-                <label for="name">Pavadinimas</label>
+                <label for="name">{% translate "Pavadinimas" %}</label>
                 <input id="name" name="name" class="bn-input" value="{{ product.name|default:'' }}" required>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="kind">Tipas</label>
+                    <label for="kind">{% translate "Tipas" %}</label>
                     <select id="kind" name="kind" class="bn-select">
-                        <option value="product" {% if product.kind == 'product' %}selected{% endif %}>Produktas</option>
-                        <option value="service" {% if product.kind == 'service' or not product %}selected{% endif %}>Paslauga</option>
+                        <option value="product" {% if product.kind == 'product' %}selected{% endif %}>{% translate "Produktas" %}</option>
+                        <option value="service" {% if product.kind == 'service' or not product %}selected{% endif %}>{% translate "Paslauga" %}</option>
                     </select>
                 </div>
                 <div class="bn-field">
-                    <label for="active">Būsena</label>
+                    <label for="active">{% translate "Būsena" %}</label>
                     <select id="active" name="active" class="bn-select">
-                        <option value="1" {% if product.active or not product %}selected{% endif %}>Aktyvus</option>
-                        <option value="" {% if product and not product.active %}selected{% endif %}>Neaktyvus</option>
+                        <option value="1" {% if product.active or not product %}selected{% endif %}>{% translate "Aktyvus" %}</option>
+                        <option value="" {% if product and not product.active %}selected{% endif %}>{% translate "Neaktyvus" %}</option>
                     </select>
                 </div>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="price">Kaina</label>
+                    <label for="price">{% translate "Kaina" %}</label>
                     <input id="price" name="price" type="number" step="0.01" class="bn-input" value="{{ product.price|default:'0' }}">
                 </div>
                 <div class="bn-field">
-                    <label for="currency">Valiuta</label>
+                    <label for="currency">{% translate "Valiuta" %}</label>
                     <input id="currency" name="currency" class="bn-input" value="{{ product.currency|default:'EUR' }}" maxlength="3">
                 </div>
             </div>
             <div class="bn-field">
-                <label for="description">Aprašymas</label>
+                <label for="description">{% translate "Aprašymas" %}</label>
                 <textarea id="description" name="description" rows="3" class="bn-textarea">{{ product.description|default:'' }}</textarea>
             </div>
-            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">Išsaugoti</button>
+            <button type="submit" class="bn-btn bn-btn-primary bn-btn-block">{% translate "Išsaugoti" %}</button>
         </form>
     </div>
 </div>

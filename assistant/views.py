@@ -3,6 +3,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseBadRequest, JsonResponse
 from django.shortcuts import render
+from django.utils.translation import gettext
 from django.views.decorators.http import require_POST
 
 from accounts.models import get_organization
@@ -43,10 +44,10 @@ def send_message_view(request):
     try:
         reply_text = run_assistant_turn(organization, request.user, history, user_text)
     except AIProviderNotConfigured as exc:
-        reply_text = f'AI asistentas šiuo metu nepasiekiamas: {exc}'
+        reply_text = gettext('AI asistentas šiuo metu nepasiekiamas: %(reason)s') % {'reason': exc}
     except Exception:
         logger.exception('Assistant turn failed for organization %s', organization.pk)
-        reply_text = 'Atsiprašau, įvyko klaida bandant atsakyti. Bandykite dar kartą.'
+        reply_text = gettext('Atsiprašau, įvyko klaida bandant atsakyti. Bandykite dar kartą.')
 
     Message.objects.create(conversation=conversation, role='assistant', content=reply_text)
 
