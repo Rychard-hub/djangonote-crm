@@ -16,6 +16,7 @@ from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
+from django.utils.translation import gettext as _
 
 from accounts.models import Organization, get_organization
 from .models import Activity, Comment, Lead, Task, Profile
@@ -31,7 +32,7 @@ class EmailUserCreationForm(UserCreationForm):
     def clean_email(self):
         email = self.cleaned_data['email']
         if User.objects.filter(username=email).exists():
-            raise forms.ValidationError('Vartotojas su tokiu el. paštu jau užregistruotas.')
+            raise forms.ValidationError(_('Vartotojas su tokiu el. paštu jau užregistruotas.'))
         return email
 
     def save(self, commit=True):
@@ -60,7 +61,7 @@ def login_view(request):
             login(request, user)
             return redirect('dashboard')
 
-        error = 'Neteisingas el. paštas arba slaptažodis.'
+        error = _('Neteisingas el. paštas arba slaptažodis.')
 
     return render(request, 'crm/login.html', {'error': error, 'email': email})
 
@@ -115,7 +116,7 @@ def password_reset_view(request):
                 
                 return render(request, 'crm/password_reset_done.html', {'email': email})
             except User.DoesNotExist:
-                form.add_error('email', 'Vartotojas su tokiu el. paštu nerastas')
+                form.add_error('email', _('Vartotojas su tokiu el. paštu nerastas'))
     else:
         form = PasswordResetForm()
     
@@ -233,7 +234,7 @@ def lead_pipeline_move_view(request, pk, status):
     if request.method == 'POST':
         lead.status = status
         lead.save()
-        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+        Activity.objects.create(lead=lead, action='status_change', details=_('Statusas pakeistas į %(status)s') % {'status': lead.get_status_display()}, created_by=request.user)
 
     if request.headers.get('HX-Request'):
         return render(request, 'crm/partials/_kanban_board.html', {'columns': _pipeline_columns(organization)})
@@ -448,7 +449,7 @@ def lead_comment_add_view(request, pk):
     if request.method == 'POST':
         body = request.POST.get('body', '').strip()
         kind = request.POST.get('kind', 'note')
-        author = request.POST.get('author', 'Sistema').strip() or 'Sistema'
+        author = request.POST.get('author', '').strip() or _('Sistema')
         if body:
             comment = Comment.objects.create(lead=lead, body=body, kind=kind, author=author, created_by=request.user)
 
@@ -513,9 +514,9 @@ def lead_quick_action_view(request, pk):
     if request.method == 'POST':
         action = request.POST.get('action', '')
         if action == 'reminder':
-            Activity.objects.create(lead=lead, action='reminder_sent', details='Priminimas išsiųstas', created_by=request.user)
+            Activity.objects.create(lead=lead, action='reminder_sent', details=_('Priminimas išsiųstas'), created_by=request.user)
         elif action == 'note':
-            Activity.objects.create(lead=lead, action='note_added', details='Pastaba pridėta', created_by=request.user)
+            Activity.objects.create(lead=lead, action='note_added', details=_('Pastaba pridėta'), created_by=request.user)
     return redirect('lead-list')
 
 
@@ -525,7 +526,7 @@ def lead_status_mark_view(request, pk, status):
     if request.method == 'POST':
         lead.status = status
         lead.save()
-        Activity.objects.create(lead=lead, action='status_change', details=f'Statusas pakeistas į {lead.get_status_display()}', created_by=request.user)
+        Activity.objects.create(lead=lead, action='status_change', details=_('Statusas pakeistas į %(status)s') % {'status': lead.get_status_display()}, created_by=request.user)
 
     if request.headers.get('HX-Request'):
         return render(request, 'crm/partials/_status_badge.html', {'lead': lead})

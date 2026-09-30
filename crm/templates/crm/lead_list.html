@@ -1,55 +1,56 @@
 {% extends 'crm/base.html' %}
-{% block title %}Leadai | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Leadai" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div style="display:flex;align-items:baseline;gap:12px">
-      <h1 class="bn-h1" style="font-size:36px">Leadai</h1>
-      <span style="color:var(--mut);font-size:15px" id="total-leads-count">Viso leadų: {{ total_leads }}</span>
+      <h1 class="bn-h1" style="font-size:36px">{% translate "Leadai" %}</h1>
+      <span style="color:var(--mut);font-size:15px" id="total-leads-count">{% blocktranslate %}Viso leadų: {{ total_leads }}{% endblocktranslate %}</span>
     </div>
     <a class="bn-btn bn-btn-primary" href="{% url 'lead-create' %}" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-      Pridėti leadą
+      {% translate "Pridėti leadą" %}
     </a>
   </div>
 
   <form class="bn-toolgrid" method="get" hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true" hx-trigger="change from:find select, submit">
     <label class="bn-search">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M11 3a8 8 0 1 0 0 16 8 8 0 0 0 0-16M21 21l-4.3-4.3"></path></svg>
-      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="Paieška: vardas, įmonė, el. paštas"
+      <input class="bn-input" type="search" name="q" value="{{ query }}" placeholder="{% translate 'Paieška: vardas, įmonė, el. paštas' %}"
              hx-get="{% url 'lead-list' %}" hx-target="#lead-table-wrap" hx-push-url="true" hx-trigger="keyup changed delay:400ms">
     </label>
     <select class="bn-select" name="followup">
-      <option value="">Visi follow-up'ai</option>
-      <option value="today" {% if followup_filter == 'today' %}selected{% endif %}>Šiandien + vėluojantys</option>
-      <option value="overdue" {% if followup_filter == 'overdue' %}selected{% endif %}>Tik vėluojantys</option>
-      <option value="upcoming" {% if followup_filter == 'upcoming' %}selected{% endif %}>Būsimi</option>
+      <option value="">{% translate "Visi follow-up'ai" %}</option>
+      <option value="today" {% if followup_filter == 'today' %}selected{% endif %}>{% translate "Šiandien + vėluojantys" %}</option>
+      <option value="overdue" {% if followup_filter == 'overdue' %}selected{% endif %}>{% translate "Tik vėluojantys" %}</option>
+      <option value="upcoming" {% if followup_filter == 'upcoming' %}selected{% endif %}>{% translate "Būsimi" %}</option>
     </select>
     <select class="bn-select" name="sort">
-      <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>Paskutiniai atnaujinti</option>
-      <option value="next_follow_up" {% if sort_by == 'next_follow_up' %}selected{% endif %}>Artimiausi follow-up'ai</option>
-      <option value="-budget" {% if sort_by == '-budget' %}selected{% endif %}>Didžiausias biudžetas</option>
-      <option value="name" {% if sort_by == 'name' %}selected{% endif %}>Vardas A–Z</option>
+      <option value="-updated_at" {% if sort_by == '-updated_at' %}selected{% endif %}>{% translate "Paskutiniai atnaujinti" %}</option>
+      <option value="next_follow_up" {% if sort_by == 'next_follow_up' %}selected{% endif %}>{% translate "Artimiausi follow-up'ai" %}</option>
+      <option value="-budget" {% if sort_by == '-budget' %}selected{% endif %}>{% translate "Didžiausias biudžetas" %}</option>
+      <option value="name" {% if sort_by == 'name' %}selected{% endif %}>{% translate "Vardas A–Z" %}</option>
     </select>
   </form>
 
   <div class="bn-filters">
     <a class="bn-chip {% if not status %}is-active{% endif %}" href="?status=&q={{ query }}&followup={{ followup_filter }}&sort={{ sort_by }}"
-       hx-get="{% url 'lead-list' %}?status=&q={{ query }}&followup={{ followup_filter }}&sort={{ sort_by }}" hx-target="#lead-table-wrap" hx-push-url="true">Visi</a>
+       hx-get="{% url 'lead-list' %}?status=&q={{ query }}&followup={{ followup_filter }}&sort={{ sort_by }}" hx-target="#lead-table-wrap" hx-push-url="true">{% translate "Visi" %}</a>
     <a class="bn-chip {% if status == 'new' %}is-active{% endif %}" href="?status=new" hx-get="{% url 'lead-list' %}?status=new" hx-target="#lead-table-wrap" hx-push-url="true">
-      <span class="bn-dot bn-dot-new"></span> Naujas
+      <span class="bn-dot bn-dot-new"></span> {% translate "Naujas" %}
     </a>
     <a class="bn-chip {% if status == 'contacted' %}is-active{% endif %}" href="?status=contacted" hx-get="{% url 'lead-list' %}?status=contacted" hx-target="#lead-table-wrap" hx-push-url="true">
-      <span class="bn-dot bn-dot-contacted"></span> Susisiekta
+      <span class="bn-dot bn-dot-contacted"></span> {% translate "Susisiekta" %}
     </a>
     <a class="bn-chip {% if status == 'proposal' %}is-active{% endif %}" href="?status=proposal" hx-get="{% url 'lead-list' %}?status=proposal" hx-target="#lead-table-wrap" hx-push-url="true">
-      <span class="bn-dot bn-dot-proposal"></span> Pasiūlymas
+      <span class="bn-dot bn-dot-proposal"></span> {% translate "Pasiūlymas" %}
     </a>
     <a class="bn-chip {% if status == 'won' %}is-active{% endif %}" href="?status=won" hx-get="{% url 'lead-list' %}?status=won" hx-target="#lead-table-wrap" hx-push-url="true">
-      <span class="bn-dot bn-dot-won"></span> Laimėtas
+      <span class="bn-dot bn-dot-won"></span> {% translate "Laimėtas" %}
     </a>
     <a class="bn-chip {% if status == 'lost' %}is-active{% endif %}" href="?status=lost" hx-get="{% url 'lead-list' %}?status=lost" hx-target="#lead-table-wrap" hx-push-url="true">
-      <span class="bn-dot bn-dot-lost"></span> Prarastas
+      <span class="bn-dot bn-dot-lost"></span> {% translate "Prarastas" %}
     </a>
   </div>
 

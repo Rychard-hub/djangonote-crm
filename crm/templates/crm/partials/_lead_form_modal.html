@@ -1,8 +1,9 @@
+{% load i18n %}
 <div class="bn-modal-overlay" onclick="if(event.target===this){document.getElementById('modal').innerHTML=''}">
     <div class="bn-modal">
         <div class="bn-modal-head">
-            <h2 class="bn-modal-title">{% if mode == 'edit' %}Redaguoti leadą{% else %}Naujas leadas{% endif %}</h2>
-            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="Uždaryti">
+            <h2 class="bn-modal-title">{% if mode == 'edit' %}{% translate "Redaguoti leadą" %}{% else %}{% translate "Naujas leadas" %}{% endif %}</h2>
+            <button type="button" class="bn-close-btn" onclick="document.getElementById('modal').innerHTML=''" aria-label="{% translate 'Uždaryti' %}">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"></path></svg>
             </button>
         </div>
@@ -10,58 +11,58 @@
               hx-target="#modal" hx-swap="innerHTML" style="display:grid;gap:14px">
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="name">Vardas</label>
+                    <label for="name">{% translate "Vardas" %}</label>
                     <input id="name" name="name" class="bn-input" value="{{ lead.name|default:'' }}" required>
-                    <div class="bn-hint">Pavyzdžiui: Mantas ar „Studio X“</div>
+                    <div class="bn-hint">{% translate "Pavyzdžiui: Mantas ar „Studio X“" %}</div>
                 </div>
                 <div class="bn-field">
-                    <label for="company">Įmonė</label>
+                    <label for="company">{% translate "Įmonė" %}</label>
                     <input id="company" name="company" class="bn-input" value="{{ lead.company|default:'' }}">
                 </div>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="email">El. paštas</label>
+                    <label for="email">{% translate "El. paštas" %}</label>
                     <input id="email" name="email" type="email" class="bn-input" value="{{ lead.email|default:'' }}">
                 </div>
                 <div class="bn-field">
-                    <label for="phone">Telefonas</label>
+                    <label for="phone">{% translate "Telefonas" %}</label>
                     <input id="phone" name="phone" class="bn-input" value="{{ lead.phone|default:'' }}">
                 </div>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="source">Šaltinis</label>
-                    <input id="source" name="source" class="bn-input" value="{{ lead.source|default:'' }}" placeholder="LinkedIn, rekomendacija, svetainė">
+                    <label for="source">{% translate "Šaltinis" %}</label>
+                    <input id="source" name="source" class="bn-input" value="{{ lead.source|default:'' }}" placeholder="{% translate 'LinkedIn, rekomendacija, svetainė' %}">
                 </div>
                 <div class="bn-field">
-                    <label for="status">Statusas</label>
+                    <label for="status">{% translate "Statusas" %}</label>
                     <select id="status" name="status" class="bn-select">
-                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>Naujas</option>
-                        <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>Susisiekta</option>
-                        <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>Pasiūlymas</option>
-                        <option value="won" {% if lead.status == 'won' %}selected{% endif %}>Laimėtas</option>
-                        <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>Prarastas</option>
+                        <option value="new" {% if lead.status == 'new' %}selected{% endif %}>{% translate "Naujas" %}</option>
+                        <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>{% translate "Susisiekta" %}</option>
+                        <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>{% translate "Pasiūlymas" %}</option>
+                        <option value="won" {% if lead.status == 'won' %}selected{% endif %}>{% translate "Laimėtas" %}</option>
+                        <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>{% translate "Prarastas" %}</option>
                     </select>
                 </div>
             </div>
             <div class="bn-form-row">
                 <div class="bn-field">
-                    <label for="budget">Biudžetas, €</label>
+                    <label for="budget">{% translate "Biudžetas, €" %}</label>
                     <input id="budget" name="budget" type="number" step="0.01" class="bn-input" value="{{ lead.budget|default:'0' }}">
                 </div>
                 <div class="bn-field">
-                    <label for="next_follow_up">Kitas follow-up</label>
+                    <label for="next_follow_up">{% translate "Kitas follow-up" %}</label>
                     <input id="next_follow_up" name="next_follow_up" type="date" class="bn-input" value="{{ lead.next_follow_up|date:'Y-m-d'|default:'' }}">
                 </div>
             </div>
             <div class="bn-field">
-                <label for="notes">Poreikiai ir pastabos</label>
-                <textarea id="notes" name="notes" rows="3" class="bn-textarea" placeholder="Trumpa pastaba apie poreikį ar susitarimą">{{ lead.notes|default:'' }}</textarea>
+                <label for="notes">{% translate "Poreikiai ir pastabos" %}</label>
+                <textarea id="notes" name="notes" rows="3" class="bn-textarea" placeholder="{% translate 'Trumpa pastaba apie poreikį ar susitarimą' %}">{{ lead.notes|default:'' }}</textarea>
             </div>
             <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:6px">
-                <button type="button" class="bn-btn" onclick="document.getElementById('modal').innerHTML=''">Atšaukti</button>
-                <button type="submit" class="bn-btn bn-btn-primary">Išsaugoti</button>
+                <button type="button" class="bn-btn" onclick="document.getElementById('modal').innerHTML=''">{% translate "Atšaukti" %}</button>
+                <button type="submit" class="bn-btn bn-btn-primary">{% translate "Išsaugoti" %}</button>
             </div>
         </form>
     </div>

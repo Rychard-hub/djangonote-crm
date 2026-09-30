@@ -1,31 +1,32 @@
 {% extends 'crm/base.html' %}
+{% load i18n %}
 {% block title %}{{ lead.name }} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:18px">
   <a href="{% url 'lead-list' %}" style="justify-self:start;display:flex;align-items:center;gap:6px;color:var(--mut);text-decoration:none;font-weight:600">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>Leadai
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg>{% translate "Leadai" %}
   </a>
 
   <div class="bn-detail-head">
     <span class="bn-avatar-lg bn-badge-{{ lead.status }}">{{ lead.name|first|upper }}</span>
     <div style="flex:1;min-width:200px">
       <h1 class="bn-h1" style="font-size:38px">{{ lead.name }}</h1>
-      <div style="color:var(--mut);margin-top:4px">{{ lead.company|default:"—" }} · šaltinis: {{ lead.source|default:"—" }}</div>
+      <div style="color:var(--mut);margin-top:4px">{{ lead.company|default:"—" }} · {% blocktranslate with source=lead.source|default:"—" %}šaltinis: {{ source }}{% endblocktranslate %}</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px">
         {% include 'crm/partials/_status_badge.html' %}
         {% if is_today %}
-          <span class="bn-fu bn-fu-today">Follow-up: šiandien</span>
+          <span class="bn-fu bn-fu-today">{% translate "Follow-up: šiandien" %}</span>
         {% elif is_overdue %}
-          <span class="bn-fu bn-fu-overdue">Follow-up: vėluoja {{ days_until_followup }} d.</span>
+          <span class="bn-fu bn-fu-overdue">{% blocktranslate with days=days_until_followup %}Follow-up: vėluoja {{ days }} d.{% endblocktranslate %}</span>
         {% elif days_until_followup == 1 %}
-          <span class="bn-fu bn-fu-upcoming">Follow-up: rytoj</span>
+          <span class="bn-fu bn-fu-upcoming">{% translate "Follow-up: rytoj" %}</span>
         {% elif days_until_followup %}
-          <span class="bn-fu bn-fu-upcoming">Follow-up: po {{ days_until_followup }} d.</span>
+          <span class="bn-fu bn-fu-upcoming">{% blocktranslate with days=days_until_followup %}Follow-up: po {{ days }} d.{% endblocktranslate %}</span>
         {% endif %}
       </div>
     </div>
     <a class="bn-btn bn-btn-ghost" href="{% url 'lead-edit' lead.pk %}" hx-get="{% url 'lead-edit' lead.pk %}" hx-target="#modal" hx-swap="innerHTML">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>Redaguoti
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path></svg>{% translate "Redaguoti" %}
     </a>
   </div>
 
@@ -40,36 +41,39 @@
 
   <div class="bn-quick-row">
     <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend">
-      <input type="hidden" name="body" value="Telefoninis skambutis">
+      {% translate "Telefoninis skambutis" as call_body %}
+      {% translate "Sistema" as system_author %}
+      <input type="hidden" name="body" value="{{ call_body }}">
       <input type="hidden" name="kind" value="call">
-      <input type="hidden" name="author" value="Sistema">
+      <input type="hidden" name="author" value="{{ system_author }}">
       <button type="submit" class="bn-quick-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>Skambutis
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>{% translate "Skambutis" %}
       </button>
     </form>
     <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend">
-      <input type="hidden" name="body" value="El. laiškas išsiųstas">
+      {% translate "El. laiškas išsiųstas" as email_body %}
+      <input type="hidden" name="body" value="{{ email_body }}">
       <input type="hidden" name="kind" value="email">
-      <input type="hidden" name="author" value="Sistema">
+      <input type="hidden" name="author" value="{{ system_author }}">
       <button type="submit" class="bn-quick-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 7l-10 6L2 7"></path></svg>Laiškas
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zM22 7l-10 6L2 7"></path></svg>{% translate "Laiškas" %}
       </button>
     </form>
     <form hx-post="{% url 'lead-task-add' lead.pk %}" hx-target="#task-list" hx-swap="beforeend">
-      <input type="hidden" name="title" value="Susisiekti dėl pasiūlymo">
+      <input type="hidden" name="title" value="{% translate 'Susisiekti dėl pasiūlymo' %}">
       <button type="submit" class="bn-quick-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>Užduotis
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path></svg>{% translate "Užduotis" %}
       </button>
     </form>
     {% if lead.email %}
     <form hx-post="{% url 'lead-reminder-send' lead.pk %}" hx-target="#reminder-status" hx-swap="outerHTML">
       <button type="submit" class="bn-quick-btn">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>Priminimas
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>{% translate "Priminimas" %}
       </button>
     </form>
     {% endif %}
     <a class="bn-quick-btn" href="/billing/payment-links/new/?lead={{ lead.pk }}" hx-get="/billing/payment-links/new/?lead={{ lead.pk }}" hx-target="#modal" hx-swap="innerHTML" style="text-decoration:none">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>Mokėjimo nuoroda
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2zM2 10h20"></path></svg>{% translate "Mokėjimo nuoroda" %}
     </a>
     <span id="reminder-status"></span>
   </div>
@@ -77,22 +81,22 @@
   <div class="bn-grid-2">
     <div style="display:grid;gap:16px;order:2;min-width:0">
       <section class="bn-card">
-        <h2 class="bn-card-title">Komunikacija</h2>
+        <h2 class="bn-card-title">{% translate "Komunikacija" %}</h2>
         <div style="border:1px solid var(--line2);border-radius:12px;background:var(--bg);padding:10px">
           <form hx-post="{% url 'lead-comment-add' lead.pk %}" hx-target="#comments-list" hx-swap="beforeend"
                 hx-on::after-request="if(event.detail.successful) this.reset()">
             <div style="display:flex;gap:8px;margin-bottom:8px">
               <select name="kind" class="bn-select" style="min-height:36px;width:auto">
-                <option value="note">Pastaba</option>
-                <option value="call">Skambutis</option>
-                <option value="email">Laiškas</option>
-                <option value="message">Žinutė</option>
+                <option value="note">{% translate "Pastaba" %}</option>
+                <option value="call">{% translate "Skambutis" %}</option>
+                <option value="email">{% translate "Laiškas" %}</option>
+                <option value="message">{% translate "Žinutė" %}</option>
               </select>
-              <input type="text" name="author" placeholder="Autorius" value="Sistema" class="bn-input" style="flex:1;min-height:36px">
+              <input type="text" name="author" placeholder="{% translate 'Autorius' %}" value="{{ system_author }}" class="bn-input" style="flex:1;min-height:36px">
             </div>
-            <textarea name="body" rows="3" placeholder="Ką aptarėte?" class="bn-textarea" required></textarea>
+            <textarea name="body" rows="3" placeholder="{% translate 'Ką aptarėte?' %}" class="bn-textarea" required></textarea>
             <div style="display:flex;justify-content:flex-end;margin-top:8px">
-              <button type="submit" class="bn-btn">Pridėti įrašą</button>
+              <button type="submit" class="bn-btn">{% translate "Pridėti įrašą" %}</button>
             </div>
           </form>
         </div>
@@ -100,39 +104,39 @@
           {% for comment in comments %}
             {% include 'crm/partials/_comment_item.html' %}
           {% empty %}
-            <div class="bn-empty" id="comment-empty">Kol kas istorijos įrašų nėra.</div>
+            <div class="bn-empty" id="comment-empty">{% translate "Kol kas istorijos įrašų nėra." %}</div>
           {% endfor %}
         </div>
       </section>
 
       <section class="bn-card">
         <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px">
-          <h2 class="bn-card-title" style="margin:0">Užduotys</h2>
-          <span style="font-size:13px;color:var(--mut)">{{ completed_tasks }} / {{ total_tasks }} atlikta</span>
+          <h2 class="bn-card-title" style="margin:0">{% translate "Užduotys" %}</h2>
+          <span style="font-size:13px;color:var(--mut)">{% blocktranslate %}{{ completed_tasks }} / {{ total_tasks }} atlikta{% endblocktranslate %}</span>
         </div>
         <form hx-post="{% url 'lead-task-add' lead.pk %}" hx-target="#task-list" hx-swap="beforeend"
               hx-on::after-request="if(event.detail.successful) this.reset()" style="display:flex;gap:8px;margin-bottom:6px">
-          <input type="text" name="title" placeholder="Nauja užduotis…" class="bn-input" style="flex:1" required>
-          <button type="submit" class="bn-btn">Pridėti</button>
+          <input type="text" name="title" placeholder="{% translate 'Nauja užduotis…' %}" class="bn-input" style="flex:1" required>
+          <button type="submit" class="bn-btn">{% translate "Pridėti" %}</button>
         </form>
         <div id="task-list">
           {% for task in tasks %}
             {% include 'crm/partials/_task_item.html' %}
           {% empty %}
-            <div class="bn-empty" id="task-empty">Kol kas užduočių nėra.</div>
+            <div class="bn-empty" id="task-empty">{% translate "Kol kas užduočių nėra." %}</div>
           {% endfor %}
         </div>
       </section>
 
       <section class="bn-card">
-        <h2 class="bn-card-title">Lead'o istorijos žurnalas</h2>
+        <h2 class="bn-card-title">{% translate "Lead'o istorijos žurnalas" %}</h2>
         {% for activity in activities %}
           <div style="display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)">
             <div style="font-size:12px;color:var(--mut)">{{ activity.created_at|date:"Y-m-d H:i" }}</div>
             <div>{{ activity.action }}: {{ activity.details }}</div>
           </div>
         {% empty %}
-          <div class="bn-empty">Kol kas įrašų nėra.</div>
+          <div class="bn-empty">{% translate "Kol kas įrašų nėra." %}</div>
         {% endfor %}
       </section>
     </div>
@@ -140,27 +144,28 @@
     <div style="display:grid;gap:16px;order:1;min-width:0">
       <section class="bn-card" style="padding:6px 18px">
         <div class="bn-kv">
-          <span class="bn-kv-k">El. paštas</span>
+          <span class="bn-kv-k">{% translate "El. paštas" %}</span>
           {% if lead.email %}<a class="bn-kv-v" href="mailto:{{ lead.email }}">{{ lead.email }}</a>{% else %}<span class="bn-kv-v">—</span>{% endif %}
         </div>
         <div class="bn-kv">
-          <span class="bn-kv-k">Telefonas</span>
+          <span class="bn-kv-k">{% translate "Telefonas" %}</span>
           {% if lead.phone %}<a class="bn-kv-v" href="tel:{{ lead.phone }}">{{ lead.phone }}</a>{% else %}<span class="bn-kv-v">—</span>{% endif %}
         </div>
         <div class="bn-kv">
-          <span class="bn-kv-k">Šaltinis</span>
+          <span class="bn-kv-k">{% translate "Šaltinis" %}</span>
           <span class="bn-kv-v">{{ lead.source|default:"—" }}</span>
         </div>
       </section>
       <section class="bn-card">
-        <div style="font-size:12.5px;color:var(--mut)">Biudžetas</div>
+        <div style="font-size:12.5px;color:var(--mut)">{% translate "Biudžetas" %}</div>
         <div class="bn-serif" style="font-size:40px;line-height:1.05">{{ lead.budget }} €</div>
-        <div style="font-size:13px;color:var(--mut);margin-top:6px">Paskutinis kontaktas: <strong style="color:var(--ink)">{{ lead.last_contacted|default:"—" }}</strong></div>
-        <div style="font-size:13px;color:var(--mut);margin-top:2px">Kitas follow-up: <strong style="color:var(--ink)">{{ lead.next_follow_up|default:"—" }}</strong></div>
+        <div style="font-size:13px;color:var(--mut);margin-top:6px">{% translate "Paskutinis kontaktas:" %} <strong style="color:var(--ink)">{{ lead.last_contacted|default:"—" }}</strong></div>
+        <div style="font-size:13px;color:var(--mut);margin-top:2px">{% translate "Kitas follow-up:" %} <strong style="color:var(--ink)">{{ lead.next_follow_up|default:"—" }}</strong></div>
       </section>
       <section class="bn-notes-card">
-        <div style="font-size:12.5px;font-weight:700;color:var(--mut);margin-bottom:6px">Poreikiai ir pastabos</div>
-        <div class="bn-serif">{{ lead.notes|default:"Nėra nurodytų poreikių." }}</div>
+        <div style="font-size:12.5px;font-weight:700;color:var(--mut);margin-bottom:6px">{% translate "Poreikiai ir pastabos" %}</div>
+        {% translate "Nėra nurodytų poreikių." as notes_placeholder %}
+        <div class="bn-serif">{{ lead.notes|default:notes_placeholder }}</div>
       </section>
     </div>
   </div>

@@ -1,22 +1,23 @@
 {% extends 'crm/base_auth.html' %}
-{% block title %}Registracija | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Registracija" %} | Bussy'Note{% endblock %}
 {% block box %}
 <div class="bn-auth-tabs">
-    <a class="bn-auth-tab" href="{% url 'login' %}">Prisijungti</a>
-    <span class="bn-auth-tab is-active">Registruotis</span>
+    <a class="bn-auth-tab" href="{% url 'login' %}">{% translate "Prisijungti" %}</a>
+    <span class="bn-auth-tab is-active">{% translate "Registruotis" %}</span>
 </div>
-<h2 class="bn-auth-title">Susikurkite paskyrą</h2>
-<p class="bn-auth-sub">Užtruks mažiau nei minutę.</p>
+<h2 class="bn-auth-title">{% translate "Susikurkite paskyrą" %}</h2>
+<p class="bn-auth-sub">{% translate "Užtruks mažiau nei minutę." %}</p>
 
 <form method="post" style="display:grid;gap:14px">
     {% csrf_token %}
     {% for field in form %}
         <div class="bn-field">
             <label for="{{ field.id_for_label }}">
-                {% if field.name == 'username' %}Vartotojo vardas
-                {% elif field.name == 'email' %}El. paštas
-                {% elif field.name == 'password1' %}Slaptažodis
-                {% elif field.name == 'password2' %}Patvirtinkite slaptažodį
+                {% if field.name == 'username' %}{% translate "Vartotojo vardas" %}
+                {% elif field.name == 'email' %}{% translate "El. paštas" %}
+                {% elif field.name == 'password1' %}{% translate "Slaptažodis" %}
+                {% elif field.name == 'password2' %}{% translate "Patvirtinkite slaptažodį" %}
                 {% else %}{{ field.label }}
                 {% endif %}
             </label>
@@ -31,10 +32,10 @@
         </div>
     {% endfor %}
 
-    <button type="submit" class="bn-btn bn-btn-primary bn-btn-block" style="margin-top:4px">Sukurti paskyrą</button>
+    <button type="submit" class="bn-btn bn-btn-primary bn-btn-block" style="margin-top:4px">{% translate "Sukurti paskyrą" %}</button>
 
     <div class="bn-auth-links" style="justify-content:center">
-        <span>Jau turite paskyrą? <a href="{% url 'login' %}">Prisijungti</a></span>
+        <span>{% translate "Jau turite paskyrą?" %} <a href="{% url 'login' %}">{% translate "Prisijungti" %}</a></span>
     </div>
 </form>
 

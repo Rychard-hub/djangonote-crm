@@ -1,37 +1,38 @@
 {% extends 'crm/base_auth.html' %}
-{% block title %}Prisijungimas | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Prisijungimas" %} | Bussy'Note{% endblock %}
 {% block box %}
 <div class="bn-auth-tabs">
-    <span class="bn-auth-tab is-active">Prisijungti</span>
-    <a class="bn-auth-tab" href="{% url 'register' %}">Registruotis</a>
+    <span class="bn-auth-tab is-active">{% translate "Prisijungti" %}</span>
+    <a class="bn-auth-tab" href="{% url 'register' %}">{% translate "Registruotis" %}</a>
 </div>
-<h2 class="bn-auth-title">Sveiki sugrįžę</h2>
-<p class="bn-auth-sub">Prisijunkite prie savo užrašinės.</p>
+<h2 class="bn-auth-title">{% translate "Sveiki sugrįžę" %}</h2>
+<p class="bn-auth-sub">{% translate "Prisijunkite prie savo užrašinės." %}</p>
 
 <form method="post" style="display:grid;gap:14px">
     {% csrf_token %}
     <div class="bn-field">
-        <label for="email">El. paštas</label>
+        <label for="email">{% translate "El. paštas" %}</label>
         <input id="email" name="email" type="email" class="bn-input" placeholder="jus@imone.lt" value="{{ email }}" required autocomplete="email">
     </div>
     <div class="bn-field">
-        <label for="password">Slaptažodis</label>
+        <label for="password">{% translate "Slaptažodis" %}</label>
         <input id="password" name="password" type="password" class="bn-input" placeholder="••••••••" required autocomplete="current-password">
     </div>
     <label style="display:flex;align-items:center;gap:8px;font-weight:400;color:var(--mut)">
         <input type="checkbox" name="remember" style="width:auto;accent-color:var(--acc)">
-        Prisiminti mane
+        {% translate "Prisiminti mane" %}
     </label>
 
     {% if error %}
         <div class="bn-error-slot">{{ error }}</div>
     {% endif %}
 
-    <button type="submit" class="bn-btn bn-btn-primary bn-btn-block" style="margin-top:4px">Prisijungti →</button>
+    <button type="submit" class="bn-btn bn-btn-primary bn-btn-block" style="margin-top:4px">{% translate "Prisijungti" %} →</button>
 
     <div class="bn-auth-links">
-        <a href="{% url 'password-reset' %}">Pamiršote slaptažodį?</a>
-        <a href="{% url 'register' %}">Sukurti paskyrą</a>
+        <a href="{% url 'password-reset' %}">{% translate "Pamiršote slaptažodį?" %}</a>
+        <a href="{% url 'register' %}">{% translate "Sukurti paskyrą" %}</a>
     </div>
 </form>
 {% endblock %}

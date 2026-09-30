@@ -1,54 +1,61 @@
 {% extends 'crm/base.html' %}
-{% block title %}Apžvalga | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Apžvalga" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
   <div class="bn-toolbar">
     <div>
       <div class="bn-eyebrow">{{ today|date:"l, Y-m-d" }}</div>
-      <h1 class="bn-h1">Laba diena, {{ request.user.first_name|default:request.user.username }}.</h1>
+      <h1 class="bn-h1">{% blocktranslate with name=request.user.first_name|default:request.user.username %}Laba diena, {{ name }}.{% endblocktranslate %}</h1>
       <div class="bn-lead-line">
-        {% if due_today %}Šiandien laukia {{ due_today|length }} follow-up'{% if due_today|length == 1 %}as{% else %}ai{% endif %}.{% else %}Šiandien follow-up'ų nėra.{% endif %}
+        {% if due_today %}
+          {% with counter=due_today|length %}
+            {% if counter == 1 %}{% blocktranslate %}Šiandien laukia {{ counter }} follow-up'as.{% endblocktranslate %}
+            {% else %}{% blocktranslate %}Šiandien laukia {{ counter }} follow-up'ai.{% endblocktranslate %}
+            {% endif %}
+          {% endwith %}
+        {% else %}{% translate "Šiandien follow-up'ų nėra." %}{% endif %}
       </div>
     </div>
     <a class="bn-btn bn-btn-primary" href="{% url 'lead-create' %}" hx-get="{% url 'lead-create' %}" hx-target="#modal" hx-swap="innerHTML">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>
-      Naujas leadas
+      {% translate "Naujas leadas" %}
     </a>
   </div>
 
   <div class="bn-kpi-row">
     <a class="bn-kpi is-hl" href="{% url 'lead-list' %}?followup=today">
-      <span class="bn-kpi-label">Šiandien susisiekti</span>
+      <span class="bn-kpi-label">{% translate "Šiandien susisiekti" %}</span>
       <span class="bn-kpi-value">{{ due_today|length }}</span>
       <span class="bn-kpi-sub">follow-up'ai</span>
     </a>
     <a class="bn-kpi" href="{% url 'lead-list' %}?status=new">
-      <span class="bn-kpi-label">Nauji</span>
+      <span class="bn-kpi-label">{% translate "Nauji" %}</span>
       <span class="bn-kpi-value">{{ new_leads }}</span>
-      <span class="bn-kpi-sub">leadai</span>
+      <span class="bn-kpi-sub">{% translate "leadai" %}</span>
     </a>
     <a class="bn-kpi" href="{% url 'lead-list' %}?status=contacted">
-      <span class="bn-kpi-label">Laukia atsakymo</span>
+      <span class="bn-kpi-label">{% translate "Laukia atsakymo" %}</span>
       <span class="bn-kpi-value">{{ waiting_leads }}</span>
-      <span class="bn-kpi-sub">leadai</span>
+      <span class="bn-kpi-sub">{% translate "leadai" %}</span>
     </a>
     <a class="bn-kpi" href="{% url 'lead-list' %}?status=won">
-      <span class="bn-kpi-label">Laimėti</span>
+      <span class="bn-kpi-label">{% translate "Laimėti" %}</span>
       <span class="bn-kpi-value">{{ won_projects }}</span>
-      <span class="bn-kpi-sub">projektai</span>
+      <span class="bn-kpi-sub">{% translate "projektai" %}</span>
     </a>
     <a class="bn-kpi" href="{% url 'lead-list' %}?status=lost">
-      <span class="bn-kpi-label">Prarasti</span>
+      <span class="bn-kpi-label">{% translate "Prarasti" %}</span>
       <span class="bn-kpi-value">{{ lost_projects }}</span>
-      <span class="bn-kpi-sub">projektai</span>
+      <span class="bn-kpi-sub">{% translate "projektai" %}</span>
     </a>
   </div>
 
   <div class="bn-grid-2">
     <section class="bn-card">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px">
-        <h2 class="bn-card-title" style="margin:0">Šiandien susisiekti</h2>
-        <a href="{% url 'lead-list' %}?followup=today" style="color:var(--mut);font-size:13px;text-decoration:none">Visi →</a>
+        <h2 class="bn-card-title" style="margin:0">{% translate "Šiandien susisiekti" %}</h2>
+        <a href="{% url 'lead-list' %}?followup=today" style="color:var(--mut);font-size:13px;text-decoration:none">{% translate "Visi" %} →</a>
       </div>
       {% for lead in due_today %}
         <div class="bn-row-item">
@@ -60,15 +67,15 @@
             </span>
           </a>
           {% if lead.next_follow_up < today %}
-            <span class="bn-fu bn-fu-overdue">Vėluoja {{ today|timesince:lead.next_follow_up }}</span>
+            <span class="bn-fu bn-fu-overdue">{% blocktranslate with n=today|timesince:lead.next_follow_up %}Vėluoja {{ n }}{% endblocktranslate %}</span>
           {% else %}
-            <span class="bn-fu bn-fu-today">Šiandien</span>
+            <span class="bn-fu bn-fu-today">{% translate "Šiandien" %}</span>
           {% endif %}
         </div>
       {% empty %}
         <div class="bn-empty-hero">
-          <div class="bn-empty-hero-title">Viskas sutvarkyta.</div>
-          <div style="color:var(--mut);margin-top:2px">Šiandien niekam skambinti nereikia.</div>
+          <div class="bn-empty-hero-title">{% translate "Viskas sutvarkyta." %}</div>
+          <div style="color:var(--mut);margin-top:2px">{% translate "Šiandien niekam skambinti nereikia." %}</div>
         </div>
       {% endfor %}
     </section>
@@ -93,7 +100,7 @@
 
   <div class="bn-grid-2-even">
     <section class="bn-card">
-      <h2 class="bn-card-title">Šiandienos užduotys</h2>
+      <h2 class="bn-card-title">{% translate "Šiandienos užduotys" %}</h2>
       {% for task in today_tasks %}
         <div class="bn-task-row">
           <span class="bn-task-box" style="cursor:default">
@@ -105,12 +112,12 @@
           </div>
         </div>
       {% empty %}
-        <div class="bn-empty">Nėra šiandienos užduočių.</div>
+        <div class="bn-empty">{% translate "Nėra šiandienos užduočių." %}</div>
       {% endfor %}
     </section>
 
     <section class="bn-card">
-      <h2 class="bn-card-title">Paskutinė veikla</h2>
+      <h2 class="bn-card-title">{% translate "Paskutinė veikla" %}</h2>
       {% for activity in recent_activity %}
         <div style="display:grid;grid-template-columns:92px minmax(0,1fr);gap:12px;padding:10px 0;border-top:1px solid var(--line)">
           <div style="font-size:12px;color:var(--mut);padding-top:1px">{{ activity.created_at|date:"m-d H:i" }}</div>
@@ -120,7 +127,7 @@
           </div>
         </div>
       {% empty %}
-        <div class="bn-empty">Kol kas veiklos įrašų nėra.</div>
+        <div class="bn-empty">{% translate "Kol kas veiklos įrašų nėra." %}</div>
       {% endfor %}
     </section>
   </div>

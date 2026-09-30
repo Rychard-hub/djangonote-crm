@@ -7,7 +7,7 @@
       el.innerHTML = theme === 'dark' ? ICON_SUN : ICON_MOON;
     });
     document.querySelectorAll('[data-theme-label]').forEach(function (el) {
-      el.textContent = theme === 'dark' ? 'Šviesi tema' : 'Tamsi tema';
+      el.textContent = theme === 'dark' ? el.dataset.labelLight : el.dataset.labelDark;
     });
   }
 

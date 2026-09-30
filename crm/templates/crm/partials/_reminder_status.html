@@ -1,5 +1,6 @@
+{% load i18n %}
 {% if sent %}
-    <span id="reminder-status" style="color:var(--success);font-weight:600">Priminimas išsiųstas ✓</span>
+    <span id="reminder-status" style="color:var(--success);font-weight:600">{% translate "Priminimas išsiųstas ✓" %}</span>
 {% else %}
-    <span id="reminder-status" style="color:var(--danger);font-weight:600">Nepavyko išsiųsti (nėra el. pašto)</span>
+    <span id="reminder-status" style="color:var(--danger);font-weight:600">{% translate "Nepavyko išsiųsti (nėra el. pašto)" %}</span>
 {% endif %}
