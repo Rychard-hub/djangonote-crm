@@ -1,13 +1,14 @@
 {% extends 'crm/base.html' %}
-{% block title %}Ištrinti leadą | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Ištrinti leadą" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div class="bn-card" style="max-width:520px;margin:0 auto">
-    <h1 class="bn-h1" style="font-size:28px">Ištrinti leadą?</h1>
-    <p style="color:var(--mut)">Ar tikrai norite ištrinti leadą „{{ lead.name }}“? Šio veiksmo atšaukti negalėsite.</p>
+    <h1 class="bn-h1" style="font-size:28px">{% translate "Ištrinti leadą?" %}</h1>
+    <p style="color:var(--mut)">{% blocktranslate with name=lead.name %}Ar tikrai norite ištrinti leadą „{{ name }}“? Šio veiksmo atšaukti negalėsite.{% endblocktranslate %}</p>
     <form method="post" style="display:flex;gap:10px;margin-top:10px">
         {% csrf_token %}
-        <button type="submit" class="bn-btn bn-btn-danger">Taip, ištrinti</button>
-        <a class="bn-btn" href="{% url 'lead-detail' lead.pk %}">Atšaukti</a>
+        <button type="submit" class="bn-btn bn-btn-danger">{% translate "Taip, ištrinti" %}</button>
+        <a class="bn-btn" href="{% url 'lead-detail' lead.pk %}">{% translate "Atšaukti" %}</a>
     </form>
 </div>
 {% endblock %}

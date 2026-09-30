@@ -1,6 +1,6 @@
-{% load static %}
+{% load static i18n %}
 <!DOCTYPE html>
-<html lang="lt">
+<html lang="{{ LANGUAGE_CODE }}">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,13 +23,20 @@
       <span class="bn-brand-name">Bussy<em>'Note</em></span>
     </a>
     <div>
-      <h1 class="bn-auth-headline">{% block headline %}Kiekvienas klientas — <em>vienoje užrašinėje.</em>{% endblock %}</h1>
-      <p style="font-size:16px;color:var(--mut);max-width:38ch;margin:18px 0 0">{% block subheadline %}Leadai, follow-up'ai ir užduotys smulkiam paslaugų verslui. Be skaičiuoklių, be pamirštų skambučių.{% endblock %}</p>
+      <h1 class="bn-auth-headline">{% block headline %}{% blocktranslate %}Kiekvienas klientas — <em>vienoje užrašinėje.</em>{% endblocktranslate %}{% endblock %}</h1>
+      <p style="font-size:16px;color:var(--mut);max-width:38ch;margin:18px 0 0">{% block subheadline %}{% translate "Leadai, follow-up'ai ir užduotys smulkiam paslaugų verslui. Be skaičiuoklių, be pamirštų skambučių." %}{% endblock %}</p>
     </div>
     <div></div>
   </div>
   <div class="bn-auth-form-side">
     <div class="bn-auth-box">
+      {% get_current_language as CURRENT_LANGUAGE %}
+      <form method="post" action="{% url 'set_language' %}" class="bn-lang-switch" style="width:88px;margin:0 0 20px auto">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" name="language" value="lt" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'lt' %}is-active{% endif %}">LT</button>
+        <button type="submit" name="language" value="en" class="bn-lang-btn {% if CURRENT_LANGUAGE == 'en' %}is-active{% endif %}">EN</button>
+      </form>
       {% block box %}{% endblock %}
     </div>
   </div>

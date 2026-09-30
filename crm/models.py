@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 import uuid
 
 from accounts.models import Organization
@@ -34,11 +35,11 @@ class Profile(models.Model):
 
 class Lead(models.Model):
     STATUS_CHOICES = [
-        ('new', 'Naujas'),
-        ('contacted', 'Susisiekta'),
-        ('proposal', 'Pasiūlymas'),
-        ('won', 'Laimėtas'),
-        ('lost', 'Prarastas'),
+        ('new', _('Naujas')),
+        ('contacted', _('Susisiekta')),
+        ('proposal', _('Pasiūlymas')),
+        ('won', _('Laimėtas')),
+        ('lost', _('Prarastas')),
     ]
 
     name = models.CharField(max_length=100)
@@ -62,10 +63,10 @@ class Lead(models.Model):
 
 class Comment(models.Model):
     TYPE_CHOICES = [
-        ('note', 'Pastaba'),
-        ('call', 'Skambutis'),
-        ('email', 'El. laiškas'),
-        ('message', 'Žinutė'),
+        ('note', _('Pastaba')),
+        ('call', _('Skambutis')),
+        ('email', _('El. laiškas')),
+        ('message', _('Žinutė')),
     ]
 
     lead = models.ForeignKey(Lead, related_name='comments', on_delete=models.CASCADE)

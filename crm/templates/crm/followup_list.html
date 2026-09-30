@@ -1,8 +1,9 @@
 {% extends 'crm/base.html' %}
+{% load i18n %}
 {% block title %}Follow-up | Bussy'Note{% endblock %}
 {% block content %}
 <div style="display:grid;gap:16px">
-  <h1 class="bn-h1" style="font-size:36px">Follow-up priminimai</h1>
+  <h1 class="bn-h1" style="font-size:36px">{% translate "Follow-up priminimai" %}</h1>
   <div id="followup-content">
     {% include 'crm/partials/_followup_content.html' %}
   </div>

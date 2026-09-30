@@ -399,3 +399,480 @@ msgstr "The AI assistant is currently unavailable: %(reason)s"
 
 msgid "Atsiprašau, įvyko klaida bandant atsakyti. Bandykite dar kartą."
 msgstr "Sorry, something went wrong while replying. Please try again."
+
+msgid "Apžvalga"
+msgstr "Overview"
+
+msgid ""
+"Ar tikrai norite ištrinti leadą „%(name)s“? Šio veiksmo atšaukti negalėsite."
+msgstr ""
+"Are you sure you want to delete the lead \"%(name)s\"? This action cannot be"
+" undone."
+
+msgid "Artimiausi follow-up'ai"
+msgstr "Upcoming follow-ups"
+
+msgid "Atgal"
+msgstr "Back"
+
+msgid "Atsijungti"
+msgstr "Log out"
+
+msgid "Autorius"
+msgstr "Author"
+
+msgid "Bandyti iš naujo"
+msgstr "Try again"
+
+msgid "Biudžetas"
+msgstr "Budget"
+
+msgid "Biudžetas, €"
+msgstr "Budget, €"
+
+msgid "Būsimi"
+msgstr "Upcoming"
+
+msgid "Daugiau"
+msgstr "More"
+
+msgid "Didžiausias biudžetas"
+msgstr "Maximum budget"
+
+msgid "El. laiškas"
+msgstr "Email"
+
+msgid "El. laiškas išsiųstas"
+msgstr "Email sent"
+
+msgid "El. laiškas išsiųstas!"
+msgstr "Email sent!"
+
+msgid "El. paštas"
+msgstr "Email"
+
+msgid "Follow-up priminimai"
+msgstr "Follow-up reminders"
+
+msgid "Follow-up: po %(days)s d."
+msgstr "Follow-up: in %(days)s d."
+
+msgid "Follow-up: rytoj"
+msgstr "Follow-up: tomorrow"
+
+msgid "Follow-up: vėluoja %(days)s d."
+msgstr "Follow-up: %(days)s d. overdue"
+
+msgid "Follow-up: šiandien"
+msgstr "Follow-up: today"
+
+msgid "Grįžti į prisijungimą"
+msgstr "Back to login"
+
+msgid "Ištrinti leadą"
+msgstr "Delete lead"
+
+msgid "Ištrinti leadą?"
+msgstr "Delete lead?"
+
+msgid "Jau turite paskyrą?"
+msgstr "Already have an account?"
+
+msgid "Keisti temą"
+msgstr "Toggle theme"
+
+msgid "Kiekvienas klientas — <em>vienoje užrašinėje.</em>"
+msgstr "Every client — <em>in one notebook.</em>"
+
+msgid "Kitas follow-up"
+msgstr "Next follow-up"
+
+msgid "Kitas follow-up:"
+msgstr "Next follow-up:"
+
+msgid "Klientas"
+msgstr "Client"
+
+msgid "Kol kas istorijos įrašų nėra."
+msgstr "No history entries yet."
+
+msgid "Kol kas užduočių nėra."
+msgstr "No tasks yet."
+
+msgid "Kol kas veiklos įrašų nėra."
+msgstr "No activity entries yet."
+
+msgid "Kol kas įrašų nėra."
+msgstr "No entries yet."
+
+msgid "Komunikacija"
+msgstr "Communication"
+
+msgid "Kontaktas"
+msgstr "Contact"
+
+msgid "Ką aptarėte?"
+msgstr "What did you discuss?"
+
+msgid "Laba diena, %(name)s."
+msgstr "Good day, %(name)s."
+
+msgid "Laiko zona"
+msgstr "Time zone"
+
+msgid "Laimėtas"
+msgstr "Won"
+
+msgid "Laimėti"
+msgstr "Won"
+
+msgid "Laiškas"
+msgstr "Email"
+
+msgid "Laukia atsakymo"
+msgstr "Awaiting response"
+
+msgid "Lead'o istorijos žurnalas"
+msgstr "Lead history log"
+
+msgid "Leadai"
+msgstr "Leads"
+
+msgid ""
+"Leadai, follow-up'ai ir užduotys smulkiam paslaugų verslui. Be skaičiuoklių,"
+" be pamirštų skambučių."
+msgstr ""
+"Leads, follow-ups, and tasks for small service businesses. No spreadsheets, "
+"no forgotten calls."
+
+msgid "LinkedIn, rekomendacija, svetainė"
+msgstr "LinkedIn, referral, website"
+
+msgid "Mano verslas"
+msgstr "My business"
+
+msgid "Mokėjimo nuoroda"
+msgstr "Payment link"
+
+msgid "Nauja užduotis…"
+msgstr "New task…"
+
+msgid "Naujas"
+msgstr "New"
+
+msgid "Naujas leadas"
+msgstr "New lead"
+
+msgid "Naujas slaptažodis"
+msgstr "New password"
+
+msgid "Nauji"
+msgstr "New"
+
+msgid "Negavote laiško?"
+msgstr "Didn't receive the email?"
+
+msgid "Nepavyko išsiųsti (nėra el. pašto)"
+msgstr "Failed to send (no email address)"
+
+msgid "Neteisingas el. paštas arba slaptažodis."
+msgstr "Incorrect email or password."
+
+msgid "Nieko nerasta."
+msgstr "Nothing found."
+
+msgid "Nėra leadų"
+msgstr "No leads"
+
+msgid "Nėra nurodytų poreikių."
+msgstr "No requirements specified."
+
+msgid "Nėra pastabos"
+msgstr "No note"
+
+msgid "Nėra priminimų šiame filtre."
+msgstr "No reminders in this filter."
+
+msgid "Nėra šiandienos užduočių."
+msgstr "No tasks for today."
+
+msgid "Organizacija"
+msgstr "Organization"
+
+msgid "Paieška: vardas, įmonė, el. paštas"
+msgstr "Search: name, company, email"
+
+msgid "Palik tuščią, jei nekeičiamas"
+msgstr "Leave blank if unchanged"
+
+msgid "Pamiršote slaptažodį?"
+msgstr "Forgot your password?"
+
+msgid "Pardavimai"
+msgstr "Sales"
+
+msgid "Pasiūlymas"
+msgstr "Proposal"
+
+msgid "Paskutiniai atnaujinti"
+msgstr "Recently updated"
+
+msgid "Paskutinis kontaktas"
+msgstr "Last contact"
+
+msgid "Paskutinis kontaktas:"
+msgstr "Last contact:"
+
+msgid "Paskutinė veikla"
+msgstr "Recent activity"
+
+msgid "Pastaba"
+msgstr "Note"
+
+msgid "Pastaba pridėta"
+msgstr "Note added"
+
+msgid "Patikrinkite šlamšto (spam) aplanką arba palaukite kelias minutes."
+msgstr "Check your spam folder or wait a few minutes."
+
+msgid "Patvirtinkite slaptažodį"
+msgstr "Confirm password"
+
+msgid "Pavyzdžiui: Mantas ar „Studio X“"
+msgstr "For example: Mantas or \"Studio X\""
+
+msgid "Pažymėti atlikta"
+msgstr "Mark done"
+
+msgid "Peržiūrėti"
+msgstr "View"
+
+msgid "Poreikiai ir pastabos"
+msgstr "Requirements and notes"
+
+msgid "Prarastas"
+msgstr "Lost"
+
+msgid "Prarasti"
+msgstr "Lost"
+
+msgid "Pridėti"
+msgstr "Add"
+
+msgid "Pridėti leadą"
+msgstr "Add lead"
+
+msgid "Pridėti įrašą"
+msgstr "Add entry"
+
+msgid "Priminimas"
+msgstr "Reminder"
+
+msgid "Priminimas išsiųstas"
+msgstr "Reminder sent"
+
+msgid "Priminimas išsiųstas ✓"
+msgstr "Reminder sent ✓"
+
+msgid "Priminimų intervalas (dienos)"
+msgstr "Reminder interval (days)"
+
+msgid "Priminti"
+msgstr "Remind"
+
+msgid "Prisijungimas"
+msgstr "Login"
+
+msgid "Prisijungti"
+msgstr "Log in"
+
+msgid "Prisijunkite prie savo užrašinės."
+msgstr "Log in to your notebook."
+
+msgid "Prisiminti mane"
+msgstr "Remember me"
+
+msgid "Profilis"
+msgstr "Profile"
+
+msgid "Redaguoti leadą"
+msgstr "Edit lead"
+
+msgid "Registracija"
+msgstr "Registration"
+
+msgid "Registruotis"
+msgstr "Sign up"
+
+msgid "Sistema"
+msgstr "System"
+
+msgid "Siųsti atkūrimo nuorodą"
+msgstr "Send reset link"
+
+msgid "Skambutis"
+msgstr "Call"
+
+msgid "Slaptažodis"
+msgstr "Password"
+
+msgid "Slaptažodžio atkūrimas"
+msgstr "Password reset"
+
+msgid "Statusas"
+msgstr "Status"
+
+msgid "Statusas pakeistas į %(status)s"
+msgstr "Status changed to %(status)s"
+
+msgid "Sukurti paskyrą"
+msgstr "Create account"
+
+msgid "Susikurkite paskyrą"
+msgstr "Create your account"
+
+msgid "Susisiekta"
+msgstr "Contacted"
+
+msgid "Susisiekti dėl pasiūlymo"
+msgstr "Follow up about the proposal"
+
+msgid "Sveiki sugrįžę"
+msgstr "Welcome back"
+
+msgid "Tamsi tema"
+msgstr "Dark theme"
+
+msgid "Tavo vardas"
+msgstr "Your name"
+
+msgid "Telefonas"
+msgstr "Phone"
+
+msgid "Telefoninis skambutis"
+msgstr "Phone call"
+
+msgid "Tik vėluojantys"
+msgstr "Overdue only"
+
+msgid "Toliau"
+msgstr "Next"
+
+msgid "Trumpa pastaba apie poreikį ar susitarimą"
+msgstr "A brief note about the requirement or agreement"
+
+msgid "Užduotis"
+msgstr "Task"
+
+msgid "Užduotys"
+msgstr "Tasks"
+
+msgid "Užtruks mažiau nei minutę."
+msgstr "Takes less than a minute."
+
+msgid "Vardas"
+msgstr "Name"
+
+msgid "Vardas / pavardė"
+msgstr "First / last name"
+
+msgid "Vardas / Įmonė"
+msgstr "Name / Company"
+
+msgid "Vardas A–Z"
+msgstr "Name A–Z"
+
+msgid "Vartotojas su tokiu el. paštu jau užregistruotas."
+msgstr "A user with this email is already registered."
+
+msgid "Vartotojas su tokiu el. paštu nerastas"
+msgstr "No user found with this email"
+
+msgid "Vartotojo vardas"
+msgstr "Username"
+
+msgid "Veiksmas"
+msgstr "Action"
+
+msgid "Visi follow-up'ai"
+msgstr "All follow-ups"
+
+msgid "Viskas sutvarkyta."
+msgstr "All caught up."
+
+msgid "Viso leadų: %(total_leads)s"
+msgstr "Total leads: %(total_leads)s"
+
+msgid "Vėluoja"
+msgstr "Overdue"
+
+msgid "Vėluoja %(n)s"
+msgstr "Overdue by %(n)s"
+
+msgid "leadai"
+msgstr "leads"
+
+msgid "projektai"
+msgstr "projects"
+
+msgid "pvz. studioX"
+msgstr "e.g. studioX"
+
+msgid "%(completed_tasks)s / %(total_tasks)s atlikta"
+msgstr "%(completed_tasks)s / %(total_tasks)s done"
+
+msgid "Įmonė"
+msgstr "Company"
+
+msgid "Įrankiai"
+msgstr "Tools"
+
+msgid ""
+"Įveskite savo el. paštą ir atsiųsime nuorodą naujam slaptažodžiui nustatyti."
+msgstr "Enter your email and we'll send you a link to set a new password."
+
+msgid "Šaltinis"
+msgstr "Source"
+
+msgid "Šiandien"
+msgstr "Today"
+
+msgid "Šiandien + vėluojantys"
+msgstr "Today + overdue"
+
+msgid "Šiandien follow-up'ų nėra."
+msgstr "No follow-ups today."
+
+msgid "Šiandien laukia %(counter)s follow-up'ai."
+msgstr "%(counter)s follow-ups waiting today."
+
+msgid "Šiandien laukia %(counter)s follow-up'as."
+msgstr "%(counter)s follow-up waiting today."
+
+msgid "Šiandien niekam skambinti nereikia."
+msgstr "No calls needed today."
+
+msgid "Šiandien susisiekti"
+msgstr "Contact today"
+
+msgid "Šiandienos užduotys"
+msgstr "Today's tasks"
+
+msgid "Šią savaitę"
+msgstr "This week"
+
+msgid "Šviesi tema"
+msgstr "Light theme"
+
+msgid "šaltinis: %(source)s"
+msgstr "source: %(source)s"
+
+msgid "Žinutė"
+msgstr "Message"
+
+msgid ""
+"Išsiuntėme slaptažodžio atkūrimo nuorodą į jūsų el. paštą. Patikrinkite "
+"pašto dėžutę ir spauskite nuorodą, kad nustatytumėte naują slaptažodį."
+msgstr ""
+"We have sent a password reset link to your email. Check your inbox and click"
+" the link to set a new password."

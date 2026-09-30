@@ -1,21 +1,22 @@
+{% load i18n %}
 <div class="bn-filters">
     <a class="bn-chip {% if filter_type == 'today' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=today"
-       hx-get="{% url 'followup-list' %}?filter=today" hx-target="#followup-content" hx-push-url="true">Šiandien</a>
+       hx-get="{% url 'followup-list' %}?filter=today" hx-target="#followup-content" hx-push-url="true">{% translate "Šiandien" %}</a>
     <a class="bn-chip {% if filter_type == 'overdue' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=overdue"
-       hx-get="{% url 'followup-list' %}?filter=overdue" hx-target="#followup-content" hx-push-url="true">Vėluoja</a>
+       hx-get="{% url 'followup-list' %}?filter=overdue" hx-target="#followup-content" hx-push-url="true">{% translate "Vėluoja" %}</a>
     <a class="bn-chip {% if filter_type == 'week' %}is-active{% endif %}" href="{% url 'followup-list' %}?filter=week"
-       hx-get="{% url 'followup-list' %}?filter=week" hx-target="#followup-content" hx-push-url="true">Šią savaitę</a>
+       hx-get="{% url 'followup-list' %}?filter=week" hx-target="#followup-content" hx-push-url="true">{% translate "Šią savaitę" %}</a>
 </div>
 
 <div class="bn-table-wrap">
 <table class="bn-table">
     <thead>
         <tr>
-            <th>Klientas</th>
-            <th>Paskutinis kontaktas</th>
-            <th>Kitas follow-up</th>
-            <th>Statusas</th>
-            <th>Veiksmas</th>
+            <th>{% translate "Klientas" %}</th>
+            <th>{% translate "Paskutinis kontaktas" %}</th>
+            <th>{% translate "Kitas follow-up" %}</th>
+            <th>{% translate "Statusas" %}</th>
+            <th>{% translate "Veiksmas" %}</th>
         </tr>
     </thead>
     <tbody>
@@ -36,7 +37,7 @@
                         {% if lead.next_follow_up < today %}
                             <span class="bn-fu bn-fu-overdue">{{ lead.next_follow_up }}</span>
                         {% elif lead.next_follow_up == today %}
-                            <span class="bn-fu bn-fu-today">Šiandien</span>
+                            <span class="bn-fu bn-fu-today">{% translate "Šiandien" %}</span>
                         {% else %}
                             <span class="bn-fu bn-fu-upcoming">{{ lead.next_follow_up }}</span>
                         {% endif %}
@@ -49,14 +50,14 @@
                     <form method="post" action="{% url 'lead-quick-action' lead.pk %}">
                         {% csrf_token %}
                         <input type="hidden" name="action" value="reminder">
-                        <button type="submit" class="bn-btn bn-btn-sm">Pažymėti atlikta</button>
+                        <button type="submit" class="bn-btn bn-btn-sm">{% translate "Pažymėti atlikta" %}</button>
                     </form>
                 </td>
             </tr>
         {% empty %}
             <tr><td colspan="5">
                 <div style="padding:40px 20px;text-align:center">
-                    <div class="bn-serif-i" style="font-size:26px">Nėra priminimų šiame filtre.</div>
+                    <div class="bn-serif-i" style="font-size:26px">{% translate "Nėra priminimų šiame filtre." %}</div>
                 </div>
             </td></tr>
         {% endfor %}

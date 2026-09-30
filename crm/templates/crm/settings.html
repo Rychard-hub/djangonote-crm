@@ -1,35 +1,36 @@
 {% extends 'crm/base.html' %}
-{% block title %}Nustatymai | Bussy'Note{% endblock %}
+{% load i18n %}
+{% block title %}{% translate "Nustatymai" %} | Bussy'Note{% endblock %}
 {% block content %}
 <div style="max-width:640px;margin:0 auto;display:grid;gap:16px">
-  <h1 class="bn-h1" style="font-size:36px">Nustatymai</h1>
+  <h1 class="bn-h1" style="font-size:36px">{% translate "Nustatymai" %}</h1>
   <section class="bn-card">
-    <h2 class="bn-card-title">Profilis</h2>
+    <h2 class="bn-card-title">{% translate "Profilis" %}</h2>
     <form method="post" style="display:grid;gap:14px">
       {% csrf_token %}
       <div class="bn-field">
-        <label>Vardas / pavardė</label>
-        <input class="bn-input" type="text" name="full_name" value="{{ full_name }}" placeholder="Tavo vardas">
+        <label>{% translate "Vardas / pavardė" %}</label>
+        <input class="bn-input" type="text" name="full_name" value="{{ full_name }}" placeholder="{% translate 'Tavo vardas' %}">
       </div>
       <div class="bn-field">
-        <label>El. paštas</label>
+        <label>{% translate "El. paštas" %}</label>
         <input class="bn-input" type="email" name="email" value="{{ email }}" placeholder="tavo@email.com">
       </div>
       <div class="bn-field">
-        <label>Naujas slaptažodis</label>
-        <input class="bn-input" type="password" name="password" placeholder="Palik tuščią, jei nekeičiamas">
+        <label>{% translate "Naujas slaptažodis" %}</label>
+        <input class="bn-input" type="password" name="password" placeholder="{% translate 'Palik tuščią, jei nekeičiamas' %}">
       </div>
       <div class="bn-field">
-        <label>Organizacija</label>
-        <input class="bn-input" type="text" name="organization" value="{{ organization }}" placeholder="pvz. studioX">
+        <label>{% translate "Organizacija" %}</label>
+        <input class="bn-input" type="text" name="organization" value="{{ organization }}" placeholder="{% translate 'pvz. studioX' %}">
       </div>
       <div class="bn-form-row">
         <div class="bn-field">
-          <label>Priminimų intervalas (dienos)</label>
+          <label>{% translate "Priminimų intervalas (dienos)" %}</label>
           <input class="bn-input" type="number" name="reminder_days" min="1" value="{{ reminder_days }}">
         </div>
         <div class="bn-field">
-          <label>Laiko zona</label>
+          <label>{% translate "Laiko zona" %}</label>
           <select class="bn-select" name="timezone">
             <option value="Europe/Vilnius" {% if timezone == 'Europe/Vilnius' %}selected{% endif %}>Europe/Vilnius</option>
             <option value="UTC" {% if timezone == 'UTC' %}selected{% endif %}>UTC</option>
@@ -37,7 +38,7 @@
         </div>
       </div>
       <div>
-        <button type="submit" class="bn-btn bn-btn-primary">Išsaugoti</button>
+        <button type="submit" class="bn-btn bn-btn-primary">{% translate "Išsaugoti" %}</button>
       </div>
     </form>
   </section>
