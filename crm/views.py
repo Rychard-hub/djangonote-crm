@@ -437,8 +437,14 @@ def lead_delete_view(request, pk):
 def lead_status_update_view(request, pk):
     lead = get_object_or_404(Lead, pk=pk, organization=get_organization(request.user))
     if request.method == 'POST':
-        lead.status = request.POST.get('status', lead.status)
-        lead.save()
+        new_status = request.POST.get('status', lead.status)
+        if new_status in dict(Lead.STATUS_CHOICES):
+            lead.status = new_status
+            lead.save()
+            Activity.objects.create(lead=lead, action='status_change', details=_('Statusas pakeistas į %(status)s') % {'status': lead.get_status_display()}, created_by=request.user)
+
+    if request.headers.get('HX-Request'):
+        return render(request, 'crm/partials/_lead_status_select.html', {'lead': lead})
     return redirect('lead-list')
 
 

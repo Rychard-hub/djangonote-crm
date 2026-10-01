@@ -1,0 +1,13 @@
+{% load i18n %}
+<select name="status" id="lead-status-select-{{ lead.pk }}"
+        hx-post="{% url 'lead-status-update' lead.pk %}"
+        hx-trigger="change"
+        hx-target="#lead-status-select-{{ lead.pk }}"
+        hx-swap="outerHTML"
+        class="bn-badge bn-badge-{{ lead.status }}" style="border:0;appearance:none;-webkit-appearance:none;cursor:pointer">
+    <option value="new" {% if lead.status == 'new' %}selected{% endif %}>{% translate "Naujas" %}</option>
+    <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>{% translate "Susisiekta" %}</option>
+    <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>{% translate "Pasiūlymas" %}</option>
+    <option value="won" {% if lead.status == 'won' %}selected{% endif %}>{% translate "Laimėtas" %}</option>
+    <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>{% translate "Prarastas" %}</option>
+</select>
