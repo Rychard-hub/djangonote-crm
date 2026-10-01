@@ -22,6 +22,8 @@ from django.urls import path, include
 from crm.views import (
     dashboard_view,
     followup_list_view,
+    followup_toast_view,
+    followup_toast_dismiss_view,
     pipeline_view,
     settings_view,
     lead_comment_add_view,
@@ -59,6 +61,8 @@ urlpatterns = [
     path('password-reset/', password_reset_view, name='password-reset'),
     path('dashboard/', dashboard_view, name='dashboard'),
     path('followups/', followup_list_view, name='followup-list'),
+    path('followups/toast/', followup_toast_view, name='followup-toast'),
+    path('followups/toast/dismiss/', followup_toast_dismiss_view, name='followup-toast-dismiss'),
     path('pipeline/', pipeline_view, name='pipeline'),
     path('settings/', settings_view, name='settings'),
     path('leads/', lead_list_view, name='lead-list'),

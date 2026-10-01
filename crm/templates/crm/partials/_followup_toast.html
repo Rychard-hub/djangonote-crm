@@ -1,0 +1,15 @@
+{% load i18n %}
+<div class="bn-toast" role="status">
+    <div class="bn-toast-body">
+        {% if count == 1 %}
+            {% blocktranslate with counter=count %}Šiandien laukia {{ counter }} follow-up'as.{% endblocktranslate %}
+        {% else %}
+            {% blocktranslate with counter=count %}Šiandien laukia {{ counter }} follow-up'ai.{% endblocktranslate %}
+        {% endif %}
+    </div>
+    <div class="bn-toast-actions">
+        <a href="{% url 'followup-list' %}?filter=today" class="bn-btn bn-btn-sm bn-btn-primary">{% translate "Peržiūrėti" %}</a>
+        <button type="button" class="bn-toast-close" aria-label="{% translate 'Uždaryti' %}"
+                hx-post="{% url 'followup-toast-dismiss' %}" hx-target="#followup-toast-container" hx-swap="innerHTML">&times;</button>
+    </div>
+</div>
