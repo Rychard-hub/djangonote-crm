@@ -29,16 +29,7 @@
                     <small style="color:var(--mut)">{{ lead.phone }}</small>
                 </td>
                 <td>
-                    <form method="post" action="{% url 'lead-status-update' lead.pk %}" style="display:inline;">
-                        {% csrf_token %}
-                        <select name="status" onchange="this.form.submit()" class="bn-badge bn-badge-{{ lead.status }}" style="border:0;appearance:none;-webkit-appearance:none;cursor:pointer">
-                            <option value="new" {% if lead.status == 'new' %}selected{% endif %}>{% translate "Naujas" %}</option>
-                            <option value="contacted" {% if lead.status == 'contacted' %}selected{% endif %}>{% translate "Susisiekta" %}</option>
-                            <option value="proposal" {% if lead.status == 'proposal' %}selected{% endif %}>{% translate "Pasiūlymas" %}</option>
-                            <option value="won" {% if lead.status == 'won' %}selected{% endif %}>{% translate "Laimėtas" %}</option>
-                            <option value="lost" {% if lead.status == 'lost' %}selected{% endif %}>{% translate "Prarastas" %}</option>
-                        </select>
-                    </form>
+                    {% include 'crm/partials/_lead_status_select.html' with lead=lead %}
                 </td>
                 <td>{{ lead.last_contacted|default:"—" }}</td>
                 <td>
