@@ -19,6 +19,8 @@
 </head>
 <body hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'>
 <div id="modal"></div>
+<div id="followup-toast-container" class="bn-toast-container"
+     hx-get="{% url 'followup-toast' %}" hx-trigger="load, every 30s" hx-swap="innerHTML"></div>
 
 <div class="bn-shell">
   <aside class="bn-sidebar">

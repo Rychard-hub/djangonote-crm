@@ -204,6 +204,37 @@ def followup_list_view(request):
     return render(request, 'crm/followup_list.html', context)
 
 
+FOLLOWUP_TOAST_SESSION_KEY = 'dismissed_followup_toast_lead_ids'
+
+
+def _due_followup_leads(user):
+    today = timezone.localdate()
+    return Lead.objects.filter(
+        organization=get_organization(user),
+        next_follow_up__lte=today,
+    ).exclude(status__in=['won', 'lost']).order_by('next_follow_up')
+
+
+@login_required(login_url='login')
+def followup_toast_view(request):
+    dismissed_ids = set(request.session.get(FOLLOWUP_TOAST_SESSION_KEY, []))
+    due_leads = _due_followup_leads(request.user).exclude(pk__in=dismissed_ids)
+    count = due_leads.count()
+    if count == 0:
+        return HttpResponse('')
+    return render(request, 'crm/partials/_followup_toast.html', {'count': count})
+
+
+@login_required(login_url='login')
+def followup_toast_dismiss_view(request):
+    if request.method == 'POST':
+        due_ids = list(_due_followup_leads(request.user).values_list('pk', flat=True))
+        dismissed_ids = set(request.session.get(FOLLOWUP_TOAST_SESSION_KEY, []))
+        dismissed_ids.update(due_ids)
+        request.session[FOLLOWUP_TOAST_SESSION_KEY] = list(dismissed_ids)
+    return HttpResponse('')
+
+
 PIPELINE_STAGES = Lead.STATUS_CHOICES
 
 
