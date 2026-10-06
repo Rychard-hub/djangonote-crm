@@ -14,8 +14,7 @@
     {% for field in form %}
         <div class="bn-field">
             <label for="{{ field.id_for_label }}">
-                {% if field.name == 'username' %}{% translate "Vartotojo vardas" %}
-                {% elif field.name == 'email' %}{% translate "El. paštas" %}
+                {% if field.name == 'email' %}{% translate "El. paštas" %}
                 {% elif field.name == 'password1' %}{% translate "Slaptažodis" %}
                 {% elif field.name == 'password2' %}{% translate "Patvirtinkite slaptažodį" %}
                 {% else %}{{ field.label }}

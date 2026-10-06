@@ -876,3 +876,67 @@ msgid ""
 msgstr ""
 "We have sent a password reset link to your email. Check your inbox and click"
 " the link to set a new password."
+
+msgid "Įveskite naują slaptažodį du kartus."
+msgstr "Enter your new password twice."
+
+msgid "Išsaugoti naują slaptažodį"
+msgstr "Save new password"
+
+msgid "Nuoroda nebegalioja"
+msgstr "Link no longer valid"
+
+msgid "Ši slaptažodžio atkūrimo nuoroda jau panaudota arba nebegalioja."
+msgstr "This password reset link has already been used or has expired."
+
+msgid "Gauti naują nuorodą"
+msgstr "Get a new link"
+
+msgid "Slaptažodis pakeistas"
+msgstr "Password changed"
+
+msgid "Slaptažodis pakeistas!"
+msgstr "Password changed!"
+
+msgid "Dabar galite prisijungti naudodami naują slaptažodį."
+msgstr "You can now log in with your new password."
+
+msgid "El. paštas patvirtintas"
+msgstr "Email confirmed"
+
+msgid "El. paštas patvirtintas!"
+msgstr "Email confirmed!"
+
+msgid "Ačiū, jūsų el. paštas sėkmingai patvirtintas."
+msgstr "Thank you, your email has been successfully confirmed."
+
+msgid "Į pagrindinį puslapį"
+msgstr "Go to dashboard"
+
+msgid ""
+"Patvirtinimo nuorodos galiojimas baigėsi. Prisijunkite ir paprašykite naujo "
+"laiško."
+msgstr "This confirmation link has expired. Log in and request a new email."
+
+msgid "Neteisinga nuoroda"
+msgstr "Invalid link"
+
+msgid ""
+"Ši patvirtinimo nuoroda neteisinga. Patikrinkite, ar nukopijavote ją visą."
+msgstr ""
+"This confirmation link is invalid. Check that you copied the whole link."
+
+msgid ""
+"Patvirtinkite el. paštą, kad galėtumėte atkurti slaptažodį ir gauti "
+"priminimus."
+msgstr ""
+"Confirm your email so you can reset your password and receive reminders."
+
+msgid "Siųsti patvirtinimo laišką iš naujo"
+msgstr "Resend confirmation email"
+
+msgid "Patvirtinimo laiškas išsiųstas iš naujo."
+msgstr "Confirmation email sent again."
+
+msgid "Laiško išsiųsti nepavyko. Bandykite vėliau."
+msgstr "Failed to send the email. Please try again later."

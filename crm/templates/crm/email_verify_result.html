@@ -1,0 +1,18 @@
+{% extends 'crm/base_auth.html' %}
+{% load i18n %}
+{% block title %}{% translate "El. paštas patvirtintas" %} | Bussy'Note{% endblock %}
+{% block box %}
+{% if status == 'ok' %}
+<h2 class="bn-auth-title">{% translate "El. paštas patvirtintas!" %}</h2>
+<p class="bn-auth-sub">{% translate "Ačiū, jūsų el. paštas sėkmingai patvirtintas." %}</p>
+<a class="bn-btn bn-btn-primary bn-btn-block" href="{% url 'dashboard' %}">{% translate "Į pagrindinį puslapį" %}</a>
+{% elif status == 'expired' %}
+<h2 class="bn-auth-title">{% translate "Nuoroda nebegalioja" %}</h2>
+<p class="bn-auth-sub">{% translate "Patvirtinimo nuorodos galiojimas baigėsi. Prisijunkite ir paprašykite naujo laiško." %}</p>
+<a class="bn-btn bn-btn-primary bn-btn-block" href="{% url 'login' %}">{% translate "Prisijungti" %}</a>
+{% else %}
+<h2 class="bn-auth-title">{% translate "Neteisinga nuoroda" %}</h2>
+<p class="bn-auth-sub">{% translate "Ši patvirtinimo nuoroda neteisinga. Patikrinkite, ar nukopijavote ją visą." %}</p>
+<a class="bn-btn bn-btn-primary bn-btn-block" href="{% url 'login' %}">{% translate "Prisijungti" %}</a>
+{% endif %}
+{% endblock %}

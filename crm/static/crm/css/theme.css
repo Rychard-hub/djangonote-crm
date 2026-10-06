@@ -311,6 +311,9 @@ table.bn-table { width: 100%; border-collapse: collapse; min-width: 720px; }
 @media (max-width: 700px) { .bn-modal-overlay { align-items: flex-end; padding: 0; } .bn-modal { border-radius: 20px 20px 0 0; max-height: 92%; } }
 
 .bn-error-slot { padding: 10px 12px; border-radius: 10px; background: var(--danger-bg); color: var(--danger); font-size: 13px; font-weight: 600; }
+.bn-verify-banner { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin: 16px 16px 0; padding: 12px 16px; border-radius: 12px; background: var(--st-contacted-bg); color: var(--st-contacted-fg); font-size: 14px; font-weight: 600; }
+.bn-verify-banner form { margin: 0; }
+.bn-flash { margin: 16px 16px 0; }
 .bn-success-slot { padding: 10px 12px; border-radius: 10px; background: var(--success-bg); color: var(--success); font-size: 13px; font-weight: 600; }
 
 .bn-toast-container { position: fixed; z-index: 60; bottom: 20px; right: 20px; left: auto; width: 100%; max-width: 360px; pointer-events: none; }

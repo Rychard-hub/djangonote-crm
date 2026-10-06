@@ -124,6 +124,21 @@
       </button>
     </header>
 
+    {% if request.user.is_authenticated %}
+      {% if not request.user.profile.email_verified %}
+        <div class="bn-verify-banner">
+          <span>{% translate "Patvirtinkite el. paštą, kad galėtumėte atkurti slaptažodį ir gauti priminimus." %}</span>
+          <form method="post" action="{% url 'resend-verification' %}">
+            {% csrf_token %}
+            <button type="submit" class="bn-btn bn-btn-sm">{% translate "Siųsti patvirtinimo laišką iš naujo" %}</button>
+          </form>
+        </div>
+      {% endif %}
+      {% for message in messages %}
+        <div class="{% if message.tags == 'error' %}bn-error-slot{% else %}bn-success-slot{% endif %} bn-flash">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
     <main class="bn-container">
       {% block content %}{% endblock %}
     </main>
