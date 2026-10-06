@@ -1,25 +1,27 @@
+import logging
+import smtplib
 from django import forms
 from datetime import timedelta
 
+from django.conf import settings
+from django.contrib import messages
 from django.db.models import Sum
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm, PasswordResetForm
+from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.contrib.auth.views import PasswordResetConfirmView
 from django.core.mail import send_mail
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils import timezone
-from django.utils.encoding import force_bytes
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.template.loader import render_to_string
 from django.utils.translation import gettext as _
 
 from accounts.models import Organization, get_organization
-from .models import Activity, Comment, Lead, Task, Profile
+from .models import Activity, Comment, EmailVerification, Lead, Task, Profile
+
+logger = logging.getLogger(__name__)
 
 
 class EmailUserCreationForm(UserCreationForm):
@@ -27,7 +29,7 @@ class EmailUserCreationForm(UserCreationForm):
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password1', 'password2')
+        fields = ('email',)
 
     def clean_email(self):
         email = self.cleaned_data['email']
@@ -73,6 +75,23 @@ def logout_view(request):
     return redirect('login')
 
 
+def _send_verification_email(request, user):
+    verification = EmailVerification.objects.create(user=user)
+    verification_link = request.build_absolute_uri(reverse('verify-email', args=[verification.token]))
+    message = render_to_string('crm/email/email_verification.txt', {'verification_link': verification_link})
+    try:
+        send_mail(
+            "Patvirtinkite savo el. paštą - Bussy'note",
+            message,
+            settings.DEFAULT_FROM_EMAIL,
+            [user.email],
+        )
+    except (smtplib.SMTPException, OSError):
+        logger.exception('Nepavyko išsiųsti patvirtinimo laiško vartotojui %s', user.pk)
+        return False
+    return True
+
+
 def register_view(request):
     if request.method == 'POST':
         form = EmailUserCreationForm(request.POST)
@@ -80,6 +99,7 @@ def register_view(request):
             user = form.save()
             Profile.objects.create(user=user)
             Organization.objects.create_for_user(user)
+            _send_verification_email(request, user)
             login(request, user)
             return redirect('dashboard')
     else:
@@ -88,39 +108,34 @@ def register_view(request):
     return render(request, 'crm/register.html', {'form': form})
 
 
-def password_reset_view(request):
-    if request.method == 'POST':
-        form = PasswordResetForm(request.POST)
-        if form.is_valid():
-            email = form.cleaned_data['email']
-            try:
-                user = User.objects.get(email=email)
-                token = default_token_generator.make_token(user)
-                uid = urlsafe_base64_encode(force_bytes(user.pk))
-                
-                # Siunčiame el. laišką (testavimui - tiesiog atspausdinam)
-                reset_link = f"http://127.0.0.1:8000/reset/{uid}/{token}/"
-                
-                # Galima siųsti tikru el. laišką jeigu nustatyta
-                try:
-                    send_mail(
-                        "Slaptažodžio atkūrimas - Bussy'note",
-                        f'Sveiki,\n\nNorėdami atkurti savo slaptažodį, spauskite šią nuorodą:\n{reset_link}\n\nJei jūs neprašėte slaptažodžio atkūrimo, ignoruokite šį laišką.',
-                        'noreply@freelancer-crm.lt',
-                        [email],
-                        fail_silently=True,
-                    )
-                except:
-                    # Testavimui - tiesiog rodome nuorodą
-                    pass
-                
-                return render(request, 'crm/password_reset_done.html', {'email': email})
-            except User.DoesNotExist:
-                form.add_error('email', _('Vartotojas su tokiu el. paštu nerastas'))
+def verify_email_view(request, token):
+    verification = EmailVerification.objects.select_related('user').filter(token=token).first()
+    if verification is None:
+        status = 'invalid'
+    elif verification.is_used:
+        status = 'ok'
+    elif verification.is_expired():
+        status = 'expired'
     else:
-        form = PasswordResetForm()
-    
-    return render(request, 'crm/password_reset.html', {'form': form})
+        profile, _created = Profile.objects.get_or_create(user=verification.user)
+        profile.email_verified = True
+        profile.save(update_fields=['email_verified'])
+        verification.is_used = True
+        verification.save(update_fields=['is_used'])
+        status = 'ok'
+    return render(request, 'crm/email_verify_result.html', {'status': status})
+
+
+@login_required(login_url='login')
+def resend_verification_view(request):
+    if request.method == 'POST':
+        profile, _created = Profile.objects.get_or_create(user=request.user)
+        if not profile.email_verified:
+            if _send_verification_email(request, request.user):
+                messages.success(request, _('Patvirtinimo laiškas išsiųstas iš naujo.'))
+            else:
+                messages.error(request, _('Laiško išsiųsti nepavyko. Bandykite vėliau.'))
+    return redirect('dashboard')
 
 
 def _pipeline_stage_stats(user_leads):

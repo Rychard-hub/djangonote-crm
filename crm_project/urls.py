@@ -17,7 +17,8 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path, include
+from django.contrib.auth import views as auth_views
+from django.urls import path, include, reverse_lazy
 
 from crm.views import (
     dashboard_view,
@@ -40,8 +41,9 @@ from crm.views import (
     lead_task_add_view,
     login_view,
     logout_view,
-    password_reset_view,
     register_view,
+    resend_verification_view,
+    verify_email_view,
     task_toggle_view,
     health_check,
 )
@@ -58,7 +60,24 @@ urlpatterns = [
     path('', login_view, name='login'),
     path('logout/', logout_view, name='logout'),
     path('register/', register_view, name='register'),
-    path('password-reset/', password_reset_view, name='password-reset'),
+    path('password-reset/', auth_views.PasswordResetView.as_view(
+        template_name='crm/password_reset.html',
+        email_template_name='crm/email/password_reset.txt',
+        subject_template_name='crm/email/password_reset_subject.txt',
+        success_url=reverse_lazy('password-reset-done'),
+    ), name='password-reset'),
+    path('password-reset/done/', auth_views.PasswordResetDoneView.as_view(
+        template_name='crm/password_reset_done.html',
+    ), name='password-reset-done'),
+    path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(
+        template_name='crm/password_reset_confirm.html',
+        success_url=reverse_lazy('password-reset-complete'),
+    ), name='password-reset-confirm'),
+    path('reset/done/', auth_views.PasswordResetCompleteView.as_view(
+        template_name='crm/password_reset_complete.html',
+    ), name='password-reset-complete'),
+    path('verify-email/resend/', resend_verification_view, name='resend-verification'),
+    path('verify-email/<uuid:token>/', verify_email_view, name='verify-email'),
     path('dashboard/', dashboard_view, name='dashboard'),
     path('followups/', followup_list_view, name='followup-list'),
     path('followups/toast/', followup_toast_view, name='followup-toast'),

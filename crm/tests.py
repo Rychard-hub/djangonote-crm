@@ -1,13 +1,16 @@
+import re
 from datetime import timedelta
 from unittest.mock import patch
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core import mail
 from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 
 from accounts.models import get_organization
-from crm.models import Activity, Comment, Lead, Task
+from crm.models import Activity, Comment, EmailVerification, Lead, Profile, Task
 
 
 def authenticate_test_client(client):
@@ -194,3 +197,82 @@ class LeadManagementTests(TestCase):
         self.assertContains(response, 'Vėluoja')
         self.assertContains(response, 'Šią savaitę')
         self.assertContains(response, 'Asta')
+
+
+class EmailVerificationAndPasswordResetTests(TestCase):
+    password = 'Sup3rSecret!pw'
+
+    def register(self, email='new@example.com'):
+        return self.client.post(reverse('register'), {
+            'email': email,
+            'password1': self.password,
+            'password2': self.password,
+        })
+
+    def verification_token_from_outbox(self):
+        match = re.search(r'/verify-email/([0-9a-f-]{36})/', mail.outbox[-1].body)
+        return match.group(1)
+
+    def test_register_sends_verification_email_and_shows_banner_until_verified(self):
+        response = self.register()
+        self.assertRedirects(response, reverse('dashboard'), fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertEqual(mail.outbox[0].to, ['new@example.com'])
+        self.assertContains(self.client.get(reverse('dashboard')), 'bn-verify-banner')
+
+        user = User.objects.get(email='new@example.com')
+        self.assertEqual(user.username, 'new@example.com')
+
+    def test_verification_link_marks_profile_verified_and_hides_banner(self):
+        self.register()
+        token = self.verification_token_from_outbox()
+
+        response = self.client.get(reverse('verify-email', args=[token]))
+        self.assertContains(response, 'El. paštas patvirtintas')
+        self.assertTrue(Profile.objects.get(user__email='new@example.com').email_verified)
+        self.assertNotContains(self.client.get(reverse('dashboard')), 'bn-verify-banner')
+
+    def test_expired_verification_link_is_rejected(self):
+        self.register()
+        token = self.verification_token_from_outbox()
+        EmailVerification.objects.filter(token=token).update(created_at=timezone.now() - timedelta(days=2))
+
+        self.client.get(reverse('verify-email', args=[token]))
+        self.assertFalse(Profile.objects.get(user__email='new@example.com').email_verified)
+
+    def test_resend_sends_new_email_only_while_unverified(self):
+        self.register()
+        self.client.post(reverse('resend-verification'))
+        self.assertEqual(len(mail.outbox), 2)
+
+        token = self.verification_token_from_outbox()
+        self.client.get(reverse('verify-email', args=[token]))
+        self.client.post(reverse('resend-verification'))
+        self.assertEqual(len(mail.outbox), 2)
+
+    def test_password_reset_sends_confirm_link_to_registered_email(self):
+        User.objects.create_user(username='reset@example.com', email='reset@example.com', password=self.password)
+
+        response = self.client.post(reverse('password-reset'), {'email': 'reset@example.com'})
+        self.assertRedirects(response, reverse('password-reset-done'), fetch_redirect_response=False)
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertEqual(mail.outbox[0].from_email, settings.DEFAULT_FROM_EMAIL)
+        self.assertRegex(mail.outbox[0].body, r'http://testserver/reset/[^/]+/[^/]+/')
+
+    def test_reset_link_lets_user_set_new_password(self):
+        user = User.objects.create_user(username='reset@example.com', email='reset@example.com', password=self.password)
+        self.client.post(reverse('password-reset'), {'email': 'reset@example.com'})
+        link = re.search(r'http://testserver(/reset/[^\s]+/)', mail.outbox[0].body).group(1)
+
+        first = self.client.get(link, follow=True)
+        self.assertContains(first, 'Naujas slaptažodis')
+        set_password_url = first.redirect_chain[-1][0]
+
+        response = self.client.post(set_password_url, {
+            'new_password1': 'An0ther!Secret',
+            'new_password2': 'An0ther!Secret',
+        })
+        self.assertRedirects(response, reverse('password-reset-complete'), fetch_redirect_response=False)
+        user.refresh_from_db()
+        self.assertTrue(user.check_password('An0ther!Secret'))
