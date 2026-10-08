@@ -312,6 +312,12 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 # handle ImageProviderNotConfigured gracefully rather than crashing.
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY", "")
 
+# Twilio (SMS follow-ups) -- crm tasks handle TwilioNotConfigured
+# gracefully rather than crashing when unset.
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+TWILIO_FROM_NUMBER = os.getenv("TWILIO_FROM_NUMBER", "")
+
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------

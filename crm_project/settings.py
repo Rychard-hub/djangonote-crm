@@ -285,6 +285,12 @@ ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 # rather than crashing.
 STABILITY_API_KEY = os.getenv('STABILITY_API_KEY', '')
 
+# Twilio settings (SMS follow-ups) -- unset in dev; crm tasks handle
+# TwilioNotConfigured gracefully rather than crashing.
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
+TWILIO_FROM_NUMBER = os.getenv('TWILIO_FROM_NUMBER', '')
+
 if not EMAIL_BACKEND:
     if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

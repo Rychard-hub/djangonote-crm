@@ -1,0 +1,1 @@
+Hi {{ lead.name }}, this is a quick follow-up from {{ company }}. Just checking in - let us know if you have any questions or would like to move forward!
