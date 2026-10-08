@@ -285,6 +285,14 @@ ANTHROPIC_API_KEY = os.getenv('ANTHROPIC_API_KEY', '')
 # rather than crashing.
 STABILITY_API_KEY = os.getenv('STABILITY_API_KEY', '')
 
+# Twilio settings (SMS follow-ups) -- platform-wide account credentials;
+# unset in dev. crm tasks handle TwilioNotConfigured gracefully rather than
+# crashing. The sending number itself is per-organization
+# (Organization.twilio_from_number), not a setting here, so one tenant's
+# messages never go out under another tenant's number.
+TWILIO_ACCOUNT_SID = os.getenv('TWILIO_ACCOUNT_SID', '')
+TWILIO_AUTH_TOKEN = os.getenv('TWILIO_AUTH_TOKEN', '')
+
 if not EMAIL_BACKEND:
     if EMAIL_HOST_USER and EMAIL_HOST_PASSWORD:
         EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

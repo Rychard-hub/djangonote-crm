@@ -11,6 +11,7 @@ from django.utils import timezone
 from django.db import models
 from celery import shared_task
 from .models import Lead, Activity, Profile
+from .services import TwilioNotConfigured, send_sms
 
 logger = logging.getLogger(__name__)
 
@@ -296,6 +297,54 @@ def send_welcome_email(lead_id):
         
     except Exception as e:
         logger.error(f"Error sending welcome email to lead {lead_id}: {str(e)}")
+        raise
+
+@shared_task(name='crm.tasks.send_sms_followup')
+def send_sms_followup(lead_id):
+    """
+    Send an SMS follow-up reminder to a lead's phone via Twilio
+    """
+    try:
+        lead = Lead.objects.get(id=lead_id)
+
+        if not lead.phone:
+            logger.warning(f"Skipping SMS follow-up for lead {lead.id}: no phone number on file")
+            return f"No phone number for lead {lead_id}"
+
+        from_number = lead.organization.twilio_from_number
+        if not from_number:
+            logger.warning(
+                f"Skipping SMS follow-up for lead {lead.id}: organization "
+                f"{lead.organization_id} has no twilio_from_number configured"
+            )
+            return f"No Twilio sender number configured for organization {lead.organization_id}"
+
+        context = {
+            'lead': lead,
+            'company': lead.company or 'Your Company',
+        }
+
+        body = render_to_string('crm/sms/follow_up_reminder.txt', context).strip()
+
+        send_sms(to=lead.phone, body=body, from_number=from_number)
+
+        # Log activity
+        Activity.objects.create(
+            lead=lead,
+            action='sms_sent',
+            details=f"SMS follow-up sent to {lead.phone}",
+            created_by=lead.owner
+        )
+
+        logger.info(f"SMS follow-up sent to lead {lead.id}")
+        return f"SMS follow-up sent to {lead.phone}"
+
+    except TwilioNotConfigured as e:
+        logger.error(f"Twilio not configured, skipping SMS follow-up for lead {lead_id}: {str(e)}")
+        return f"Twilio not configured: {str(e)}"
+
+    except Exception as e:
+        logger.error(f"Error sending SMS follow-up to lead {lead_id}: {str(e)}")
         raise
 
 @shared_task(name='crm.tasks.process_mcp_request')

@@ -312,6 +312,14 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 # handle ImageProviderNotConfigured gracefully rather than crashing.
 STABILITY_API_KEY = os.getenv("STABILITY_API_KEY", "")
 
+# Twilio (SMS follow-ups) -- platform-wide account credentials; crm tasks
+# handle TwilioNotConfigured gracefully rather than crashing when unset.
+# The sending number itself is per-organization (Organization.twilio_from_number),
+# not a setting here, so one tenant's messages never go out under another
+# tenant's number.
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID", "")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN", "")
+
 # --------------------------------------------------
 # SECURITY
 # --------------------------------------------------

@@ -23,6 +23,13 @@ class Organization(models.Model):
     name = models.CharField(max_length=150)
     slug = models.SlugField(unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    twilio_from_number = models.CharField(
+        max_length=20,
+        blank=True,
+        help_text="This organization's own Twilio SMS sender number (E.164, e.g. +15551234567). "
+                   "Leads only receive SMS once this is set, so each organization's messages come "
+                   "from a number specific to them rather than a number shared across all tenants.",
+    )
 
     objects = OrganizationManager()
 
