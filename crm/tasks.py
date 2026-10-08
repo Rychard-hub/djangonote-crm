@@ -311,6 +311,14 @@ def send_sms_followup(lead_id):
             logger.warning(f"Skipping SMS follow-up for lead {lead.id}: no phone number on file")
             return f"No phone number for lead {lead_id}"
 
+        from_number = lead.organization.twilio_from_number
+        if not from_number:
+            logger.warning(
+                f"Skipping SMS follow-up for lead {lead.id}: organization "
+                f"{lead.organization_id} has no twilio_from_number configured"
+            )
+            return f"No Twilio sender number configured for organization {lead.organization_id}"
+
         context = {
             'lead': lead,
             'company': lead.company or 'Your Company',
@@ -318,7 +326,7 @@ def send_sms_followup(lead_id):
 
         body = render_to_string('crm/sms/follow_up_reminder.txt', context).strip()
 
-        send_sms(to=lead.phone, body=body)
+        send_sms(to=lead.phone, body=body, from_number=from_number)
 
         # Log activity
         Activity.objects.create(
