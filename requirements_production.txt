@@ -24,10 +24,11 @@ whitenoise==6.6.0
 django-storages==1.14.4
 boto3==1.35.36
 
-# AI content generation (Anthropic + Stability AI) and Stripe payments
+# AI content generation (Anthropic + Stability AI), Stripe payments, and Twilio SMS
 anthropic>=0.40.0
 stripe>=10.0.0
 requests>=2.31.0
+twilio>=9.0.0
 
 # Email
 # Add your email backend if needed (e.g., django-anymail for SendGrid, Mailgun, etc.)
